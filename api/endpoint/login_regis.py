@@ -1,4 +1,5 @@
 import os
+import string
 
 from fastapi import Depends, UploadFile, File, APIRouter
 from passlib.context import CryptContext
@@ -47,3 +48,24 @@ def test():
 def upload(file: UploadFile = File(...)):
     filename = uploadFile(file)
     return {"filename": filename}
+
+
+@router.post("/test1")
+def test1():
+    return {
+        [{
+            "ab": "a",
+            "cd": "c"
+        },
+            {
+                "ab1": "a",
+                "cd1": "c"
+            }]
+    }
+
+
+@router.post("/test2/{var}")
+def test2(var: string):
+    return {
+        [var, var, var]
+    }
