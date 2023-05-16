@@ -5,10 +5,13 @@ from passlib.context import CryptContext
 
 from schemas.login import LoginRequest
 from security.security import gen_token, check_token
+from upload.upload import uploadFile
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
 fake_db = []
 router = APIRouter()
+
+
 def get_hashed_pass(password: str):
     return pwd_context.hash(password)
 
@@ -23,9 +26,11 @@ def regis(request: LoginRequest):
     fake_db.append(obj_in)
     print(fake_db[0].get('username'))
 
+
 @router.post("/login")
 def login(request: LoginRequest):
-    if request.username == fake_db[0].get('username') and pwd_context.verify(request.password,fake_db[0].get('hashedpassword')):
+    if request.username == fake_db[0].get('username') and pwd_context.verify(request.password,
+                                                                             fake_db[0].get('hashedpassword')):
         return gen_token(request.username)
     return {"Not"}
 
@@ -40,13 +45,5 @@ def test():
 
 @router.post("/upload")
 def upload(file: UploadFile = File(...)):
-    try:
-        os.makedirs("test_folder")
-    except Exception as e:
-        print(e)
-    filename = os.getcwd() + "/test_folder/" + file.filename.replace(" ", "-")
-    with open(filename, "wb+") as f:
-        f.write(file.file.read())
-        f.close()
-
+    filename = uploadFile(file)
     return {"filename": filename}

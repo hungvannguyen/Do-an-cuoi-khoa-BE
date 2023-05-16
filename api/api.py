@@ -1,5 +1,10 @@
-from api.endpoint import login_regis
 from fastapi import APIRouter
+
+from endpoint import (
+    login_regis,
+
+    )
+
 
 api_router = APIRouter()
 
