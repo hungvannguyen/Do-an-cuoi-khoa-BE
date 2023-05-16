@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from endpoint import (
+from .endpoint import (
     login_regis,
 
     )

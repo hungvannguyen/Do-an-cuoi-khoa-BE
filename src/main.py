@@ -4,6 +4,7 @@ from fastapi import FastAPI, Depends, UploadFile, File
 from passlib.context import CryptContext
 
 from api.api import api_router
+from security.security import check_token
 
 app = FastAPI()
 
@@ -15,7 +16,7 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/hello/{name}")
+@app.get("/hello/{name}", dependencies=Depends(check_token))
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
