@@ -12,11 +12,11 @@ app.include_router(api_router)
 
 
 @app.get("/")
-async def root():
+def root():
     return {"message": "Hello World"}
 
 
 @app.get("/hello/{name}", dependencies=[Depends(check_token)])
-async def say_hello(name: str):
+def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
