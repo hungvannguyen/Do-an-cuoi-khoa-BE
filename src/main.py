@@ -16,7 +16,7 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.get("/hello/{name}", dependencies=Depends(check_token))
+@app.get("/hello/{name}", dependencies=[Depends(check_token)])
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
