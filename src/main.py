@@ -1,12 +1,9 @@
-import os
 
-from fastapi import FastAPI, Depends, UploadFile, File
-from passlib.context import CryptContext
+from fastapi import FastAPI
 import models
 from api.api import api_router
-from security.security import check_token
 from fastapi.middleware.cors import CORSMiddleware
-from database.db import SessionLocal, engine, Base
+from database.db import engine
 
 
 origins = [

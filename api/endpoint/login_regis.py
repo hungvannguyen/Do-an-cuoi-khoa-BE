@@ -3,13 +3,17 @@ import os
 from fastapi import Depends, UploadFile, File, APIRouter
 from passlib.context import CryptContext
 
+import schemas.token
 from schemas.login import LoginRequest
-from security.security import gen_token, check_token
+from security.security import gen_token
+from database import deps
 from upload.upload import uploadFile
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
 fake_db = []
 router = APIRouter()
+
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
 
 
 def get_hashed_pass(password: str):
@@ -35,11 +39,12 @@ def login(request: LoginRequest):
     return {"Not"}
 
 
-@router.get("/test", dependencies=[Depends(check_token)])
-def test():
+@router.get("/test")
+def test(token: schemas.token.TokenPayload = Depends(deps.get_current_user)):
     return {
         'title': "abc",
-        'content': "content"
+        'content': "content",
+        'user': token
     }
 
 
