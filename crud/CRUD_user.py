@@ -11,7 +11,7 @@ from crud.base import CRUDBase
 from constants import Const
 
 
-class CRUDUser(CRUDBase[User, schemas.user.UserRegis, schemas.user.UserInfo]):
+class CRUDUser(CRUDBase[User]):
 
     def get_user(self, db: Session, id):
         data_db = db.query(User).filter(
@@ -42,4 +42,6 @@ class CRUDUser(CRUDBase[User, schemas.user.UserRegis, schemas.user.UserInfo]):
             return {"result": "Success"}
 
 
-CRUD_user = CRUDUser(User)
+
+
+crud_user = CRUDUser(User)

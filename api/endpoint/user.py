@@ -5,7 +5,7 @@ from passlib.context import CryptContext
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from crud.CRUD_user import CRUD_user
+from crud.CRUD_user import crud_user
 import schemas.user
 from database import deps
 from schemas.login import LoginRequest
@@ -16,5 +16,6 @@ router = APIRouter()
 
 
 @router.post("/regis")
-def create_user(request: schemas.user.UserRegis, db: Session = Depends(deps.get_db) ):
-    return CRUD_user.create_user(db=db, request=request)
+def create_user(request: schemas.user.UserRegis, db: Session = Depends(deps.get_db)):
+    return crud_user.create_user(db=db, request=request)
+
