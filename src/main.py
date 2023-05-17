@@ -2,10 +2,12 @@ import os
 
 from fastapi import FastAPI, Depends, UploadFile, File
 from passlib.context import CryptContext
-
+import models
 from api.api import api_router
 from security.security import check_token
 from fastapi.middleware.cors import CORSMiddleware
+from database.db import SessionLocal, engine, Base
+
 
 origins = [
     "http://localhost.tiangolo.com",
@@ -13,6 +15,8 @@ origins = [
     "http://localhost:3000",
     "http://localhost:8080",
 ]
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.add_middleware(
@@ -24,14 +28,4 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
-
-
-@app.get("/")
-def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}", dependencies=[Depends(check_token)])
-def say_hello(name: str):
-    return {"message": f"Hello {name}"}
 

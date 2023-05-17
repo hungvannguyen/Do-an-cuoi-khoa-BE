@@ -52,7 +52,7 @@ def upload(file: UploadFile = File(...)):
 @router.post("/test1")
 def test1():
     return {
-        "result" : [{
+        "result": [{
             "ab": "a",
             "cd": "c"
         },
@@ -66,5 +66,5 @@ def test1():
 @router.post("/test2/{var}")
 def test2(var: str):
     return {
-        "result" : [var, var, var]
+        "result": [var, var, var]
     }
