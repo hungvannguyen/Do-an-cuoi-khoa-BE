@@ -2,14 +2,11 @@ from datetime import datetime, timedelta, time
 from typing import Union, Any, Optional
 from fastapi.security.utils import get_authorization_scheme_param
 import jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, APIKeyHeader
+from fastapi import HTTPException, status
+from fastapi.security import APIKeyHeader
 from passlib.context import CryptContext
-from pydantic import ValidationError
 
 from constants import Const
-from schemas.token import TokenPayload
-from schemas.user import UserInfo
 
 
 Authorization = APIKeyHeader(name='Authorization')

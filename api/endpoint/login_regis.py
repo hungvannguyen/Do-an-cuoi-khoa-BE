@@ -13,8 +13,6 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
 fake_db = []
 router = APIRouter()
 
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
-
 
 def get_hashed_pass(password: str):
     return pwd_context.hash(password)
@@ -42,8 +40,6 @@ def login(request: LoginRequest):
 @router.get("/test")
 def test(token: schemas.token.TokenPayload = Depends(deps.get_current_user)):
     return {
-        'title': "abc",
-        'content': "content",
         'user': token
     }
 
