@@ -20,5 +20,11 @@ class UserRegis(BaseModel):
     password: str
 
 
+class UserUpdatePassword(BaseModel):
+    current_password: str
+    password: str
+    password_repeat: str
+
+
 class UserLogin(UserRegis):
     pass

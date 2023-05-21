@@ -42,6 +42,7 @@ def gen_token(user) -> Any:
     )
     to_encode = {
         "exp": expire,
+        "id": user['id'],
         "name": user['name'],
         "address": user['address'],
         "phone_number": user['phone_number'],

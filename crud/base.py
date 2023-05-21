@@ -1,5 +1,5 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
-
+from datetime import datetime
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -27,7 +27,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db.query(self.model).filter(self.model.id == id).first()
 
     def get_multi(
-        self, db: Session, *, skip: int = 0, limit: int = 100
+            self, db: Session, *, skip: int = 0, limit: int = 100
     ) -> List[ModelType]:
         return db.query(self.model).offset(skip).limit(limit).all()
 
@@ -40,12 +40,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     def update(
-        self,
-        db: Session,
-        *,
-        db_obj: ModelType,
-        obj_in: Union[UpdateSchemaType, Dict[str, Any]]
+            self,
+            db: Session,
+            db_obj: Any,
+            obj_in: Union[UpdateSchemaType, Dict[str, Any]],
+            admin_id: Any
     ) -> ModelType:
+        db_obj.update_id = admin_id
+        db_obj.update_at = datetime.utcnow()
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -57,10 +59,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
-        return db_obj
+        return {
+            'detail': "Đã cập nhật thành công"
+        }
 
-    def remove(self, db: Session, *, id: int) -> ModelType:
-        obj = db.query(self.model).get(id)
-        db.delete(obj)
+    def delete(self, db: Session, *, db_obj: Any, admin_id: int) -> ModelType:
+        db_obj.delete_id = admin_id
+        db_obj.delete_at = datetime.utcnow()
+        db_obj.delete_flag = 1
+        db.add(db_obj)
         db.commit()
-        return obj
+        db.refresh(db_obj)
+        return {
+            'detail': "Đã xoá thành công"
+        }

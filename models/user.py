@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, BigInteger
 
 from models.BaseModel import BaseDBModel
 from database.db import Base
@@ -7,7 +7,7 @@ from database.db import Base
 class User(Base, BaseDBModel):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True, unique=True)
+    id = Column(BigInteger, primary_key=True, index=True, unique=True)
     account = Column(String(255), unique=True, index=True)
     password = Column(String(255), nullable=False)
     name = Column(String(255), nullable=True)
