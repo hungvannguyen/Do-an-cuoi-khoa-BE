@@ -8,6 +8,6 @@ class BaseDBModel:
     insert_at = Column(DateTime, nullable=False, default=datetime.now())
     update_id = Column(BigInteger, nullable=False, default=1)
     update_at = Column(DateTime, nullable=False, default=datetime.now())
-    delete_id = Column(BigInteger)
-    delete_at = Column(DateTime, default=None)
+    delete_id = Column(BigInteger, nullable=True)
+    delete_at = Column(DateTime, nullable=True)
     delete_flag = Column(Integer, index=True, default=0, nullable=False)

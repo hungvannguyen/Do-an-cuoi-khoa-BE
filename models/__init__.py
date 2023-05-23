@@ -1,6 +1,7 @@
 from models import (
     user,
-    category
+    category,
+    address
 )
 
 from database.db import Base
