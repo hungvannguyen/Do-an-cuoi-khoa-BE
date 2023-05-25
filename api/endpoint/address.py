@@ -1,9 +1,12 @@
 import os
+from typing import Any
 
 from fastapi import Depends, UploadFile, File, APIRouter, status
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
+
+import crud.api_add
 from security.security import verify_password
 from fastapi.encoders import jsonable_encoder
 from crud.CRUD_address import crud_address
@@ -40,3 +43,9 @@ def update_address(request: AddressUpdate, db: Session = Depends(deps.get_db),
 def delete_address(user_id: int, db: Session = Depends(deps.get_db),
                    token: TokenPayload = Depends(deps.get_admin_user)):
     return crud_address.delete_address(user_id=user_id, db=db, admin_id=token.id)
+
+
+@router.post("/abc")
+def abc(db: Session = Depends(deps.get_db)):
+    data = crud.api_add.data_api
+    return crud_address.abcd(data, db)

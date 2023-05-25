@@ -1,7 +1,10 @@
 from models import (
     user,
     category,
-    address
+    address,
+    city,
+    district,
+    ward
 )
 
 from database.db import Base

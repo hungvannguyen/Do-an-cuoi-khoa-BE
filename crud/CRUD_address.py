@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import Any
 
@@ -5,6 +6,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 
+import models.city
 from models.address import Address
 from schemas.address import AddressInfo, AddressCreate, AddressUpdate
 from crud.base import CRUDBase
@@ -27,7 +29,7 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail=f"User ID #{request.user_id} đã có Đị̣a chỉ")
         request = request.dict()
-        data_db = self.model(**request, insert_id=user_id, update_id=user_id, user_id = user_id)
+        data_db = self.model(**request, insert_id=user_id, update_id=user_id, user_id=user_id)
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
@@ -54,6 +56,27 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         return {
             'detail': "Đã xoá"
         }
+
+    def abcd(self, data, db: Session):
+        data_obj = json.loads(data)
+        for item in data_obj:
+            city = models.city.City(name = item['name'])
+            db.add(city)
+            db.commit()
+            db.refresh(city)
+            city_id = city.id
+            for item2 in item['districts']:
+                district = models.district.District(city_id = city_id, name = item2['name'])
+                db.add(district)
+                db.commit()
+                db.refresh(district)
+                district_id = district.id
+                for item3 in item2['wards']:
+                    ward = models.ward.Ward(city_id = city_id, district_id = district_id, name = item3['name'])
+                    db.add(ward)
+                    db.commit()
+                    db.refresh(ward)
+        return "success"
 
 
 crud_address = CRUDAddress(Address)
