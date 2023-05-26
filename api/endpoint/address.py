@@ -20,11 +20,29 @@ router = APIRouter()
 @router.get("/")
 def get_address_by_user_id(db: Session = Depends(deps.get_db),
                            token: TokenPayload = Depends(deps.get_current_user)):
-    data_db = crud_address.get_address_by_user_id(user_id=token.id, db=db)
+    data_db = crud_address.get_address_info_by_user_id(user_id=token.id, db=db)
     if not data_db:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail=f"User ID #{token.id} chưa có Địa chỉ nào")
     return data_db
+
+
+@router.get("/city/all")
+def get_all_city(db: Session = Depends(deps.get_db),
+                 token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_address.get_all_cities(db=db)
+
+
+@router.get("/district/{city_id}")
+def get_all_districts(city_id: int, db: Session = Depends(deps.get_db),
+                      token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_address.get_all_districts(city_id=city_id, db=db)
+
+
+@router.get("/ward/{city_id}/{district_id}")
+def get_all_wards(city_id: int, district_id: int, db: Session = Depends(deps.get_db),
+                  token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_address.get_all_wards(city_id=city_id, district_id=district_id, db=db)
 
 
 @router.post("/create")

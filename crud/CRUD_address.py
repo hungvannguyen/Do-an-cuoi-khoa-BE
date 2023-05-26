@@ -1,12 +1,13 @@
 import json
 from datetime import datetime
 from typing import Any
-
+import pandas as pd
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
-
-import models.city
+from models.district import District
+from models.city import City
+from models.ward import Ward
 from models.address import Address
 from schemas.address import AddressInfo, AddressCreate, AddressUpdate
 from crud.base import CRUDBase
@@ -15,8 +16,51 @@ from security.security import hash_password, verify_password
 
 
 class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
+
+    def get_all_cities(self, db: Session):
+        data_db = db.query(City).all()
+        return data_db
+
+    def get_city_by_id(self, city_id, db: Session):
+        data_db = db.query(City).filter(City.id == city_id).first()
+        return data_db
+
+    def get_all_districts(self, city_id, db: Session):
+        data_db = db.query(District).filter(District.city_id == city_id).all()
+        return data_db
+
+    def get_district_by_id(self, district_id, db: Session):
+        data_db = db.query(District).filter(District.id == district_id).first()
+        return data_db
+
+    def get_all_wards(self, city_id, district_id, db: Session):
+        data_db = db.query(Ward).filter(Ward.city_id == city_id, Ward.district_id == district_id).all()
+        return data_db
+
+    def get_ward_by_id(self, ward_id, db: Session):
+        data_db = db.query(Ward).filter(Ward.id == ward_id).first()
+        return data_db
+
+    def get_address_info_by_user_id(self, user_id, db: Session):
+        data_db = db.query(self.model). \
+            filter(
+            self.model.user_id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        city = self.get_city_by_id(city_id=data_db.city, db=db)
+        district = self.get_district_by_id(district_id=data_db.district, db=db)
+        ward = self.get_ward_by_id(ward_id=data_db.ward, db=db)
+        return {
+            'user_id': user_id,
+            'city': city.name,
+            'district': district.name,
+            'ward': ward.name,
+            'detail': data_db.detail
+        }
+
     def get_address_by_user_id(self, user_id, db: Session):
-        data_db = db.query(self.model).filter(
+        data_db = db.query(self.model). \
+            filter(
             self.model.user_id == user_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
@@ -60,19 +104,19 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
     def abcd(self, data, db: Session):
         data_obj = json.loads(data)
         for item in data_obj:
-            city = models.city.City(name = item['name'])
+            city = City(name=item['name'])
             db.add(city)
             db.commit()
             db.refresh(city)
             city_id = city.id
             for item2 in item['districts']:
-                district = models.district.District(city_id = city_id, name = item2['name'])
+                district = District(city_id=city_id, name=item2['name'])
                 db.add(district)
                 db.commit()
                 db.refresh(district)
                 district_id = district.id
                 for item3 in item2['wards']:
-                    ward = models.ward.Ward(city_id = city_id, district_id = district_id, name = item3['name'])
+                    ward = Ward(city_id=city_id, district_id=district_id, name=item3['name'])
                     db.add(ward)
                     db.commit()
                     db.refresh(ward)
