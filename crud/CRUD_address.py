@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 from typing import Any
-import pandas as pd
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
