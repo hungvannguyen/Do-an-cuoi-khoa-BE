@@ -44,7 +44,7 @@ def gen_token(user) -> Any:
         "exp": expire,
         "id": user['id'],
         "name": user['name'],
-        "address": user['address'],
+        "email": user['email'],
         "phone_number": user['phone_number'],
         "role_id": user['role_id']
     }

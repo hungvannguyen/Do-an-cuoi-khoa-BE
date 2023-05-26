@@ -11,7 +11,7 @@ class User(Base, BaseDBModel):
     account = Column(String(255), unique=True, index=True)
     password = Column(String(255), nullable=False)
     name = Column(String(255), nullable=True)
-    address = Column(String(255), nullable=True)
+    email = Column(String(255), nullable=True)
     phone_number = Column(String(10), nullable=True)
     role_id = Column(Integer, nullable=False, default=99)
 
