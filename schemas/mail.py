@@ -8,5 +8,3 @@ class MailCreate(BaseModel, Config):
     mail_to: str
     title: str
     content: str
-    img: Optional[str]
-    file: Optional[str]
