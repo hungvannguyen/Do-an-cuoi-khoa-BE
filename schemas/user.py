@@ -10,7 +10,7 @@ class UserBase(BaseModel, Config):
 
 
 class UserInfo(UserBase):
-    address: Optional[str]
+    email: Optional[str]
     phone_number: Optional[str]
     role_id: int
 

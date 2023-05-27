@@ -29,6 +29,11 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         ).first()
         return data_db
 
+    def get_user_info(self, db: Session, id):
+        data_db = self.get_user_by_id(db, id)
+        data_db = jsonable_encoder(data_db)
+        return data_db
+
     def login(self, db: Session, account, password):
         data_db = db.query(self.model).filter(
             User.account == account,
@@ -58,12 +63,12 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             db.refresh(data_db)
             return {"result": "Tạo thành công"}
 
-    def create_admin(self, db: Session, request) -> Any:
+    def create_admin(self, db: Session, request, role_id) -> Any:
         request = request.dict()
         password = request['password']
         hashed_password = hash_password(password)
         request['password'] = hashed_password
-        data_db = self.model(**request,role_id = 1)
+        data_db = self.model(**request,role_id = role_id)
         db.add(data_db)
         db.commit()
         db.refresh(data_db)

@@ -53,9 +53,7 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
 
     def update_category(self, request, id, db: Session, admin_id):
         data_db = self.get_category_by_id(id, db)
-        if not data_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=f"Danh mục ID #{id} không tồn tại")
+
         self.update(db_obj=data_db, obj_in=request, db=db, admin_id=admin_id)
         return {
             'detail': "Cập nhật thành công"

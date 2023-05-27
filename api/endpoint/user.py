@@ -4,6 +4,8 @@ from fastapi import Depends, UploadFile, File, APIRouter, status
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
+
+import schemas.user
 from security.security import verify_password
 from fastapi.encoders import jsonable_encoder
 from crud.CRUD_user import crud_user
@@ -19,9 +21,9 @@ def create_user(request: UserRegis, db: Session = Depends(deps.get_db)):
     return crud_user.create_user(db=db, request=request)
 
 
-@router.post("/admin")
-def create_admin(request: UserRegis, db: Session = Depends(deps.get_db)):
-    return crud_user.create_admin(db=db, request=request)
+@router.post("/admin/{role_id}")
+def create_admin(request: UserRegis, role_id: int, db: Session = Depends(deps.get_db)):
+    return crud_user.create_admin(db=db, request=request, role_id=role_id)
 
 
 @router.post("/login")
@@ -49,3 +51,8 @@ def update_password(request: UserUpdatePassword, db: Session = Depends(deps.get_
 @router.get("/password/reset/{account_id}")
 def reset_password(account_id, db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_admin_user)):
     return crud_user.reset_password(db, account_id, token.role_id)
+
+
+@router.get("/info", response_model=schemas.user.UserInfo)
+def get_user_info(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_user.get_user_info(db=db, id=token.id)
