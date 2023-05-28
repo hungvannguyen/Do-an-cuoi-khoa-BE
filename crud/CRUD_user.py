@@ -51,11 +51,17 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Mật khẩu không khớp")
         data_db = db.query(self.model).filter(
             self.model.account == request.account,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        email_db = db.query(self.model).filter(
             self.model.email == request.email,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         )
-        if data_db.count():
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tài khoản/Email này đã tồn tại")
+        if email_db:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Email này đã tồn tại")
+        if data_db:
+
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tài khoản này đã tồn tại")
         else:
             request = request.dict()
             password = request['password']
