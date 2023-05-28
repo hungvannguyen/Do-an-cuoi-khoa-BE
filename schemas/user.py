@@ -18,6 +18,7 @@ class UserInfo(UserBase):
 class UserRegis(BaseModel):
     account: str
     password: str
+    confirm_password: str
 
 
 class UserUpdatePassword(BaseModel):

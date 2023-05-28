@@ -46,6 +46,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tài khoản hoặc mật khẩu không chính xác")
 
     def create_user(self, db: Session, request) -> Any:
+        if not request.password == request.confirm_password:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Mật khẩu không khớp")
         data_db = db.query(self.model).filter(
             self.model.account == request.account,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
