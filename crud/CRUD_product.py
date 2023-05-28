@@ -4,8 +4,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
-import models
-import schemas.user
+from crud.CRUD_category import crud_category
 from models.product import Product
 from schemas.product import *
 from crud.base import CRUDBase
@@ -39,12 +38,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         return data_db
 
     def create_product(self, request, db: Session, admin_id):
-        request = request.dict()
 
-        data_db = self.model(**request, insert_id=admin_id, update_id=admin_id)
-        db.add(data_db)
-        db.commit()
-        db.refresh(data_db)
+        request = request.dict()
+        cat_id = request['cat_id']
+        if crud_category.get_category_by_id(db=db, id=cat_id):
+            data_db = self.model(**request, insert_id=admin_id, update_id=admin_id)
+            db.add(data_db)
+            db.commit()
+            db.refresh(data_db)
         return {
             'detail': "Tạo thành công"
         }

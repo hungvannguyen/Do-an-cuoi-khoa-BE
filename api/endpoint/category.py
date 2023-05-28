@@ -26,13 +26,13 @@ def get_category_by_id(cat_id: int, db: Session = Depends(deps.get_db)):
 
 @router.post("/add")
 def create_category(request: CategoryCreate, db: Session = Depends(deps.get_db),
-                    token: TokenPayload = Depends(deps.get_admin_user)):
+                    token: TokenPayload = Depends(deps.get_employee_user)):
     return crud_category.create_category(request=request, db=db, admin_id=token.id)
 
 
 @router.put("/update/{cat_id}")
 def update_category(request: CategoryUpdate, cat_id: int, db: Session = Depends(deps.get_db),
-                    token: TokenPayload = Depends(deps.get_admin_user)):
+                    token: TokenPayload = Depends(deps.get_employee_user)):
     return crud_category.update_category(request=request, id=cat_id, db=db, admin_id=token.id)
 
 
