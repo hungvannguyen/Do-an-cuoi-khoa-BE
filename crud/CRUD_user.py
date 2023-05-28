@@ -56,7 +56,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         email_db = db.query(self.model).filter(
             self.model.email == request.email,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        )
+        ).first()
         if email_db:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Email này đã tồn tại")
         if data_db:
