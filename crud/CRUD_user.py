@@ -43,7 +43,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             data_db = jsonable_encoder(data_db)
             if verify_password(password, data_db['password']):
                 return gen_token(data_db), data_db['role_id']
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tài khoản hoặc mật khẩu không chính xác")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="Tài khoản hoặc mật khẩu không chính xác")
 
     def create_user(self, db: Session, request) -> Any:
         if not request.password == request.confirm_password:
@@ -59,6 +60,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             password = request['password']
             hashed_password = hash_password(password)
             request['password'] = hashed_password
+            delattr(request, 'confirm_password')
             data_db = self.model(**request)
             db.add(data_db)
             db.commit()
@@ -70,7 +72,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         password = request['password']
         hashed_password = hash_password(password)
         request['password'] = hashed_password
-        data_db = self.model(**request,role_id = role_id)
+        data_db = self.model(**request, role_id=role_id)
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
