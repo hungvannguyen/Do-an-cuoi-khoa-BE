@@ -60,8 +60,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             password = request['password']
             hashed_password = hash_password(password)
             request['password'] = hashed_password
-            delattr(request, 'confirm_password')
-            data_db = self.model(**request)
+            data_db = self.model(account = request['account'], password = request['password'])
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
