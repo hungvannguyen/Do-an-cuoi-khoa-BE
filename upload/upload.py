@@ -8,8 +8,9 @@ def uploadFile(file: UploadFile = File(...)):
         os.makedirs("img")
     except Exception as e:
         print(e)
+    file_name_db = file.filename.replace(" ", "-")
     filename = os.getcwd() + "/img/" + file.filename.replace(" ", "-")
     with open(filename, "wb+") as f:
         f.write(file.file.read())
         f.close()
-    return filename
+    return file_name_db
