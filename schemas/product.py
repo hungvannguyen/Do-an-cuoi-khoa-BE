@@ -11,6 +11,9 @@ class ProductBase(BaseModel, Config):
 class ProductInfo(ProductBase):
     name: Optional[str]
     quantity: Optional[str]
+    price: Optional[float]
+    sale_price: Optional[float]
+    is_sale: Optional[int]
     img_url: Optional[str]
     description: Optional[str]
 
@@ -19,8 +22,11 @@ class ProductCreate(BaseModel):
     cat_id: int
     name: Optional[str]
     quantity: Optional[int]
+    price: Optional[float]
+    sale_percent: Optional[int]
     img_url: Optional[str]
     status: Optional[int]
+    is_sale: Optional[int]
     description: Optional[str]
 
 

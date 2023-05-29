@@ -20,7 +20,7 @@ def get_cart(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(d
 @router.post("/add")
 def create_cart(request: CartCreate, db: Session = Depends(deps.get_db),
                 token: TokenPayload = Depends(deps.get_current_user)):
-    return crud_cart.create_cart(request=request, db=db, user_id=token.id)
+    return crud_cart.add_to_cart(request=request, db=db, user_id=token.id)
 
 
 @router.put("/update/{prd_id}/quantity/{quantity}")
