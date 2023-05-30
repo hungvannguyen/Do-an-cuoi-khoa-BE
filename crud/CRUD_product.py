@@ -44,6 +44,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Không tồn tại Sản phẩm ID #{id}")
         if data_db.is_sale == 1:
             setattr(data_db, 'sale_price', data_db.price * (100 - data_db.sale_percent)/100)
+        else:
+            setattr(data_db, 'sale_price', data_db.price)
         return data_db
 
     def create_product(self, request, db: Session, admin_id):

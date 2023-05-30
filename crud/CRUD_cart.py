@@ -30,10 +30,11 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                     self.update_cart(prd_id=prd_id, quantity=prd_data['quantity'], db=db, user_id=user_id)
                 data = jsonable_encoder(item)
                 data['is_sale'] = prd_data['is_sale']
-                if prd_data['is_sale']:
+                if prd_data['is_sale'] == 1:
                     total += prd_data['price'] * data['quantity'] * (100 - prd_data['sale_percent']) / 100
                     data['sale_price'] = prd_data['sale_price']
                 else:
+                    data['sale_price'] = prd_data['sale_price']
                     total += prd_data['price'] * data['quantity']
                 data['name'] = prd_data['name']
                 data['price'] = prd_data['price']

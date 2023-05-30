@@ -8,7 +8,8 @@ from api.endpoint import (
     mail,
     product,
     cart,
-    image
+    image,
+    checkout
 )
 
 api_router = APIRouter()
@@ -21,4 +22,4 @@ api_router.include_router(mail.router, prefix="/mail", tags=['Mail'])
 api_router.include_router(product.router, prefix="/product", tags=['Product'])
 api_router.include_router(image.router, prefix="/image", tags=['Image'])
 api_router.include_router(cart.router, prefix="/cart", tags=['Cart'])
-
+api_router.include_router(checkout.router, prefix="/checkout", tags=['Checkout'])
