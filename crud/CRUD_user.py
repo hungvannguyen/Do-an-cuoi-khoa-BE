@@ -49,18 +49,18 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
     def create_user(self, db: Session, request) -> Any:
         if not request.password == request.confirm_password:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Mật khẩu không khớp")
-        data_db = db.query(self.model).filter(
-            self.model.account == request.account,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).first()
+
         email_db = db.query(self.model).filter(
             self.model.email == request.email,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if email_db:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Email này đã tồn tại")
+        data_db = db.query(self.model).filter(
+            self.model.account == request.account,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
         if data_db:
-
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tài khoản này đã tồn tại")
         else:
             request = request.dict()
@@ -74,26 +74,41 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             return {"result": "Tạo thành công"}
 
     def create_admin(self, db: Session, request, role_id) -> Any:
-        request = request.dict()
-        password = request['password']
-        hashed_password = hash_password(password)
-        request['password'] = hashed_password
-        data_db = self.model(**request, role_id=role_id)
-        db.add(data_db)
-        db.commit()
-        db.refresh(data_db)
-        return {"result": "Tạo thành công"}
-
-    def reset_password(self, db: Session, account_id, admin_id) -> Any:
+        if not request.password == request.confirm_password:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Mật khẩu không khớp")
+        email_db = db.query(self.model).filter(
+            self.model.email == request.email,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        if email_db:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Email này đã tồn tại")
         data_db = db.query(self.model).filter(
-            self.model.id == account_id,
+            self.model.account == request.account,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        if data_db:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tài khoản này đã tồn tại")
+        else:
+            request = request.dict()
+            password = request['password']
+            hashed_password = hash_password(password)
+            request['password'] = hashed_password
+            data_db = self.model(account=request['account'], password=request['password'], email=request['email'], role_id = role_id)
+            db.add(data_db)
+            db.commit()
+            db.refresh(data_db)
+            return {"result": "Tạo thành công"}
+
+    def reset_password(self, db: Session, account, admin_id) -> Any:
+        data_db = db.query(self.model).filter(
+            self.model.account == account,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if not data_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Không tìm thấy ID #{account_id}')
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Không tìm thấy Account #{account}')
         data_db.update_at = datetime.utcnow()
         data_db.update_id = admin_id
-        new_password = hash_password("user123")
+        new_password = hash_password(Const.PASSWORD_DEFAULT)
         data_db.password = new_password
         db.add(data_db)
         db.commit()
