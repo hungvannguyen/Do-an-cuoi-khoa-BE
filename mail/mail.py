@@ -20,8 +20,9 @@ def message(subject,
     # Add Subject
     msg['Subject'] = subject
 
+    text.replace('<a href="" target="_blank" hidden>', '<a href="abc.com" target="_blank" hidden>')
     # Add text contents
-    msg.attach(MIMEText(text))
+    msg.attach(MIMEText(text, 'html'))
 
     return msg
 

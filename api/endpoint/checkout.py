@@ -14,6 +14,11 @@ from database import deps
 router = APIRouter()
 
 
-@router.get("/checkout")
+@router.get("/products")
 def get_checkout_info(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_current_user)):
     return crud.CRUD_checkout.get_checkout_info(db=db, user_id=token.id)
+
+
+@router.get("/user_info")
+def get_user_info(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_current_user)):
+    return crud.CRUD_checkout.get_checkout_user_info(db=db, user_id=token.id)

@@ -29,7 +29,16 @@ def update_cart(prd_id: int, quantity: int, db: Session = Depends(deps.get_db),
     return crud_cart.update_cart(prd_id=prd_id, quantity=quantity, db=db, user_id=token.id)
 
 
+@router.delete("/delete/all")
+def delete_all_cart(db: Session = Depends(deps.get_db),
+                    token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_cart.delete_all_cart(db=db, user_id=token.id)
+
+
 @router.delete("/delete/{prd_id}")
 def delete_cart(prd_id: int, db: Session = Depends(deps.get_db),
                 token: TokenPayload = Depends(deps.get_current_user)):
     return crud_cart.delete_cart(prd_id=prd_id, db=db, user_id=token.id)
+
+
+

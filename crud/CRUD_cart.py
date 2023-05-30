@@ -114,5 +114,22 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
             'detail': "Đã xoá sản phẩm trong giỏ hàng"
         }
 
+    def delete_all_cart(self, db: Session, user_id):
+        data_db = db.query(self.model).filter(
+            self.model.user_id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
+
+        if not data_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f"Giỏ hàng trống")
+
+        for item in data_db:
+            self.delete_cart(prd_id=item.prd_id, db=db, user_id=user_id)
+
+        return {
+            'detail': "Đã xoá toàn bộ giỏ hàng"
+        }
+
 
 crud_cart = CRUDCart(Cart)

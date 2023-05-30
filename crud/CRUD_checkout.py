@@ -9,6 +9,8 @@ import schemas.user
 from models.category import Category
 from schemas.category import CategoryCreate, CategoryUpdate
 from crud.CRUD_cart import crud_cart
+from crud.CRUD_user import crud_user
+from crud.CRUD_address import crud_address
 from constants import Const
 from security.security import hash_password, verify_password, gen_token
 
@@ -32,4 +34,18 @@ def get_checkout_info(db: Session, user_id):
     return {
         'products': checkout,
         'total': total
+    }
+
+
+def get_checkout_user_info(db: Session, user_id):
+    user_info = crud_user.get_user_info(db, user_id)
+    address_info = crud_address.get_address_info_by_user_id(user_id=user_id, db=db)
+    return {
+        'name': user_info['name'],
+        'email': user_info['email'],
+        'phone_number': user_info['phone_number'],
+        'city': address_info['city'],
+        'district': address_info['district'],
+        'ward': address_info['ward'],
+        'detail': address_info['detail']
     }

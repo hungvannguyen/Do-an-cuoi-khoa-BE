@@ -46,6 +46,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             self.model.user_id == user_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
+        if not data_db:
+            return None
         city = self.get_city_by_id(city_id=data_db.city, db=db)
         district = self.get_district_by_id(district_id=data_db.district, db=db)
         ward = self.get_ward_by_id(ward_id=data_db.ward, db=db)
