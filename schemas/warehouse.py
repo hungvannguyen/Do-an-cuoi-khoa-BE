@@ -10,8 +10,8 @@ class WarehouseBase(BaseModel, Config):
 
 class WarehouseCreate(BaseModel):
 
-    city: Optional[int]
-    district: Optional[int]
+    city_id: Optional[int]
+    district_id: Optional[int]
     ward: Optional[int]
     detail: Optional[str]
 

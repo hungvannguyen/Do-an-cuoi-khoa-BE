@@ -48,14 +48,14 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         ).first()
         if not data_db:
             return None
-        city = self.get_city_by_id(city_id=data_db.city, db=db)
-        district = self.get_district_by_id(district_id=data_db.district, db=db)
-        ward = self.get_ward_by_id(ward_id=data_db.ward, db=db)
+        city = self.get_city_by_id(city_id=data_db.city_id, db=db)
+        district = self.get_district_by_id(district_id=data_db.district_id, db=db)
+        ward = self.get_ward_by_id(ward_id=data_db.ward_id, db=db)
         return {
             'user_id': user_id,
-            'city': city.name,
-            'district': district.name,
-            'ward': ward.name,
+            'city': city.id,
+            'district': district.id,
+            'ward': ward.id,
             'detail': data_db.detail
         }
 
@@ -84,9 +84,6 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
 
     def update_address(self, request, db: Session, user_id):
         data_db = self.get_address_by_user_id(user_id=user_id, db=db)
-        if not data_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=f"User ID #{user_id} chưa có Địa chỉ nào")
         self.update(db=db, obj_in=request, db_obj=data_db, admin_id=user_id)
         return {
             'detail': "Cập nhật thành công"

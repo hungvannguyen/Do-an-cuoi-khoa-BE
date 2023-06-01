@@ -4,7 +4,11 @@ from models import (
     address,
     city,
     district,
-    ward
+    ward,
+    order,
+    order_product,
+    payment,
+    paymentType
 )
 
 from database.db import Base
