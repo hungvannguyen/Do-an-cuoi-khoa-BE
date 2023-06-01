@@ -4,6 +4,8 @@ from typing import Any
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
+
+from models import product
 from models.cart import Cart
 from schemas.cart import *
 from crud.base import CRUDBase
@@ -36,6 +38,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                 else:
                     data['sale_price'] = prd_data['sale_price']
                     total += prd_data['price'] * data['quantity']
+                data['total_price'] = prd_data['sale_price'] * data['quantity']
                 data['name'] = prd_data['name']
                 data['price'] = prd_data['price']
                 data['img_url'] = prd_data['img_url']
@@ -129,6 +132,25 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
 
         return {
             'detail': "Đã xoá toàn bộ giỏ hàng"
+        }
+
+    def check_cart_to_order(self, db: Session, user_id):
+        data_db = db.query(self.model).filter(
+            self.model.user_id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        )
+        if data_db:
+            for item in data_db:
+                prd_id = item.prd_id
+                prd_data = db.query(product.Product).filter(
+                    product.Product.id == prd_id,
+                    product.Product.delete_flag == Const.DELETE_FLAG_NORMAL
+                ).first()
+                if item.quantity > prd_data.quantity:
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                        detail="Số lượng sản phẩm quá lớn")
+        return {
+            'detail': 'success'
         }
 
 

@@ -9,6 +9,7 @@ class Product(Base, BaseDBModel):
 
     id = Column(BigInteger, primary_key=True, index=True, unique=True)
     cat_id = Column(BigInteger, nullable=False)
+    warehouse_id = Column(BigInteger, nullable=False)
     name = Column(String(255), nullable=False)
     quantity = Column(Integer, default=1)
     price = Column(Float, nullable=False)

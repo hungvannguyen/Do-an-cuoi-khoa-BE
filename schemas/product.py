@@ -20,6 +20,7 @@ class ProductInfo(ProductBase):
 
 class ProductCreate(BaseModel):
     cat_id: int
+    warehouse_id: int
     name: Optional[str]
     quantity: Optional[int]
     price: Optional[float]

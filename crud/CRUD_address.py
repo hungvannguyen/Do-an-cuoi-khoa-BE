@@ -102,26 +102,26 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             'detail': "Đã xoá"
         }
 
-    def abcd(self, data, db: Session):
-        data_obj = json.loads(data)
-        for item in data_obj:
-            city = City(name=item['name'])
-            db.add(city)
-            db.commit()
-            db.refresh(city)
-            city_id = city.id
-            for item2 in item['districts']:
-                district = District(city_id=city_id, name=item2['name'])
-                db.add(district)
-                db.commit()
-                db.refresh(district)
-                district_id = district.id
-                for item3 in item2['wards']:
-                    ward = Ward(city_id=city_id, district_id=district_id, name=item3['name'])
-                    db.add(ward)
-                    db.commit()
-                    db.refresh(ward)
-        return "success"
+    # def abcd(self, data, db: Session):
+    #     data_obj = json.loads(data)
+    #     for item in data_obj:
+    #         city = City(name=item['name'])
+    #         db.add(city)
+    #         db.commit()
+    #         db.refresh(city)
+    #         city_id = city.id
+    #         for item2 in item['districts']:
+    #             district = District(city_id=city_id, name=item2['name'])
+    #             db.add(district)
+    #             db.commit()
+    #             db.refresh(district)
+    #             district_id = district.id
+    #             for item3 in item2['wards']:
+    #                 ward = Ward(city_id=city_id, district_id=district_id, name=item3['name'])
+    #                 db.add(ward)
+    #                 db.commit()
+    #                 db.refresh(ward)
+    #     return "success"
 
 
 crud_address = CRUDAddress(Address)
