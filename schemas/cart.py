@@ -18,5 +18,5 @@ class CartCreate(BaseModel):
     quantity: Optional[int]
 
 
-class CartUpdate(BaseModel):
-    quantity: Optional[int]
+class CartUpdate(CartCreate):
+    pass

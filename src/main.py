@@ -9,6 +9,8 @@ from database.db import engine
 origins = [
     "http://localhost:3000",
     "http://localhost:8080",
+    "http://localhost:5000",
+
 ]
 
 models.Base.metadata.create_all(bind=engine)

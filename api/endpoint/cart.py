@@ -24,9 +24,9 @@ def create_cart(request: CartCreate, db: Session = Depends(deps.get_db),
 
 
 @router.put("/update")
-def update_cart(prd_id: int, quantity: int, db: Session = Depends(deps.get_db),
+def update_cart(request: CartUpdate, db: Session = Depends(deps.get_db),
                 token: TokenPayload = Depends(deps.get_current_user)):
-    return crud_cart.update_cart(prd_id=prd_id, quantity=quantity, db=db, user_id=token.id)
+    return crud_cart.update_cart(prd_id=request.prd_id, quantity=request.quantity , db=db, user_id=token.id)
 
 
 @router.delete("/delete/all")

@@ -71,8 +71,7 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
     def create_address(self, request, db: Session, user_id):
         data_db = self.get_address_by_user_id(user_id=user_id, db=db)
         if data_db:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                detail=f"User ID #{request.user_id} đã có Đị̣a chỉ")
+            return self.update_address(request=request, db=db, user_id=user_id)
         request = request.dict()
         data_db = self.model(**request, insert_id=user_id, update_id=user_id, user_id=user_id)
         db.add(data_db)
