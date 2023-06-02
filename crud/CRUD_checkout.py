@@ -43,15 +43,15 @@ def get_checkout_user_info(db: Session, user_id):
         'name': user_info['name'],
         'email': user_info['email'],
         'phone_number': user_info['phone_number'],
-        'city': None,
-        'district': None,
-        'ward': None,
+        'city_id': None,
+        'district_id': None,
+        'ward_id': None,
         'detail': None
     }
     address_info = crud_address.get_address_info_by_user_id(user_id=user_id, db=db)
     if address_info:
-        result['city'] = address_info['city']
-        result['district'] = address_info['district']
-        result['ward'] = address_info['ward']
+        result['city_id'] = address_info['city_id']
+        result['district_id'] = address_info['district_id']
+        result['ward_id'] = address_info['ward_id']
         result['detail'] = address_info['detail']
     return result

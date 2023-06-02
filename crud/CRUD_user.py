@@ -67,7 +67,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             password = request['password']
             hashed_password = hash_password(password)
             request['password'] = hashed_password
-            data_db = self.model(account = request['account'], password = request['password'], email = request['email'])
+            data_db = self.model(account=request['account'], password=request['password'], email=request['email'])
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
@@ -93,7 +93,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             password = request['password']
             hashed_password = hash_password(password)
             request['password'] = hashed_password
-            data_db = self.model(account=request['account'], password=request['password'], email=request['email'], role_id = role_id)
+            data_db = self.model(account=request['account'], password=request['password'], email=request['email'],
+                                 role_id=role_id)
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
@@ -126,6 +127,18 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         db.refresh(user_db)
         return {
             'detail': "Đã cập nhật mật khẩu"
+        }
+
+    def update_info(self, request, db: Session, user_id):
+
+        if not isinstance(request, dict):
+            request = request.dict
+
+        data_db = self.get_user_by_id(db, id=user_id)
+        self.update(db=db, db_obj=data_db, obj_in=request, admin_id=user_id)
+
+        return {
+            'detail': 'success'
         }
 
 

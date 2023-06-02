@@ -8,6 +8,5 @@ class Payment(Base, BaseDBModel):
     __tablename__ = "payments"
 
     id = Column(BigInteger, primary_key=True, index=True, unique=True)
-    order_id = Column(BigInteger, nullable=False)
     payment_type_id = Column(BigInteger, nullable=False)
     status = Column(Integer, nullable=False)

@@ -17,6 +17,11 @@ def get_cart(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(d
     return crud_cart.get_cart(user_id=token.id, db=db)
 
 
+@router.get("/count")
+def count_cart(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_cart.count_cart(user_id=token.id, db=db)
+
+
 @router.post("/add")
 def create_cart(request: CartCreate, db: Session = Depends(deps.get_db),
                 token: TokenPayload = Depends(deps.get_current_user)):

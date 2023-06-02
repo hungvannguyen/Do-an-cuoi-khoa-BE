@@ -9,7 +9,6 @@ class PaymentBase(BaseModel, Config):
 
 
 class PaymentCreate(BaseModel):
-    order_id: Optional[int]
     payment_type_id: Optional[int]
     status: Optional[int]
 

@@ -12,20 +12,35 @@ from database import deps
 router = APIRouter()
 
 
-@router.get("/all")
-def get_all(db: Session = Depends(deps.get_db)):
-    data = crud_product.get_all_products(db=db)
+@router.get("/all/{page}")
+def get_all(page: int, db: Session = Depends(deps.get_db)):
+    data = crud_product.get_all_products(page=page, db=db)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Không có sản phẩm")
     return data
 
 
-@router.get("/all/active")
-def get_all_active(db: Session = Depends(deps.get_db)):
-    data = crud_product.get_all_active_products(db=db)
+@router.get("/all/active/{page}")
+def get_all_active(page: int, db: Session = Depends(deps.get_db)):
+    data = crud_product.get_all_active_products(page=page, db=db)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Không có sản phẩm")
     return data
+
+
+@router.get("/sale")
+def get_sale_products(db: Session = Depends(deps.get_db)):
+    return crud_product.get_sale_products(db=db)
+
+
+@router.get("/new")
+def get_new_products(db: Session = Depends(deps.get_db)):
+    return crud_product.get_new_products(db=db)
+
+
+@router.get("/best-seller")
+def get_best_seller_products(db: Session = Depends(deps.get_db)):
+    pass
 
 
 @router.get("/{id}")

@@ -33,18 +33,18 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         }
 
     def add_payment(self, request, db: Session, user_id):
-        request = request.dict()
-        obj_data = self.model(**request, insert_id=user_id, update_at=user_id)
+        obj_data = self.model(**request, insert_id=user_id, update_id=user_id, insert_at=datetime.utcnow(),
+                              update_at=datetime.utcnow())
 
         db.add(obj_data)
         db.commit()
         db.refresh(obj_data)
 
-        return {
-            'detail': 'success'
-        }
+        return obj_data
 
     def update_payment(self, request, db: Session, user_id):
+        if not isinstance(request, dict):
+            request = request.dict()
         data_db = db.query(self.model).filter(
             self.model.order_id == request.order_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL

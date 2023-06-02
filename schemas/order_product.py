@@ -9,10 +9,10 @@ class OrderProductBase(BaseModel):
 
 
 class OrderProductCreate(BaseModel):
-    order_id = Optional[int]
-    product_id = Optional[int]
-    quantity = Optional[int]
-    price = Optional[float]
+    order_id: Optional[int]
+    product_id: Optional[int]
+    quantity: Optional[int]
+    price: Optional[float]
 
 
 class OrderProductUpdate(OrderProductCreate):

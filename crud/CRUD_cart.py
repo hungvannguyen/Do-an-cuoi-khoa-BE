@@ -25,9 +25,11 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         total = 0
         if data_db:
             for item in data_db:
-
                 prd_id = item.prd_id
                 prd_data = jsonable_encoder(crud_product.get_product_by_id(id=prd_id, db=db))
+                if not prd_data:
+                    self.delete_cart(prd_id=prd_id, db=db, user_id=user_id)
+                    raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Reloading...")
                 if item.quantity > prd_data['quantity']:
                     self.update_cart(prd_id=prd_id, quantity=prd_data['quantity'], db=db, user_id=user_id)
                 data = jsonable_encoder(item)
@@ -50,6 +52,13 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
             'products': result,
             'total_price': total
         }
+
+    def count_cart(self, db: Session, user_id):
+        count = db.query(self.model).filter(
+            self.model.user_id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).count()
+        return count
 
     def add_to_cart(self, request, db: Session, user_id):
         prd_data = crud_product.get_product_by_id(id=request.prd_id, db=db)

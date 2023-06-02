@@ -53,9 +53,9 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         ward = self.get_ward_by_id(ward_id=data_db.ward_id, db=db)
         return {
             'user_id': user_id,
-            'city': city.id,
-            'district': district.id,
-            'ward': ward.id,
+            'city_id': city.id,
+            'district_id': district.id,
+            'ward_id': ward.id,
             'detail': data_db.detail
         }
 
@@ -72,7 +72,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         data_db = self.get_address_by_user_id(user_id=user_id, db=db)
         if data_db:
             return self.update_address(request=request, db=db, user_id=user_id)
-        request = request.dict()
+        if not isinstance(request, dict):
+            request = request.dict()
         data_db = self.model(**request, insert_id=user_id, update_id=user_id, user_id=user_id)
         db.add(data_db)
         db.commit()
@@ -82,6 +83,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         }
 
     def update_address(self, request, db: Session, user_id):
+        if not isinstance(request, dict):
+            request = request.dict()
         data_db = self.get_address_by_user_id(user_id=user_id, db=db)
         self.update(db=db, obj_in=request, db_obj=data_db, admin_id=user_id)
         return {

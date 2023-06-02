@@ -9,23 +9,26 @@ class OrderBase(BaseModel, Config):
 
 
 class OrderInfo(OrderBase):
-    user_id = Optional[int]
-    payment_id = Optional[int]
-    name = Optional[str]
-    phone_number = Optional[str]
-    email = Optional[str]
-    address = Optional[str]
-    status = Optional[int]
+    user_id: Optional[int]
+    payment_id: Optional[int]
+    name: Optional[str]
+    phone_number: Optional[str]
+    email: Optional[str]
+    address: Optional[str]
+    status: Optional[int]
 
 
 class OrderCreate(BaseModel):
-    user_id = Optional[int]
-    payment_id = Optional[int]
-    name = Optional[str]
-    phone_number = Optional[str]
-    email = Optional[str]
-    address = Optional[str]
-    status = Optional[int]
+    payment_type_id: Optional[int]
+    name: Optional[str]
+    phone_number: Optional[str]
+    email: Optional[str]
+    address: Optional[str]
+    city_id: Optional[int]
+    district_id: Optional[int]
+    ward_id: Optional[int]
+    detail: Optional[str]
+    status: Optional[int]
 
 
 class OrderUpdate(OrderCreate):

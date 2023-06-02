@@ -52,6 +52,8 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         }
 
     def update_category(self, request, id, db: Session, admin_id):
+        if not isinstance(request, dict):
+            request = request.dict()
         data_db = self.get_category_by_id(id, db)
 
         self.update(db_obj=data_db, obj_in=request, db=db, admin_id=admin_id)

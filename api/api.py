@@ -12,7 +12,8 @@ from api.endpoint import (
     checkout,
     warehouse,
     paymentType,
-    payment
+    payment,
+order
 )
 
 api_router = APIRouter()
@@ -29,4 +30,4 @@ api_router.include_router(cart.router, prefix="/cart", tags=['CART'])
 api_router.include_router(checkout.router, prefix="/checkout", tags=['CHECKOUT'])
 api_router.include_router(payment.router, prefix="/payment", tags=['PAYMENT'])
 api_router.include_router(paymentType.router, prefix="/payment/type", tags=['PAYMENT TYPE'])
-
+api_router.include_router(order.router, prefix="/order", tags=['ORDER'])
