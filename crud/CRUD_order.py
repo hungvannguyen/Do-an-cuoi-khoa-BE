@@ -4,8 +4,8 @@ from typing import Any
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
-import models
-import schemas.user
+from models.product import Product
+
 from crud.base import CRUDBase
 from models.order import Order
 from schemas.order import *
@@ -21,12 +21,26 @@ from security.security import hash_password, verify_password, gen_token
 
 class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
+    def get_product_by_id(self, id, db: Session):
+        prd_data_db = db.query(Product).filter(
+            Product.id == id
+        ).first()
+        if not prd_data_db:
+            return None
+        if prd_data_db.is_sale == 1:
+            setattr(prd_data_db, 'sale_price', prd_data_db.price * (100 - prd_data_db.sale_percent) / 100)
+        else:
+            setattr(prd_data_db, 'sale_price', prd_data_db.price)
+        return prd_data_db
+
+
     def get_order_by_id(self, order_id, db: Session):
         obj_db = db.query(self.model).filter(
             self.model.id == order_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         result = {
+            'id': order_id,
             'products': [],
             'total_price': 0,
             'name': obj_db.name,
@@ -42,8 +56,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             order_id = obj_db.id
             order_product_db = crud_order_product.get_by_order_id(order_id=order_id, db=db)
             for item in order_product_db:
-                prd_id = order_product_db.prd_id
-                prd_db = crud_product.get_product_by_id(id=prd_id, db=db)
+                prd_id = item.product_id
+                prd_db = self.get_product_by_id(id=prd_id, db=db)
                 prd_name = prd_db.name
                 prd_img_url = prd_db.img_url
                 total_price += item.price * item.quantity
@@ -57,10 +71,28 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                 }
                 result['products'].append(prd_obj)
 
+        result['total_price'] = total_price
+
+        payment_id = obj_db.payment_id
+        payment_db = crud_payment.get_payment_by_id(id=payment_id, db=db)
+        result['payment_type'] = payment_db['payment_type_name']
+        result['payment_status'] = payment_db['status']
+
         return result
 
     def get_all_orders_by_user_id(self, user_id, db: Session):
-        pass
+        order_db = db.query(self.model).filter(
+            self.model.user_id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
+        if not order_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+        result = []
+        for item in order_db:
+            result.append(self.get_order_by_id(order_id=item.id, db=db))
+
+        return result
 
     def add_order(self, request, db: Session, user_id):
         # Add payment method

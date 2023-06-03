@@ -12,10 +12,10 @@ from database import deps
 router = APIRouter()
 
 
-@router.get("/info/{order_id}")
-def get_payment_info(order_id: int, db: Session = Depends(deps.get_db),
+@router.get("/info/{id}")
+def get_payment_info(id: int, db: Session = Depends(deps.get_db),
                      token: TokenPayload = Depends(deps.get_current_user)):
-    return crud_payment.get_payment_by_order_id(order_id=order_id, db=db)
+    return crud_payment.get_payment_by_id(id=id, db=db)
 
 
 @router.post("/add")

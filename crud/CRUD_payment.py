@@ -16,9 +16,9 @@ from security.security import hash_password, verify_password, gen_token
 
 class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
 
-    def get_payment_by_order_id(self, order_id, db: Session):
+    def get_payment_by_id(self, id, db: Session):
         data_db = db.query(self.model).filter(
-            self.model.order_id == order_id,
+            self.model.id == id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
 
@@ -26,9 +26,8 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
 
         return {
             'id': data_db.id,
-            'order_id': data_db.order_id,
             'payment_type_id': data_db.payment_type_id,
-            'payment_type_name': payment_type_db.name,
+            'payment_type_name': payment_type_db['name'],
             'status': data_db.status
         }
 
