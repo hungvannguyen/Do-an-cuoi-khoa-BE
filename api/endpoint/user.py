@@ -48,9 +48,14 @@ def update_password(request: UserUpdatePassword, db: Session = Depends(deps.get_
     return crud_user.update_password(token.id, request.password, db)
 
 
-@router.get("/password/reset/{account_id}")
-def reset_password(account_id, db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_admin_user)):
-    return crud_user.reset_password(db, account_id, token.role_id)
+@router.get("/role/all")
+def get_all_roles(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_admin_user)):
+    return crud_user.get_all_roles(db=db)
+
+
+@router.get("/password/reset/{account}")
+def reset_password(account, db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_admin_user)):
+    return crud_user.reset_password(db, account, token.role_id)
 
 
 @router.get("/info", response_model=schemas.user.UserInfo)

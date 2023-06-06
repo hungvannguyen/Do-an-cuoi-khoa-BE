@@ -8,7 +8,8 @@ from models import (
     order,
     order_product,
     payment,
-    paymentType
+    paymentType,
+role
 )
 
 from database.db import Base

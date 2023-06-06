@@ -15,6 +15,12 @@ from security.security import hash_password, verify_password, gen_token
 
 class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
 
+    def get_all_roles(self, db: Session):
+        data_db = db.query(models.role.Role).filter(
+            models.role.Role.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
+        return data_db
+
     def get_user_by_id(self, db: Session, id):
         data_db = db.query(self.model).filter(
             self.model.id == id,

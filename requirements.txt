@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+jwt
+passlib
+bcrypt
+SQLAlchemy
+mysqlclient
+python-multipart
+PyJWT

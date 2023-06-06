@@ -4,6 +4,8 @@ from typing import Any
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
+
+import models
 from models.product import Product
 
 from crud.base import CRUDBase
