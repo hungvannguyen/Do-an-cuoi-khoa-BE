@@ -17,27 +17,35 @@ from security.security import hash_password, verify_password
 class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
 
     def get_all_cities(self, db: Session):
-        data_db = db.query(City).all()
+        data_db = db.query(City).filter(
+            City.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
         return data_db
 
     def get_city_by_id(self, city_id, db: Session):
-        data_db = db.query(City).filter(City.id == city_id).first()
+        data_db = db.query(City).filter(
+            City.id == city_id,
+            City.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
         return data_db
 
     def get_all_districts(self, city_id, db: Session):
-        data_db = db.query(District).filter(District.city_id == city_id).all()
+        data_db = db.query(District).filter(District.city_id == city_id,
+                                            District.delete_flag == Const.DELETE_FLAG_NORMAL).all()
         return data_db
 
     def get_district_by_id(self, district_id, db: Session):
-        data_db = db.query(District).filter(District.id == district_id).first()
+        data_db = db.query(District).filter(District.id == district_id,
+                                            District.delete_flag == Const.DELETE_FLAG_NORMAL).first()
         return data_db
 
     def get_all_wards(self, city_id, district_id, db: Session):
-        data_db = db.query(Ward).filter(Ward.city_id == city_id, Ward.district_id == district_id).all()
+        data_db = db.query(Ward).filter(Ward.city_id == city_id, Ward.district_id == district_id,
+                                        Ward.delete_flag == Const.DELETE_FLAG_NORMAL).all()
         return data_db
 
     def get_ward_by_id(self, ward_id, db: Session):
-        data_db = db.query(Ward).filter(Ward.id == ward_id).first()
+        data_db = db.query(Ward).filter(Ward.id == ward_id, Ward.delete_flag == Const.DELETE_FLAG_NORMAL).first()
         return data_db
 
     def get_address_info_by_user_id(self, user_id, db: Session):
@@ -122,7 +130,6 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
                     db.refresh(ward)
         return "success"
 
-
     def delete_address_sample(self, db: Session):
 
         data_db = db.query(Ward).filter(
@@ -155,10 +162,7 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
                 db.commit()
                 db.refresh(item)
 
-
-
-
-
         return {'success'}
+
 
 crud_address = CRUDAddress(Address)
