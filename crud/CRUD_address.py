@@ -124,32 +124,40 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
 
 
     def delete_address_sample(self, db: Session):
-        data_db = db.query(City).filter(
-            City.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).all()
-        for item in data_db:
-            item.delete_flag = 1
-            db.add(item)
-            db.commit()
-            db.refresh(item)
-
-        data_db = db.query(District).filter(
-            District.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).all()
-        for item in data_db:
-            item.delete_flag = 1
-            db.add(item)
-            db.commit()
-            db.refresh(item)
 
         data_db = db.query(Ward).filter(
             Ward.delete_flag == Const.DELETE_FLAG_NORMAL
         ).all()
-        for item in data_db:
-            item.delete_flag = 1
-            db.add(item)
-            db.commit()
-            db.refresh(item)
+        if data_db:
+            for item in data_db:
+                item.delete_flag = 1
+                db.add(item)
+                db.commit()
+                db.refresh(item)
+
+        data_db = db.query(District).filter(
+            District.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
+        if data_db:
+            for item in data_db:
+                item.delete_flag = 1
+                db.add(item)
+                db.commit()
+                db.refresh(item)
+
+        data_db = db.query(City).filter(
+            City.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
+        if data_db:
+            for item in data_db:
+                item.delete_flag = 1
+                db.add(item)
+                db.commit()
+                db.refresh(item)
+
+
+
+
 
         return {'success'}
 
