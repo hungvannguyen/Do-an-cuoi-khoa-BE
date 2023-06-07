@@ -63,7 +63,7 @@ def delete_address(user_id: int, db: Session = Depends(deps.get_db),
     return crud_address.delete_address(user_id=user_id, db=db, admin_id=token.id)
 
 
-# @router.post("/abc")
-# def abc(db: Session = Depends(deps.get_db)):
-#     data = crud.api_add.data_api
-#     return crud_address.abcd(data, db)
+@router.post("/abc")
+def abc(db: Session = Depends(deps.get_db)):
+    data = crud.api_add.data_api
+    return crud_address.abcd(data, db)
