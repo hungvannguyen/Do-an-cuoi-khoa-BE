@@ -12,6 +12,7 @@ class Product(Base, BaseDBModel):
     warehouse_id = Column(BigInteger, nullable=False)
     name = Column(String(255), nullable=False)
     quantity = Column(Integer, default=1)
+    import_price = Column(Float, nullable=False)
     price = Column(Float, nullable=False)
     sale_percent = Column(Integer, nullable=True, default=0)
     img_url = Column(String(255), nullable=True)
