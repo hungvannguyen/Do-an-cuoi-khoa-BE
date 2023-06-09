@@ -1,6 +1,5 @@
 fastapi
 uvicorn[standard]
-jwt
 passlib
 bcrypt
 SQLAlchemy
