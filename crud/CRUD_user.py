@@ -144,7 +144,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         self.update(db=db, db_obj=data_db, obj_in=request, admin_id=user_id)
 
         return {
-            'detail': 'success'
+            'detail': 'Đã cập nhật địa chỉ'
         }
 
 
