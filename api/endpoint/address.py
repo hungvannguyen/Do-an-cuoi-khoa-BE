@@ -51,10 +51,10 @@ def create_address(request: AddressCreate, db: Session = Depends(deps.get_db),
     return crud_address.create_address(request=request, db=db, user_id=token.id)
 
 
-@router.post("/update/")
-def update_address(request: AddressUpdate, db: Session = Depends(deps.get_db),
-                   token: TokenPayload = Depends(deps.get_current_user)):
-    return crud_address.update_address(request=request, db=db, user_id=token.id)
+# @router.post("/update/")
+# def update_address(request: AddressUpdate, db: Session = Depends(deps.get_db),
+#                    token: TokenPayload = Depends(deps.get_current_user)):
+#     return crud_address.update_address(request=request, db=db, user_id=token.id)
 
 
 @router.delete("/delete/{user_id}")
@@ -63,12 +63,12 @@ def delete_address(user_id: int, db: Session = Depends(deps.get_db),
     return crud_address.delete_address(user_id=user_id, db=db, admin_id=token.id)
 
 
-@router.post("/abc")
-def abc(db: Session = Depends(deps.get_db)):
-    data = crud.api_add.data_api
-    return crud_address.abcd(data, db)
-
-
-@router.delete("/sample/del")
-def delete_sample(db: Session = Depends(deps.get_db)):
-    return crud_address.delete_address_sample(db=db)
+# @router.post("/abc")
+# def abc(db: Session = Depends(deps.get_db)):
+#     data = crud.api_add.data_api
+#     return crud_address.abcd(data, db)
+#
+#
+# @router.delete("/sample/del")
+# def delete_sample(db: Session = Depends(deps.get_db)):
+#     return crud_address.delete_address_sample(db=db)
