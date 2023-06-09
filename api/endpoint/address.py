@@ -51,7 +51,7 @@ def create_address(request: AddressCreate, db: Session = Depends(deps.get_db),
     return crud_address.create_address(request=request, db=db, user_id=token.id)
 
 
-@router.put("/update/")
+@router.post("/update/")
 def update_address(request: AddressUpdate, db: Session = Depends(deps.get_db),
                    token: TokenPayload = Depends(deps.get_current_user)):
     return crud_address.update_address(request=request, db=db, user_id=token.id)
