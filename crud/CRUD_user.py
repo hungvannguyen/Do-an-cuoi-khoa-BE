@@ -138,7 +138,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
     def update_info(self, request, db: Session, user_id):
 
         if not isinstance(request, dict):
-            request = request.dict
+            request = request.dict()
 
         data_db = self.get_user_by_id(db, id=user_id)
         self.update(db=db, db_obj=data_db, obj_in=request, admin_id=user_id)

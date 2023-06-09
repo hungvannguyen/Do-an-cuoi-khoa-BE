@@ -9,7 +9,7 @@ import schemas.user
 from security.security import verify_password
 from fastapi.encoders import jsonable_encoder
 from crud.CRUD_user import crud_user
-from schemas.user import UserRegis, UserInfo, UserLogin, UserUpdatePassword
+from schemas.user import UserRegis, UserInfo, UserLogin, UserUpdatePassword, UserUpdateInfo
 from schemas.token import TokenPayload
 from database import deps
 
@@ -61,3 +61,9 @@ def reset_password(account, db: Session = Depends(deps.get_db), token: TokenPayl
 @router.get("/info", response_model=schemas.user.UserInfo)
 def get_user_info(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_current_user)):
     return crud_user.get_user_info(db=db, id=token.id)
+
+
+@router.post("/update")
+def update_user_info(request: UserUpdateInfo, db: Session = Depends(deps.get_db),
+                     token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_user.update_info(request=request, db=db, user_id=token.id)
