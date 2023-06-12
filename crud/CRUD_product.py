@@ -104,6 +104,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.is_sale == Const.IS_SALE,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        for item in data_db:
+            if item.is_sale == 1:
+                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
 
         return {
             'data': data_db,
@@ -130,6 +133,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        for item in data_db:
+            if item.is_sale == 1:
+                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
         return {
             'data': data_db,
             'current_page': current_page,
