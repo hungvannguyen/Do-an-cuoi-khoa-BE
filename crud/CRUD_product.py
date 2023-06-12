@@ -84,20 +84,57 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             setattr(data_db, 'sale_price', data_db.price)
         return data_db
 
-    def get_sale_products(self, db: Session):
+    def get_sale_products(self, page: int, db: Session):
+        current_page = page
+        if current_page <= 0:
+            current_page = 1
+        total_product = db.query(self.model).filter(
+            self.model.status == Const.ACTIVE_STATUS,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).count()
+        total_page = int(total_product / Const.ROW_PER_PAGE)
+        if total_product % Const.ROW_PER_PAGE > 0:
+            total_page += 1
+        if current_page > total_page:
+            current_page = total_page
+        offset = (current_page - 1) * Const.ROW_PER_PAGE
+        limit = Const.ROW_PER_PAGE
         data_db = db.query(self.model).filter(
             self.model.status == Const.ACTIVE_STATUS,
             self.model.is_sale == Const.IS_SALE,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).order_by(self.model.insert_at.desc()).offset(0).limit(4).all()
-        return data_db
+        ).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
 
-    def get_new_products(self, db: Session):
+        return {
+            'data': data_db,
+            'current_page': current_page,
+            'total_page': total_page
+        }
+
+    def get_new_products(self, page: int, db: Session):
+        current_page = page
+        if current_page <= 0:
+            current_page = 1
+        total_product = db.query(self.model).filter(
+            self.model.status == Const.ACTIVE_STATUS,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).count()
+        total_page = int(total_product / Const.ROW_PER_PAGE)
+        if total_product % Const.ROW_PER_PAGE > 0:
+            total_page += 1
+        if current_page > total_page:
+            current_page = total_page
+        offset = (current_page - 1) * Const.ROW_PER_PAGE
+        limit = Const.ROW_PER_PAGE
         data_db = db.query(self.model).filter(
             self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).order_by(self.model.insert_at.desc()).offset(0).limit(4).all()
-        return data_db
+        ).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        return {
+            'data': data_db,
+            'current_page': current_page,
+            'total_page': total_page
+        }
 
     def create_product(self, request, db: Session, admin_id):
 

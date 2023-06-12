@@ -48,6 +48,11 @@ def update_password(request: UserUpdatePassword, db: Session = Depends(deps.get_
     return crud_user.update_password(token.id, request.password, db)
 
 
+@router.get("/confirm/{email}")
+def confirm_email(email: str, db: Session = Depends(deps.get_db)):
+    return crud_user.confirm_email(email=email, db=db)
+
+
 @router.get("/role/all")
 def get_all_roles(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_admin_user)):
     return crud_user.get_all_roles(db=db)

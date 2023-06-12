@@ -43,7 +43,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
     def login(self, db: Session, account, password):
         data_db = db.query(self.model).filter(
             User.account == account,
-            User.delete_flag == Const.DELETE_FLAG_NORMAL
+            User.delete_flag == Const.DELETE_FLAG_NORMAL,
+            User.is_confirmed == Const.IS_CONFIRMED
         ).first()
         if data_db:
             data_db = jsonable_encoder(data_db)
@@ -100,16 +101,32 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             hashed_password = hash_password(password)
             request['password'] = hashed_password
             data_db = self.model(account=request['account'], password=request['password'], email=request['email'],
-                                 role_id=role_id)
+                                 role_id=role_id, is_confirmed = 1)
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
             return {"result": "Tạo thành công"}
 
+    def confirm_email(self, email, db: Session):
+        data_db = db.query(self.model).filter(
+            self.model.email == email,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        if not data_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Email không chính xác hoặc đã xác nhận")
+        data_db.is_confirmed = 1
+        db.add(data_db)
+        db.commit()
+        db.refresh(data_db)
+        return {
+            'detail': "Đã xác nhận Email thành công"
+        }
+
     def reset_password(self, db: Session, account, admin_id) -> Any:
         data_db = db.query(self.model).filter(
             self.model.account == account,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL,
+            self.model.is_confirmed == Const.IS_CONFIRMED
         ).first()
         if not data_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Không tìm thấy Account #{account}')

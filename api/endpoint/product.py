@@ -28,14 +28,14 @@ def get_all_active(page: int, db: Session = Depends(deps.get_db)):
     return data
 
 
-@router.get("/sale")
-def get_sale_products(db: Session = Depends(deps.get_db)):
-    return crud_product.get_sale_products(db=db)
+@router.get("/sale/{page}")
+def get_sale_products(page: int, db: Session = Depends(deps.get_db)):
+    return crud_product.get_sale_products(page=page, db=db)
 
 
-@router.get("/new")
-def get_new_products(db: Session = Depends(deps.get_db)):
-    return crud_product.get_new_products(db=db)
+@router.get("/new/{page}")
+def get_new_products(page: int, db: Session = Depends(deps.get_db)):
+    return crud_product.get_new_products(page=page, db=db)
 
 
 @router.get("/best-seller")
