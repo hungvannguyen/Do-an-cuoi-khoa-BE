@@ -74,7 +74,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             password = request['password']
             hashed_password = hash_password(password)
             request['password'] = hashed_password
-            data_db = self.model(account=request['account'], password=request['password'], email=request['email'], is_confirmed = 1)
+            data_db = self.model(account=request['account'], password=request['password'], email=request['email'])
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
@@ -110,11 +110,12 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
     def confirm_email(self, email, db: Session):
         data_db = db.query(self.model).filter(
             self.model.email == email,
+            self.model.is_confirmed == Const.IS_NOT_CONFIRMED,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if not data_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Email không chính xác hoặc đã xác nhận")
-        data_db.is_confirmed = 1
+        data_db.is_confirmed = Const.IS_CONFIRMED
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
