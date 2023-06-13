@@ -43,10 +43,12 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
     def login(self, db: Session, account, password):
         data_db = db.query(self.model).filter(
             User.account == account,
-            User.delete_flag == Const.DELETE_FLAG_NORMAL,
-            User.is_confirmed == Const.IS_CONFIRMED
+            User.delete_flag == Const.DELETE_FLAG_NORMAL
+            # User.is_confirmed == Const.IS_CONFIRMED
         ).first()
         if data_db:
+            if data_db.is_confirmed == Const.IS_NOT_CONFIRMED:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Tài khoản này chưa xác thực Email")
             data_db = jsonable_encoder(data_db)
             if verify_password(password, data_db['password']):
                 return gen_token(data_db), data_db['role_id']
