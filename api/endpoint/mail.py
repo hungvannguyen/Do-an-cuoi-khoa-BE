@@ -18,6 +18,5 @@ router = APIRouter()
 
 
 @router.post("/auto_mail")
-def create_auto_mail(request: MailCreate, token: TokenPayload = Depends(deps.get_employee_user)):
-    return CRUD_mail.create_auto_mail(mail_to=request.mail_to, title=request.title,
-                                      content=request.content)
+def create_confirm_mail(request: MailConfirm):
+    return CRUD_mail.create_confirm_mail(mail_to=request.mail_to)

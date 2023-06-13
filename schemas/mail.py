@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from schemas.Default import Config
 
 
-class MailCreate(BaseModel, Config):
+class MailConfirm(BaseModel, Config):
     mail_to: str
-    title: str
-    content: str
+
