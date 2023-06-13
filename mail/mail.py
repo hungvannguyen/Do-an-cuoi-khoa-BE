@@ -6,10 +6,7 @@ import smtplib
 import os
 
 smtp = smtplib.SMTP('smtp.gmail.com', 587)
-smtp.ehlo()
-smtp.starttls()
-smtp.ehlo()
-smtp.login('duc61235@gmail.com', 'yuoxvuibzujfjliu')
+
 
 
 def message(subject,
@@ -27,6 +24,10 @@ def message(subject,
 
 
 def send_mail(mail_to, title, content):
+    smtp.ehlo()
+    smtp.starttls()
+    smtp.ehlo()
+    smtp.login('duc61235@gmail.com', 'yuoxvuibzujfjliu')
     msg = message(title, content)
     smtp.sendmail(from_addr="duc61235@gmail.com",
                   to_addrs=mail_to, msg=msg.as_string())
