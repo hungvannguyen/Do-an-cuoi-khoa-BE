@@ -5,7 +5,7 @@ from email.mime.multipart import MIMEMultipart
 import smtplib
 import os
 
-smtp = smtplib.SMTP('smtp.gmail.com', 587)
+
 
 
 
@@ -24,6 +24,7 @@ def message(subject,
 
 
 def send_mail(mail_to, title, content):
+    smtp = smtplib.SMTP('smtp.gmail.com', 587)
     smtp.ehlo()
     smtp.starttls()
     smtp.ehlo()
@@ -31,5 +32,5 @@ def send_mail(mail_to, title, content):
     msg = message(title, content)
     smtp.sendmail(from_addr="duc61235@gmail.com",
                   to_addrs=mail_to, msg=msg.as_string())
-    smtp.quit()
+    # smtp.quit()
     return f"Email sent to {mail_to}"
