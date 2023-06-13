@@ -142,6 +142,35 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             'total_page': total_page
         }
 
+    def get_by_cat_id(self,cat_id, page, db: Session):
+        current_page = page
+        if current_page <= 0:
+            current_page = 1
+        total_product = db.query(self.model).filter(
+            self.model.status == Const.ACTIVE_STATUS,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).count()
+        total_page = int(total_product / Const.ROW_PER_PAGE)
+        if total_product % Const.ROW_PER_PAGE > 0:
+            total_page += 1
+        if current_page > total_page:
+            current_page = total_page
+        offset = (current_page - 1) * Const.ROW_PER_PAGE
+        limit = Const.ROW_PER_PAGE
+        data_db = db.query(self.model).filter(
+            self.model.cat_id == cat_id,
+            self.model.status == Const.ACTIVE_STATUS,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        for item in data_db:
+            if item.is_sale == 1:
+                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+        return {
+            'data': data_db,
+            'current_page': current_page,
+            'total_page': total_page
+        }
+
     def create_product(self, request, db: Session, admin_id):
 
         request = request.dict()

@@ -38,9 +38,14 @@ def get_new_products(page: int, db: Session = Depends(deps.get_db)):
     return crud_product.get_new_products(page=page, db=db)
 
 
-@router.get("/best-seller")
+@router.get("/best-seller/{page}")
 def get_best_seller_products(db: Session = Depends(deps.get_db)):
     pass
+
+
+@router.get("/category/{cat_id}/page/{page}")
+def get_products_by_cat_id(cat_id: int, page: int, db: Session = Depends(deps.get_db)):
+    return crud_product.get_by_cat_id(cat_id=cat_id, page=page, db=db)
 
 
 @router.get("/{id}")
