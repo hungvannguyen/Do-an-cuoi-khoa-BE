@@ -7,7 +7,7 @@ import schemas.token
 from schemas.login import LoginRequest
 from security.security import gen_token
 from database import deps
-from upload.upload import uploadFile
+from upload.upload import uploadFile, return_img
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated="auto")
 fake_db = []
@@ -48,6 +48,12 @@ def test(token: schemas.token.TokenPayload = Depends(deps.get_current_user)):
 def upload(file: UploadFile = File(...)):
     filename = uploadFile(file)
     return {"filename": filename}
+
+
+@router.get("/img")
+def get_img(name: str):
+    return return_img(name=name)
+
 
 
 @router.post("/test1")
