@@ -207,8 +207,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             self.model.account == account,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
-
-        user_db.password = password
+        hashed_password = hash_password(password)
+        user_db.password = hashed_password
         user_db.update_at = datetime.utcnow()
         db.merge(user_db)
         db.commit()
