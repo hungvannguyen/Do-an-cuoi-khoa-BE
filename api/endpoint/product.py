@@ -15,29 +15,47 @@ router = APIRouter()
 
 
 @router.get("/all")
-def get_all(page: int = 1, db: Session = Depends(deps.get_db)):
-    data = crud_product.get_all_products(page=page, db=db)
+def get_all(page: int = 1, sort: int = 0, min_price: int = 0, max_price: int = 0, db: Session = Depends(deps.get_db)):
+    condition = {
+        'sort': sort,
+        'min_price': min_price,
+        'max_price': max_price
+    }
+    data = crud_product.get_all_products(page=page, condition=condition, db=db)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Không có sản phẩm")
     return data
 
 
 @router.get("/all/active")
-def get_all_active(page: int = 1, db: Session = Depends(deps.get_db)):
-    data = crud_product.get_all_active_products(page=page, db=db)
+def get_all_active(page: int = 1, sort: int = 0, min_price: int = 0, max_price: int = 0,
+                   db: Session = Depends(deps.get_db)):
+    condition = {
+        'sort': sort,
+        'min_price': min_price,
+        'max_price': max_price
+    }
+    data = crud_product.get_all_active_products(page=page, condition=condition, db=db)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Không có sản phẩm")
     return data
 
 
 @router.get("/sale")
-def get_sale_products(page: int = 1, sort: int = 0, db: Session = Depends(deps.get_db)):
-    print(sort)
-    return crud_product.get_sale_products(page=page, db=db)
+def get_sale_products(page: int = 1, sort: int = 0, min_price: int = 0, max_price: int = 0,
+                      db: Session = Depends(deps.get_db)):
+    condition = {
+        'sort': sort,
+        'min_price': min_price,
+        'max_price': max_price
+    }
+    return crud_product.get_sale_products(page=page, condition=condition, db=db)
 
 
 @router.get("/new")
-def get_new_products(page: int = 1, db: Session = Depends(deps.get_db)):
+def get_new_products(page: int = 1,
+                     db: Session = Depends(deps.get_db)):
+
     return crud_product.get_new_products(page=page, db=db)
 
 
@@ -47,8 +65,14 @@ def get_best_seller_products(db: Session = Depends(deps.get_db)):
 
 
 @router.get("/category/{cat_id}")
-def get_products_by_cat_id(cat_id: int, page: int = 1, db: Session = Depends(deps.get_db)):
-    return crud_product.get_by_cat_id(cat_id=cat_id, page=page, db=db)
+def get_products_by_cat_id(cat_id: int, page: int = 1, sort: int = 0, min_price: int = 0, max_price: int = 0,
+                           db: Session = Depends(deps.get_db)):
+    condition = {
+        'sort': sort,
+        'min_price': min_price,
+        'max_price': max_price
+    }
+    return crud_product.get_by_cat_id(cat_id=cat_id, page=page, condition=condition, db=db)
 
 
 @router.get("/{id}")

@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any
 
+from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -14,7 +15,7 @@ from security.security import hash_password, verify_password, gen_token
 
 class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
-    def get_all_products(self, page: int, db: Session):
+    def get_all_products(self, page: int, condition, db: Session):
         current_page = page
         if current_page <= 0:
             current_page = 1
@@ -28,9 +29,23 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             current_page = total_page
         offset = (current_page - 1) * Const.ROW_PER_PAGE
         limit = Const.ROW_PER_PAGE
+
         data_db = db.query(self.model).filter(
+            self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).offset(offset).limit(limit).all()
+        )
+        if condition['sort'] == 1:
+            data_db = data_db.order_by(asc(self.model.price))
+        elif condition['sort'] == 2:
+            data_db = data_db.order_by(desc(self.model.price))
+        elif condition['sort'] == 3:
+            data_db = data_db.filter(
+                self.model.price >= condition['min_price'],
+                self.model.price <= condition['max_price']
+            )
+        data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        if not data_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
@@ -41,7 +56,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             'total_page': total_page
         }
 
-    def get_all_active_products(self, page: int, db: Session):
+    def get_all_active_products(self, page: int, condition, db: Session):
         current_page = page
         if current_page <= 0:
             current_page = 1
@@ -54,12 +69,25 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             total_page += 1
         if current_page > total_page:
             current_page = total_page
+
         offset = (current_page - 1) * Const.ROW_PER_PAGE
         limit = Const.ROW_PER_PAGE
         data_db = db.query(self.model).filter(
             self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).offset(offset).limit(limit).all()
+        )
+        if condition['sort'] == 1:
+            data_db = data_db.order_by(asc(self.model.price))
+        elif condition['sort'] == 2:
+            data_db = data_db.order_by(desc(self.model.price))
+        elif condition['sort'] == 3:
+            data_db = data_db.filter(
+                self.model.price >= condition['min_price'],
+                self.model.price <= condition['max_price']
+            )
+        data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        if not data_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
@@ -84,7 +112,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             setattr(data_db, 'sale_price', data_db.price)
         return data_db
 
-    def get_sale_products(self, page: int, db: Session):
+    def get_sale_products(self, page: int, condition, db: Session):
         current_page = page
         if current_page <= 0:
             current_page = 1
@@ -103,7 +131,19 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.status == Const.ACTIVE_STATUS,
             self.model.is_sale == Const.IS_SALE,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        )
+        if condition['sort'] == 1:
+            data_db = data_db.order_by(asc(self.model.price))
+        elif condition['sort'] == 2:
+            data_db = data_db.order_by(desc(self.model.price))
+        elif condition['sort'] == 3:
+            data_db = data_db.filter(
+                self.model.price >= condition['min_price'],
+                self.model.price <= condition['max_price']
+            )
+        data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        if not data_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
@@ -132,7 +172,10 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         data_db = db.query(self.model).filter(
             self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        )
+        data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        if not data_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
@@ -142,7 +185,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             'total_page': total_page
         }
 
-    def get_by_cat_id(self,cat_id, page, db: Session):
+    def get_by_cat_id(self, cat_id, page, condition, db: Session):
         current_page = page
         if current_page <= 0:
             current_page = 1
@@ -158,10 +201,22 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         offset = (current_page - 1) * Const.ROW_PER_PAGE
         limit = Const.ROW_PER_PAGE
         data_db = db.query(self.model).filter(
-            self.model.cat_id == cat_id,
             self.model.status == Const.ACTIVE_STATUS,
+            self.model.cat_id == cat_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        )
+        if condition['sort'] == 1:
+            data_db = data_db.order_by(asc(self.model.price))
+        elif condition['sort'] == 2:
+            data_db = data_db.order_by(desc(self.model.price))
+        elif condition['sort'] == 3:
+            data_db = data_db.filter(
+                self.model.price >= condition['min_price'],
+                self.model.price <= condition['max_price']
+            )
+        data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        if not data_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
