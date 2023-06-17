@@ -50,6 +50,14 @@ def update_password(request: UserUpdatePassword, db: Session = Depends(deps.get_
     return crud_user.update_password(token.id, request.password, db)
 
 
+@router.put("/password/reset/{account}")
+def user_reset_password(account: str, request: UserUpdatePassword, db: Session = Depends(deps.get_db)):
+    if not request.password == request.password_repeat:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Mật khẩu không khớp")
+
+    return crud_user.user_reset_password(account=account, password=request.password, db=db)
+
+
 @router.get("/confirm/{email}")
 def confirm_email(email: str, db: Session = Depends(deps.get_db)):
     return crud_user.confirm_email(email=email, db=db)

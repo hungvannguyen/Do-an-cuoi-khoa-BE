@@ -36,3 +36,8 @@ class UserUpdatePassword(BaseModel):
 class UserLogin(BaseModel):
     account: str
     password: str
+
+
+class UserResetPassword(BaseModel):
+    password: str
+    password_repeat: str

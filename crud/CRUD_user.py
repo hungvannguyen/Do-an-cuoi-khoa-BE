@@ -202,6 +202,20 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             'detail': "Đã xác thực thành công"
         }
 
+    def user_reset_password(self, account, password, db: Session):
+        user_db = db.query(self.model).filter(
+            self.model.account == account,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+
+        user_db.password = password
+        user_db.update_at = datetime.utcnow()
+        db.merge(user_db)
+        db.commit()
+        return {
+            'detail': "Đã đặt lại mật khẩu"
+        }
+
 
 crud_user = CRUDUser(User)
 
