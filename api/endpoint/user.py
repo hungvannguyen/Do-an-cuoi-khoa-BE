@@ -6,6 +6,8 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
 import schemas.user
+from crud import CRUD_mail
+from schemas.mail import CodeConfirm
 from security.security import verify_password
 from fastapi.encoders import jsonable_encoder
 from crud.CRUD_user import crud_user
@@ -51,6 +53,11 @@ def update_password(request: UserUpdatePassword, db: Session = Depends(deps.get_
 @router.get("/confirm/{email}")
 def confirm_email(email: str, db: Session = Depends(deps.get_db)):
     return crud_user.confirm_email(email=email, db=db)
+
+
+@router.post("/confirm_code")
+def confirm_code(request: CodeConfirm, db: Session = Depends(deps.get_db)):
+    return crud_user.confirm_code(request=request, db=db)
 
 
 @router.get("/role/all")

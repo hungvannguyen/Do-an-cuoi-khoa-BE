@@ -9,7 +9,8 @@ from models import (
     order_product,
     payment,
     paymentType,
-role
+    role,
+    code_confirm
 )
 
 from database.db import Base

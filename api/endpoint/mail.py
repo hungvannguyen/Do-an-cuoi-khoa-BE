@@ -17,6 +17,12 @@ from database import deps
 router = APIRouter()
 
 
-@router.post("/auto_mail")
+@router.post("/confirm_email")
 def create_confirm_mail(request: MailConfirm):
     return CRUD_mail.create_confirm_mail(mail_to=request.mail_to)
+
+
+@router.post("/send_confirm_code")
+def create_confirm_code(request: CodeConfirmCreate, db: Session = Depends(deps.get_db)):
+    return CRUD_mail.create_confirm_code_email(account=request.account, db=db)
+

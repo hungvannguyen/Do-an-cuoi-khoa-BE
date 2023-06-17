@@ -6,6 +6,7 @@ from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 import models
 import schemas.user
+from models.code_confirm import Code_Confirm
 from models.user import User
 from schemas.user import UserRegis, UserInfo
 from crud.base import CRUDBase
@@ -132,7 +133,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             self.model.is_confirmed == Const.IS_CONFIRMED
         ).first()
         if not data_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Không tìm thấy Account #{account}')
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Không tìm thấy tài khoản #{account}')
         data_db.update_at = datetime.utcnow()
         data_db.update_id = admin_id
         new_password = hash_password(Const.PASSWORD_DEFAULT)
@@ -167,5 +168,41 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             'detail': 'Đã cập nhật địa chỉ'
         }
 
+    def confirm_code(self, request, db: Session):
+        code = request.code
+        account = request.account
+
+        user_db = db.query(User).filter(
+            User.account == account,
+            User.is_confirmed == Const.IS_CONFIRMED,
+            User.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+
+        if not user_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy tài khoản")
+        user_id = user_db.id
+        code_db = db.query(Code_Confirm).filter(
+            Code_Confirm.code == code,
+            Code_Confirm.user_id == user_id,
+            Code_Confirm.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        if not code_db:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Mã xác thực không chính xác")
+        expire_time = code_db.expire_time
+        now = datetime.utcnow()
+        if expire_time < now:
+            raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Mã xác thực đã hết hạn")
+        code_db.delete_flag = Const.DELETE_FLAG_DELETED
+        code_db.delete_at = datetime.utcnow()
+        code_db.delete_id = user_id
+        db.merge(code_db)
+        db.commit()
+        db.refresh(code_db)
+        return {
+            'detail': "Đã xác thực thành công"
+        }
+
 
 crud_user = CRUDUser(User)
+
+

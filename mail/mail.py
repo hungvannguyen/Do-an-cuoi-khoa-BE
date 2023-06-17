@@ -28,9 +28,9 @@ def send_mail(mail_to, title, content):
     smtp.ehlo()
     smtp.starttls()
     smtp.ehlo()
-    smtp.login('duc61235@gmail.com', 'yuoxvuibzujfjliu')
+    smtp.login('dhsgundam@gmail.com', 'morfwyqtzrovgvzy')
     msg = message(title, content)
-    smtp.sendmail(from_addr="duc61235@gmail.com",
+    smtp.sendmail(from_addr="dhsgundam@gmail.com",
                   to_addrs=mail_to, msg=msg.as_string())
     # smtp.quit()
     return f"Email sent to {mail_to}"
