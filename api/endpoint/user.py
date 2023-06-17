@@ -11,7 +11,7 @@ from schemas.mail import CodeConfirm
 from security.security import verify_password
 from fastapi.encoders import jsonable_encoder
 from crud.CRUD_user import crud_user
-from schemas.user import UserRegis, UserInfo, UserLogin, UserUpdatePassword, UserUpdateInfo
+from schemas.user import UserRegis, UserInfo, UserLogin, UserUpdatePassword, UserUpdateInfo, UserResetPassword
 from schemas.token import TokenPayload
 from database import deps
 
@@ -51,7 +51,7 @@ def update_password(request: UserUpdatePassword, db: Session = Depends(deps.get_
 
 
 @router.put("/password/reset/{account}")
-def user_reset_password(account: str, request: UserUpdatePassword, db: Session = Depends(deps.get_db)):
+def user_reset_password(account: str, request: UserResetPassword, db: Session = Depends(deps.get_db)):
     if not request.password == request.password_repeat:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Mật khẩu không khớp")
 
