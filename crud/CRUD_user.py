@@ -49,7 +49,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         ).first()
         if data_db:
             if data_db.is_confirmed == Const.IS_NOT_CONFIRMED:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Tài khoản này chưa xác thực Email")
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                    detail=f"Tài khoản này chưa xác thực Email")
             data_db = jsonable_encoder(data_db)
             if verify_password(password, data_db['password']):
                 return gen_token(data_db), data_db['role_id']
@@ -104,7 +105,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             hashed_password = hash_password(password)
             request['password'] = hashed_password
             data_db = self.model(account=request['account'], password=request['password'], email=request['email'],
-                                 role_id=role_id, is_confirmed = 1)
+                                 role_id=role_id, is_confirmed=1)
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
@@ -117,7 +118,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if not data_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Email không chính xác hoặc đã xác nhận")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f"Email không chính xác hoặc đã xác nhận")
         data_db.is_confirmed = Const.IS_CONFIRMED
         db.add(data_db)
         db.commit()
@@ -133,7 +135,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             self.model.is_confirmed == Const.IS_CONFIRMED
         ).first()
         if not data_db:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'Không tìm thấy tài khoản #{account}')
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail=f'Không tìm thấy tài khoản #{account}')
         data_db.update_at = datetime.utcnow()
         data_db.update_id = admin_id
         new_password = hash_password(Const.PASSWORD_DEFAULT)
@@ -218,5 +221,3 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
 
 
 crud_user = CRUDUser(User)
-
-

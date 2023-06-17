@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fastapi import Depends, UploadFile, File, APIRouter, status
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException
@@ -12,39 +14,40 @@ from database import deps
 router = APIRouter()
 
 
-@router.get("/all/{page}")
-def get_all(page: int, db: Session = Depends(deps.get_db)):
+@router.get("/all")
+def get_all(page: int = 1, db: Session = Depends(deps.get_db)):
     data = crud_product.get_all_products(page=page, db=db)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Không có sản phẩm")
     return data
 
 
-@router.get("/all/active/{page}")
-def get_all_active(page: int, db: Session = Depends(deps.get_db)):
+@router.get("/all/active")
+def get_all_active(page: int = 1, db: Session = Depends(deps.get_db)):
     data = crud_product.get_all_active_products(page=page, db=db)
     if not data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Không có sản phẩm")
     return data
 
 
-@router.get("/sale/{page}")
-def get_sale_products(page: int, db: Session = Depends(deps.get_db)):
+@router.get("/sale")
+def get_sale_products(page: int = 1, sort: int = 0, db: Session = Depends(deps.get_db)):
+    print(sort)
     return crud_product.get_sale_products(page=page, db=db)
 
 
-@router.get("/new/{page}")
-def get_new_products(page: int, db: Session = Depends(deps.get_db)):
+@router.get("/new")
+def get_new_products(page: int = 1, db: Session = Depends(deps.get_db)):
     return crud_product.get_new_products(page=page, db=db)
 
 
-@router.get("/best-seller/{page}")
+@router.get("/best-seller")
 def get_best_seller_products(db: Session = Depends(deps.get_db)):
     pass
 
 
-@router.get("/category/{cat_id}/page/{page}")
-def get_products_by_cat_id(cat_id: int, page: int, db: Session = Depends(deps.get_db)):
+@router.get("/category/{cat_id}")
+def get_products_by_cat_id(cat_id: int, page: int = 1, db: Session = Depends(deps.get_db)):
     return crud_product.get_by_cat_id(cat_id=cat_id, page=page, db=db)
 
 
