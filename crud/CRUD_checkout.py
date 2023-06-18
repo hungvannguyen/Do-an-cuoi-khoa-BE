@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any
-
+from crud import logger
+from constants import Method, Target
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -16,6 +17,7 @@ from security.security import hash_password, verify_password, gen_token
 
 
 def get_checkout_info(db: Session, user_id):
+
     carts = crud_cart.get_cart(user_id=user_id, db=db)
     checkout = []
     total = 0
@@ -31,6 +33,10 @@ def get_checkout_info(db: Session, user_id):
             }
             total += item['sale_price'] * item['quantity']
             checkout.append(tmp)
+    logger.log(Method.GET, Target.CHECKOUT, comment=f"CHECK OUT CART OF USER ID #{user_id}",
+               status=Target.SUCCESS,
+               id=user_id,
+               db=db)
     return {
         'products': checkout,
         'total': total
@@ -54,4 +60,8 @@ def get_checkout_user_info(db: Session, user_id):
         result['district_id'] = address_info['district_id']
         result['ward_id'] = address_info['ward_id']
         result['detail'] = address_info['detail']
+    logger.log(Method.GET, Target.CHECKOUT, comment=f"CHECK OUT USER INFO OF USER ID #{user_id}",
+               status=Target.SUCCESS,
+               id=user_id,
+               db=db)
     return result

@@ -18,8 +18,8 @@ router = APIRouter()
 
 
 @router.post("/confirm_email")
-def create_confirm_mail(request: MailConfirm):
-    return CRUD_mail.create_confirm_mail(mail_to=request.mail_to)
+def create_confirm_mail(request: MailConfirm, db: Session = Depends(deps.get_db)):
+    return CRUD_mail.create_confirm_mail(mail_to=request.mail_to, db=db)
 
 
 @router.post("/send_confirm_code")

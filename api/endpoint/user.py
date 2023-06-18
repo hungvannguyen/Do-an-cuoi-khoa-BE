@@ -73,7 +73,7 @@ def get_all_roles(db: Session = Depends(deps.get_db), token: TokenPayload = Depe
     return crud_user.get_all_roles(db=db)
 
 
-@router.get("/password/reset/{account}")
+@router.put("/password/reset/{account}")
 def reset_password(account, db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_admin_user)):
     return crud_user.reset_password(db, account, token.role_id)
 

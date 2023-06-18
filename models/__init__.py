@@ -10,7 +10,8 @@ from models import (
     payment,
     paymentType,
     role,
-    code_confirm
+    code_confirm,
+    log
 )
 
 from database.db import Base

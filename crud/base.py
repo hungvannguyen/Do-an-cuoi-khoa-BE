@@ -47,7 +47,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             admin_id: Any
     ) -> ModelType:
         db_obj.update_id = admin_id
-        db_obj.update_at = datetime.utcnow()
+        db_obj.update_at = datetime.now()
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -65,7 +65,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def delete(self, db: Session, *, db_obj: Any, admin_id: int) -> ModelType:
         db_obj.delete_id = admin_id
-        db_obj.delete_at = datetime.utcnow()
+        db_obj.delete_at = datetime.now()
         db_obj.delete_flag = 1
         db.add(db_obj)
         db.commit()

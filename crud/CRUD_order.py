@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any
-
+from crud import logger
+from constants import Method, Target
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -79,7 +80,10 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         payment_db = crud_payment.get_payment_by_id(id=payment_id, db=db)
         result['payment_type'] = payment_db['payment_type_name']
         result['payment_status'] = payment_db['status']
-
+        logger.log(Method.GET, Target.ORDER, comment=f"GET ORDER BY ID #{order_id}",
+                   status=Target.SUCCESS,
+                   id=0,
+                   db=db)
         return result
 
     def get_all_orders_by_user_id(self, user_id, db: Session):
@@ -88,12 +92,19 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).all()
         if not order_db:
+            logger.log(Method.GET, Target.ORDER, comment=f"GET ALL ORDER BY USER ID #{user_id}",
+                       status=Target.FAIL,
+                       id=user_id,
+                       db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
         result = []
         for item in order_db:
             result.append(self.get_order_by_id(order_id=item.id, db=db))
-
+        logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ORDER BY USER ID #{user_id}",
+                   status=Target.SUCCESS,
+                   id=user_id,
+                   db=db)
         return result
 
     def add_order(self, request, db: Session, user_id):
@@ -114,8 +125,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         status = request.status
 
         order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number,
-                                  email=email, address=address, status=status, insert_at=datetime.utcnow(),
-                                  insert_id=user_id, update_id=user_id, update_at=datetime.utcnow())
+                                  email=email, address=address, status=status, insert_at=datetime.now(),
+                                  insert_id=user_id, update_id=user_id, update_at=datetime.now())
 
         db.add(order_obj_db)
         db.commit()
@@ -131,9 +142,9 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             price = item['price']
             order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
                                                                       quantity=quantity,
-                                                                      price=price, insert_at=datetime.utcnow(),
+                                                                      price=price, insert_at=datetime.now(),
                                                                       insert_id=user_id, update_id=user_id,
-                                                                      update_at=datetime.utcnow())
+                                                                      update_at=datetime.now())
 
             db.add(order_product_obj_db)
             db.commit()
@@ -160,7 +171,10 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'phone_number': phone_number
         }
         crud_user.update_info(request=user_update_info, db=db, user_id=user_id)
-
+        logger.log(Method.POST, Target.ORDER, comment=f"CREATE ORDER FOR USER ID #{user_id}",
+                   status=Target.SUCCESS,
+                   id=user_id,
+                   db=db)
         return {
             'detail': 'Đã đặt hàng thành công'
         }

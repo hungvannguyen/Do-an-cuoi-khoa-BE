@@ -12,7 +12,8 @@ from schemas.warehouse import *
 from crud.base import CRUDBase
 from crud.CRUD_address import crud_address
 from constants import Const
-
+from crud import logger
+from constants import Method, Target
 
 class CRUDWarehouse(CRUDBase[Warehouse, WarehouseCreate, WarehouseUpdate]):
 

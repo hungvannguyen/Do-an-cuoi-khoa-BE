@@ -12,17 +12,25 @@ from schemas.address import AddressInfo, AddressCreate, AddressUpdate
 from crud.base import CRUDBase
 from constants import Const
 from security.security import hash_password, verify_password
+from crud import logger
+from constants import Method, Target
 
 
 class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
 
     def get_all_cities(self, db: Session):
+
+        logger.log(Method.GET, Target.CITY, comment="GET ALL CITIES", status=Target.SUCCESS, id=0, db=db)
+
         data_db = db.query(City).filter(
             City.delete_flag == Const.DELETE_FLAG_NORMAL
         ).all()
         return data_db
 
     def get_city_by_id(self, city_id, db: Session):
+
+        logger.log(Method.GET, Target.CITY, comment="GET CITY BY ID", status=Target.SUCCESS, id=0, db=db)
+
         data_db = db.query(City).filter(
             City.id == city_id,
             City.delete_flag == Const.DELETE_FLAG_NORMAL
@@ -30,35 +38,50 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         return data_db
 
     def get_all_districts(self, city_id, db: Session):
+
+        logger.log(Method.GET, Target.DISTRICT, comment="GET ALL DISTRICTS", status=Target.SUCCESS, id=0, db=db)
+
         data_db = db.query(District).filter(District.city_id == city_id,
                                             District.delete_flag == Const.DELETE_FLAG_NORMAL).all()
         return data_db
 
     def get_district_by_id(self, district_id, db: Session):
+
+        logger.log(Method.GET, Target.DISTRICT, comment="GET DISTRICT BY ID", status=Target.SUCCESS, id=0, db=db)
+
         data_db = db.query(District).filter(District.id == district_id,
                                             District.delete_flag == Const.DELETE_FLAG_NORMAL).first()
         return data_db
 
     def get_all_wards(self, city_id, district_id, db: Session):
+
+        logger.log(Method.GET, Target.WARD, comment="GET ALL WARDS", status=Target.SUCCESS, id=0, db=db)
+
         data_db = db.query(Ward).filter(Ward.city_id == city_id, Ward.district_id == district_id,
                                         Ward.delete_flag == Const.DELETE_FLAG_NORMAL).all()
         return data_db
 
     def get_ward_by_id(self, ward_id, db: Session):
+        logger.log(Method.GET, Target.WARD, comment="GET WARD BY ID", status=Target.SUCCESS, id=0, db=db)
         data_db = db.query(Ward).filter(Ward.id == ward_id, Ward.delete_flag == Const.DELETE_FLAG_NORMAL).first()
         return data_db
 
     def get_address_info_by_user_id(self, user_id, db: Session):
+
         data_db = db.query(self.model). \
             filter(
             self.model.user_id == user_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if not data_db:
+            logger.log(Method.GET, Target.ADDRESS, comment=f"GET ADDRESS INFO OF USER #{user_id}", status=Target.FAIL,
+                       id=user_id, db=db)
             return None
         city = self.get_city_by_id(city_id=data_db.city_id, db=db)
         district = self.get_district_by_id(district_id=data_db.district_id, db=db)
         ward = self.get_ward_by_id(ward_id=data_db.ward_id, db=db)
+        logger.log(Method.GET, Target.ADDRESS, comment=f"GET ADDRESS INFO OF USER #{user_id}", status=Target.SUCCESS,
+                   id=user_id, db=db)
         return {
             'user_id': user_id,
             'city_id': city.id,
@@ -68,6 +91,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         }
 
     def get_address_by_user_id(self, user_id, db: Session):
+        logger.log(Method.GET, Target.ADDRESS, comment=f"GET ADDRESS BY USER ID #{user_id}", status=Target.SUCCESS,
+                   id=0, db=db)
         data_db = db.query(self.model). \
             filter(
             self.model.user_id == user_id,
@@ -77,6 +102,7 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         return data_db
 
     def create_address(self, request, db: Session, user_id):
+
         data_db = self.get_address_by_user_id(user_id=user_id, db=db)
         if data_db:
             return self.update_address(request=request, db=db, user_id=user_id)
@@ -86,11 +112,15 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
+        logger.log(Method.POST, Target.ADDRESS, comment=f"CREATE USER #{user_id} ADDRESS", status=Target.SUCCESS,
+                   id=user_id, db=db)
         return {
             'detail': "Đã tạo Địa chỉ thành công"
         }
 
     def update_address(self, request, db: Session, user_id):
+        logger.log(Method.PUT, Target.ADDRESS, comment=f"UPDATE ADDRESS USER ID #{user_id}", status=Target.SUCCESS,
+                   id=user_id, db=db)
         if not isinstance(request, dict):
             request = request.dict()
         data_db = self.get_address_by_user_id(user_id=user_id, db=db)
@@ -100,11 +130,17 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         }
 
     def delete_address(self, user_id, db: Session, admin_id):
+
         data_db = self.get_address_by_user_id(user_id, db)
         if not data_db:
+            logger.log(Method.DELETE, Target.ADDRESS, comment=f"DELETE USER ID #{user_id} ADDRESS ",
+                       status=Target.FAIL,
+                       id=admin_id, db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"User ID #{user_id} chưa có Địa chỉ nào")
         self.delete(db=db, db_obj=data_db, admin_id=admin_id)
+        logger.log(Method.DELETE, Target.ADDRESS, comment=f"DELETE USER ID #{user_id} ADDRESS ", status=Target.SUCCESS,
+                   id=admin_id, db=db)
         return {
             'detail': "Đã xoá"
         }

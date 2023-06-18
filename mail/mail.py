@@ -5,8 +5,10 @@ from email.mime.multipart import MIMEMultipart
 import smtplib
 import os
 
+from sqlalchemy.orm import Session
 
-
+from constants import Method, Target, Const
+from crud import logger
 
 
 def message(subject,
@@ -23,7 +25,7 @@ def message(subject,
     return msg
 
 
-def send_mail(mail_to, title, content):
+def send_mail(mail_to, title, content, db: Session):
     smtp = smtplib.SMTP('smtp.gmail.com', 587)
     smtp.ehlo()
     smtp.starttls()
@@ -33,4 +35,8 @@ def send_mail(mail_to, title, content):
     smtp.sendmail(from_addr="dhsgundam@gmail.com",
                   to_addrs=mail_to, msg=msg.as_string())
     # smtp.quit()
+    logger.log(Method.POST, Target.MAIL, comment=f"SEND MAIL TO {mail_to}",
+               status=Target.SUCCESS,
+               id=Const.ADMIN_ID,
+               db=db)
     return f"Email sent to {mail_to}"

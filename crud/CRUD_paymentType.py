@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any
-
+from crud import logger
+from constants import Method, Target
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -20,6 +21,10 @@ class CRUDPaymentType(CRUDBase[PaymentType, PaymentTypeCreate, PaymentTypeUpdate
             self.model.id == paymentType_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
+        logger.log(Method.GET, Target.PAYMENT_TYPE, comment=f"GET PAYMENT TYPE BY ID #{paymentType_id}",
+                   status=Target.SUCCESS,
+                   id=0,
+                   db=db)
         return {
             'id': data_db.id,
             'name': data_db.name
@@ -35,6 +40,10 @@ class CRUDPaymentType(CRUDBase[PaymentType, PaymentTypeCreate, PaymentTypeUpdate
                 'id': item.id,
                 'name': item.name
             })
+        logger.log(Method.GET, Target.PAYMENT_TYPE, comment=f"GET ALL PAYMENT TYPE",
+                   status=Target.SUCCESS,
+                   id=0,
+                   db=db)
         return result
 
 

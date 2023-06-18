@@ -37,7 +37,7 @@ def verify_password(password, hashed_password):
 
 
 def gen_token(user) -> Any:
-    expire = datetime.utcnow() + timedelta(
+    expire = datetime.now() + timedelta(
         seconds=3600 * 24
     )
     to_encode = {

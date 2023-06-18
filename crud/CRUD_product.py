@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any
-
+from crud import logger
+from constants import Method, Target
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
@@ -45,11 +46,18 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
+            logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL PRODUCTS",
+                       status=Target.FAIL,
+                       id=0,
+                       db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
-
+        logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL PRODUCTS",
+                   status=Target.SUCCESS,
+                   id=0,
+                   db=db)
         return {
             'data': data_db,
             'current_page': current_page,
@@ -87,11 +95,18 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
+            logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ACTIVE PRODUCTS",
+                       status=Target.FAIL,
+                       id=0,
+                       db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
-
+        logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ACTIVE PRODUCTS",
+                   status=Target.SUCCESS,
+                   id=0,
+                   db=db)
         return {
             'data': data_db,
             'current_page': current_page,
@@ -105,11 +120,19 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if not data_db:
+            logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCT BY ID {id}",
+                       status=Target.FAIL,
+                       id=0,
+                       db=db)
             return None
         if data_db.is_sale == 1:
             setattr(data_db, 'sale_price', data_db.price * (100 - data_db.sale_percent) / 100)
         else:
             setattr(data_db, 'sale_price', data_db.price)
+        logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCT BY ID {id}",
+                   status=Target.SUCCESS,
+                   id=0,
+                   db=db)
         return data_db
 
     def get_sale_products(self, page: int, condition, db: Session):
@@ -143,11 +166,18 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
+            logger.log(Method.GET, Target.PRODUCT, comment=f"GET SALE PRODUCTS",
+                       status=Target.FAIL,
+                       id=0,
+                       db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
-
+        logger.log(Method.GET, Target.PRODUCT, comment=f"GET SALE PRODUCTS",
+                   status=Target.SUCCESS,
+                   id=0,
+                   db=db)
         return {
             'data': data_db,
             'current_page': current_page,
@@ -175,10 +205,18 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
+            logger.log(Method.GET, Target.PRODUCT, comment=f"GET NEW PRODUCTS",
+                       status=Target.FAIL,
+                       id=0,
+                       db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+        logger.log(Method.GET, Target.PRODUCT, comment=f"GET NEW PRODUCTS",
+                   status=Target.SUCCESS,
+                   id=0,
+                   db=db)
         return {
             'data': data_db,
             'current_page': current_page,
@@ -216,10 +254,18 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
+            logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCTS BY CATEGORY ID {cat_id}",
+                       status=Target.FAIL,
+                       id=0,
+                       db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+        logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCTS BY CATEGORY ID {cat_id}",
+                   status=Target.SUCCESS,
+                   id=0,
+                   db=db)
         return {
             'data': data_db,
             'current_page': current_page,
@@ -233,11 +279,15 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         if request['is_sale'] == 0:
             request['sale_percent'] = 0
         if crud_category.get_category_by_id(db=db, id=cat_id):
-            data_db = self.model(**request, insert_id=admin_id, update_id=admin_id, insert_at=datetime.utcnow(),
-                                 update_at=datetime.utcnow())
+            data_db = self.model(**request, insert_id=admin_id, update_id=admin_id, insert_at=datetime.now(),
+                                 update_at=datetime.now())
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
+        logger.log(Method.POST, Target.PRODUCT, comment=f"CREATE NEW PRODUCT",
+                   status=Target.SUCCESS,
+                   id=admin_id,
+                   db=db)
         return {
             'detail': "Tạo thành công"
         }
@@ -249,7 +299,10 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         if request['is_sale'] == 0:
             request['sale_percent'] = 0
         self.update(db_obj=data_db, obj_in=request, db=db, admin_id=admin_id)
-
+        logger.log(Method.POST, Target.PRODUCT, comment=f"UPDATE PRODUCT ID #{id}",
+                   status=Target.SUCCESS,
+                   id=admin_id,
+                   db=db)
         return {
             'detail': 'Cập nhật thành công'
         }
