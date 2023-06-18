@@ -72,8 +72,9 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
                             detail="Tài khoản hoặc mật khẩu không chính xác")
 
     def create_user(self, db: Session, request) -> Any:
+        account = request.account
         if not request.password == request.confirm_password:
-            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW USER {request.account}",
+            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW USER {account}",
                        status=Target.FAIL,
                        id=0,
                        db=db)
@@ -84,7 +85,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if email_db:
-            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW USER {request.account}",
+            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW USER {account}",
                        status=Target.FAIL,
                        id=0,
                        db=db)
@@ -94,7 +95,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if data_db:
-            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW USER {request.account}",
+            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW USER {account}",
                        status=Target.FAIL,
                        id=0,
                        db=db)
@@ -108,15 +109,16 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
-            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW USER {request.account}",
+            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW USER {account}",
                        status=Target.SUCCESS,
                        id=0,
                        db=db)
             return {"result": "Tạo thành công"}
 
     def create_admin(self, db: Session, request, role_id) -> Any:
+        account = request.account
         if not request.password == request.confirm_password:
-            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW ADMIN {request.account}",
+            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW ADMIN {account}",
                        status=Target.FAIL,
                        id=0,
                        db=db)
@@ -126,7 +128,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if email_db:
-            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW ADMIN {request.account}",
+            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW ADMIN {account}",
                        status=Target.FAIL,
                        id=0,
                        db=db)
@@ -136,7 +138,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if data_db:
-            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW ADMIN {request.account}",
+            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW ADMIN {account}",
                        status=Target.FAIL,
                        id=0,
                        db=db)
@@ -151,7 +153,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
-            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW ADMIN {request.account}",
+            logger.log(Method.POST, Target.USER, comment=f"CREATE NEW ADMIN {account}",
                        status=Target.SUCCESS,
                        id=0,
                        db=db)
