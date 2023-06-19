@@ -46,5 +46,16 @@ class CRUDPaymentType(CRUDBase[PaymentType, PaymentTypeCreate, PaymentTypeUpdate
                    db=db)
         return result
 
+    def create_payment_type(self, request, db: Session, admin_id):
+        if not isinstance(request, dict):
+            request = request.dict()
+        obj_db = self.model(**request, insert_id=admin_id, update_id=admin_id)
+        db.add(obj_db)
+        db.commit()
+        db.refresh(obj_db)
+        return {
+            'detail': 'success'
+        }
+
 
 crud_paymentType = CRUDPaymentType(PaymentType)
