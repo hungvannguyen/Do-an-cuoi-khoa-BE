@@ -67,9 +67,10 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         return count
 
     def add_to_cart(self, request, db: Session, user_id):
+        prd_id = request.prd_id
         prd_data = crud_product.get_product_by_id(id=request.prd_id, db=db)
         if not prd_data:
-            logger.log(Method.POST, Target.CART, comment=f"ADD PRODUCT ID #{request.prd_id} TO CART USER ID #{user_id}",
+            logger.log(Method.POST, Target.CART, comment=f"ADD PRODUCT ID #{prd_id} TO CART USER ID #{user_id}",
                        status=Target.FAIL,
                        id=user_id,
                        db=db)
@@ -84,7 +85,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
             request = request.dict()
             if request['quantity'] > prd_data.quantity:
                 logger.log(Method.POST, Target.CART,
-                           comment=f"ADD PRODUCT ID #{request.prd_id} TO CART USER ID #{user_id}",
+                           comment=f"ADD PRODUCT ID #{prd_id} TO CART USER ID #{user_id}",
                            status=Target.FAIL,
                            id=user_id,
                            db=db)
@@ -96,13 +97,14 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         else:
             if data_db.quantity + request.quantity > prd_data.quantity:
                 logger.log(Method.POST, Target.CART,
-                           comment=f"ADD PRODUCT ID #{request.prd_id} TO CART USER ID #{user_id}",
+                           comment=f"ADD PRODUCT ID #{prd_id} TO CART USER ID #{user_id}",
                            status=Target.FAIL,
                            id=user_id,
                            db=db)
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Sản phẩm đạt giới hạn")
             self.update_cart(data_db.prd_id, request.quantity + data_db.quantity, db, user_id)
-        logger.log(Method.POST, Target.CART, comment=f"ADD PRODUCT ID #{request.prd_id} TO CART USER ID #{user_id}",
+
+        logger.log(Method.POST, Target.CART, comment=f"ADD PRODUCT ID #{prd_id} TO CART USER ID #{user_id}",
                    status=Target.SUCCESS,
                    id=user_id,
                    db=db)

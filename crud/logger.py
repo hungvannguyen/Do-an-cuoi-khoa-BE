@@ -25,4 +25,6 @@ def log(type, target, comment, status, id, db: Session):
 
     db.add(obj)
     db.commit()
-    db.refresh(obj)
+    return {
+        'success'
+    }

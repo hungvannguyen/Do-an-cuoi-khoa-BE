@@ -26,7 +26,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         total_page = int(total_product / Const.ROW_PER_PAGE)
         if total_product % Const.ROW_PER_PAGE > 0:
             total_page += 1
-        if current_page > total_page:
+        if current_page > total_page and total_page > 0:
             current_page = total_page
         offset = (current_page - 1) * Const.ROW_PER_PAGE
         limit = Const.ROW_PER_PAGE
@@ -51,13 +51,13 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                        id=0,
                        db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        for item in data_db:
-            if item.is_sale == 1:
-                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
         logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL PRODUCTS",
                    status=Target.SUCCESS,
                    id=0,
                    db=db)
+        for item in data_db:
+            if item.is_sale == 1:
+                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
         return {
             'data': data_db,
             'current_page': current_page,
@@ -75,7 +75,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         total_page = int(total_product / Const.ROW_PER_PAGE)
         if total_product % Const.ROW_PER_PAGE > 0:
             total_page += 1
-        if current_page > total_page:
+        if current_page > total_page and total_page > 0:
             current_page = total_page
 
         offset = (current_page - 1) * Const.ROW_PER_PAGE
@@ -100,13 +100,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                        id=0,
                        db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        for item in data_db:
-            if item.is_sale == 1:
-                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
         logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ACTIVE PRODUCTS",
                    status=Target.SUCCESS,
                    id=0,
                    db=db)
+        for item in data_db:
+            if item.is_sale == 1:
+                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
         return {
             'data': data_db,
             'current_page': current_page,
@@ -125,14 +126,15 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                        id=0,
                        db=db)
             return None
-        if data_db.is_sale == 1:
-            setattr(data_db, 'sale_price', data_db.price * (100 - data_db.sale_percent) / 100)
-        else:
-            setattr(data_db, 'sale_price', data_db.price)
         logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCT BY ID {id}",
                    status=Target.SUCCESS,
                    id=0,
                    db=db)
+        if data_db.is_sale == 1:
+            setattr(data_db, 'sale_price', data_db.price * (100 - data_db.sale_percent) / 100)
+        else:
+            setattr(data_db, 'sale_price', data_db.price)
+
         return data_db
 
     def get_sale_products(self, page: int, condition, db: Session):
@@ -141,12 +143,13 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             current_page = 1
         total_product = db.query(self.model).filter(
             self.model.status == Const.ACTIVE_STATUS,
+            self.model.is_sale == Const.IS_SALE,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).count()
         total_page = int(total_product / Const.ROW_PER_PAGE)
         if total_product % Const.ROW_PER_PAGE > 0:
             total_page += 1
-        if current_page > total_page:
+        if current_page > total_page and total_page > 0:
             current_page = total_page
         offset = (current_page - 1) * Const.ROW_PER_PAGE
         limit = Const.ROW_PER_PAGE
@@ -171,13 +174,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                        id=0,
                        db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        for item in data_db:
-            if item.is_sale == 1:
-                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
         logger.log(Method.GET, Target.PRODUCT, comment=f"GET SALE PRODUCTS",
                    status=Target.SUCCESS,
                    id=0,
                    db=db)
+        for item in data_db:
+            if item.is_sale == 1:
+                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
         return {
             'data': data_db,
             'current_page': current_page,
@@ -195,7 +199,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         total_page = int(total_product / Const.ROW_PER_PAGE)
         if total_product % Const.ROW_PER_PAGE > 0:
             total_page += 1
-        if current_page > total_page:
+        if current_page > total_page and total_page > 0:
             current_page = total_page
         offset = (current_page - 1) * Const.ROW_PER_PAGE
         limit = Const.ROW_PER_PAGE
@@ -210,13 +214,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                        id=0,
                        db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        for item in data_db:
-            if item.is_sale == 1:
-                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
         logger.log(Method.GET, Target.PRODUCT, comment=f"GET NEW PRODUCTS",
                    status=Target.SUCCESS,
                    id=0,
                    db=db)
+        for item in data_db:
+            if item.is_sale == 1:
+                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
         return {
             'data': data_db,
             'current_page': current_page,
@@ -229,12 +234,13 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             current_page = 1
         total_product = db.query(self.model).filter(
             self.model.status == Const.ACTIVE_STATUS,
+            self.model.cat_id == cat_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).count()
         total_page = int(total_product / Const.ROW_PER_PAGE)
         if total_product % Const.ROW_PER_PAGE > 0:
             total_page += 1
-        if current_page > total_page:
+        if current_page > total_page and total_page > 0:
             current_page = total_page
         offset = (current_page - 1) * Const.ROW_PER_PAGE
         limit = Const.ROW_PER_PAGE
@@ -259,13 +265,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                        id=0,
                        db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        for item in data_db:
-            if item.is_sale == 1:
-                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
         logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCTS BY CATEGORY ID {cat_id}",
                    status=Target.SUCCESS,
                    id=0,
                    db=db)
+        for item in data_db:
+            if item.is_sale == 1:
+                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
         return {
             'data': data_db,
             'current_page': current_page,

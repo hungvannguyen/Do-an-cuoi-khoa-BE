@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import Any
 from crud import logger
@@ -20,7 +21,7 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         data_db = db.query(self.model).filter(
             self.model.id == id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).first()
+        ).count()
         if not data_db:
             logger.log(Method.GET, Target.CATEGORY, comment=f"GET CATEGORY ID #{id}",
                        status=Target.FAIL,
@@ -31,22 +32,30 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
                    status=Target.SUCCESS,
                    id=0,
                    db=db)
+        data_db = db.query(self.model).filter(
+            self.model.id == id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
         return data_db
 
     def get_all_category(self, db: Session):
         data_db = db.query(self.model).filter(
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).all()
+        ).count()
         if not data_db:
             logger.log(Method.GET, Target.CATEGORY, comment=f"GET ALL CATEGORY",
                        status=Target.FAIL,
                        id=0,
                        db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tồn tại Danh mục nào")
-        logger.log(Method.GET, Target.CATEGORY, comment=f"GET ALL CATEGORY",
+        else:
+            logger.log(Method.GET, Target.CATEGORY, comment=f"GET ALL CATEGORY",
                    status=Target.SUCCESS,
                    id=0,
                    db=db)
+        data_db = db.query(self.model).filter(
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
         return data_db
 
     def create_category(self, request, admin_id, db: Session):
