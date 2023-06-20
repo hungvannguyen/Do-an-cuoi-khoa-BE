@@ -15,6 +15,7 @@ from constants import Const
 from crud import logger
 from constants import Method, Target
 
+
 class CRUDWarehouse(CRUDBase[Warehouse, WarehouseCreate, WarehouseUpdate]):
 
     def get_warehouse_info(self, db: Session):
@@ -23,9 +24,9 @@ class CRUDWarehouse(CRUDBase[Warehouse, WarehouseCreate, WarehouseUpdate]):
         ).first()
         if not data_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy kho hàng nào")
-        city = crud_address.get_city_by_id(city_id=data_db.city, db=db)
-        district = crud_address.get_district_by_id(district_id=data_db.district, db=db)
-        ward = crud_address.get_ward_by_id(ward_id=data_db.ward, db=db)
+        city = crud_address.get_city_by_id(city_id=data_db.city_id, db=db)
+        district = crud_address.get_district_by_id(district_id=data_db.district_id, db=db)
+        ward = crud_address.get_ward_by_id(ward_id=data_db.ward_id, db=db)
 
         return {
             'city': city.name,
@@ -33,6 +34,23 @@ class CRUDWarehouse(CRUDBase[Warehouse, WarehouseCreate, WarehouseUpdate]):
             'ward': ward.name,
             'detail': data_db.detail
         }
+
+    def create_warehouse(self, request, db: Session, admin_id):
+        if not isinstance(request, dict):
+            request = request.dict()
+        obj = self.model(**request, insert_id=admin_id, update_id=admin_id)
+        db.add(obj)
+        db.commit()
+        db.refresh(obj)
+
+        logger.log(Method.POST, Target.WAREHOUSE, comment="CREATE NEW WAREHOUSE", status=Target.SUCCESS, id=admin_id,
+                   db=db)
+
+        return {
+            'detail': "Đã tạo kho hàng thành công"
+        }
+
+
 
 
 crud_warehouse = CRUDWarehouse(Warehouse)
