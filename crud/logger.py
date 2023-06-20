@@ -30,7 +30,7 @@ def log(type, target, comment, status, id, db: Session):
     }
 
 
-def get_log(type, target, status, id, db: Session):
+def get_log(type, target, status, id, sort, db: Session):
     obj = db.query(Log)
 
     if type != None:
@@ -49,7 +49,10 @@ def get_log(type, target, status, id, db: Session):
         obj = obj.filter(Log.status == status)
     if id != None:
         obj = obj.filter(Log.insert_id == id)
-
+    if sort == 'asc':
+        obj = obj.order_by(Log.insert_at.asc())
+    elif sort == 'desc':
+        obj = obj.order_by(Log.insert_at.desc())
     obj = obj.all()
     if not obj:
         raise HTTPException(status_code=code_status.HTTP_404_NOT_FOUND, detail=f"Không có Log phù hợp")

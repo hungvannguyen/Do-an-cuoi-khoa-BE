@@ -17,6 +17,6 @@ router = APIRouter()
 
 
 @router.get("/all")
-def get_logs(type: str = None, target: str = None, status: str = None, id: int = None,
+def get_logs(type: str = None, target: str = None, status: str = None, id: int = None, sort: str = 'asc',
              db: Session = Depends(deps.get_db)):
-    return get_log(type=type, target=target, status=status, id=id, db=db)
+    return get_log(type=type, target=target, status=status, id=id,sort=sort, db=db)
