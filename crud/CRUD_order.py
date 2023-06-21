@@ -123,7 +123,11 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                    status=Target.SUCCESS,
                    id=user_id,
                    db=db)
-        return result
+        return {
+            'data': result,
+            'current_page': current_page,
+            'total_page': total_page
+        }
 
     def add_order(self, request, db: Session, user_id):
         # Add payment method
