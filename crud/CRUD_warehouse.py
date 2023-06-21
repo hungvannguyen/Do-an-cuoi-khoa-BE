@@ -29,6 +29,7 @@ class CRUDWarehouse(CRUDBase[Warehouse, WarehouseCreate, WarehouseUpdate]):
         ward = crud_address.get_ward_by_id(ward_id=data_db.ward_id, db=db)
 
         return {
+            'id': data_db.id,
             'city': city.name,
             'district': district.name,
             'ward': ward.name,
