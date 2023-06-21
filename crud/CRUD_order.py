@@ -36,7 +36,6 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             setattr(prd_data_db, 'sale_price', prd_data_db.price)
         return prd_data_db
 
-
     def get_order_by_id(self, order_id, db: Session):
         obj_db = db.query(self.model).filter(
             self.model.id == order_id,
@@ -86,17 +85,36 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                    db=db)
         return result
 
-    def get_all_orders_by_user_id(self, user_id, db: Session):
+    def get_all_orders_by_user_id(self, page, order_status, user_id, db: Session):
         order_db = db.query(self.model).filter(
             self.model.user_id == user_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).all()
+        )
+        if order_status:
+            order_db = order_db.filter(
+                self.model.status == order_status
+            )
+
+        total_order = order_db.count()
+        total_page = int(total_order / Const.ROW_PER_PAGE)
+        if total_order % Const.ROW_PER_PAGE > 0:
+            total_page += 1
+        current_page = page
+        if current_page < 1:
+            current_page = 1
+        if current_page > total_page > 0:
+            current_page = total_page
+
+        start = (current_page - 1) * Const.ROW_PER_PAGE
+
+        order_db = order_db.offset(start).limit(Const.ROW_PER_PAGE).order_by(self.model.insert_at.desc()).all()
+
         if not order_db:
             logger.log(Method.GET, Target.ORDER, comment=f"GET ALL ORDER BY USER ID #{user_id}",
                        status=Target.FAIL,
                        id=user_id,
                        db=db)
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không có đơn hàng")
 
         result = []
         for item in order_db:

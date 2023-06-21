@@ -21,9 +21,9 @@ def get_order_by_id(order_id: int, db: Session = Depends(deps.get_db),
 
 
 @router.get("/all")
-def get_all_order(db: Session = Depends(deps.get_db),
+def get_all_order(page: int = 1, order_status: int = None, db: Session = Depends(deps.get_db),
                   token: TokenPayload = Depends(deps.get_current_user)):
-    return crud_order.get_all_orders_by_user_id(db=db, user_id=token.id)
+    return crud_order.get_all_orders_by_user_id(page = page, order_status=order_status, db=db, user_id=token.id)
 
 
 @router.post("/add")
