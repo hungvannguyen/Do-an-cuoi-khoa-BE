@@ -89,7 +89,6 @@ def update_user_info(request: UserUpdateInfo, db: Session = Depends(deps.get_db)
     return crud_user.update_info(request=request, db=db, user_id=token.id)
 
 
-
 @router.delete("/delete/{id}")
-def del_acc(id:int, db: Session = Depends(deps.get_db)):
-    return crud_user.delete_account(id=id,db=db)
+def del_acc(id: int, db: Session = Depends(deps.get_db)):
+    return crud_user.delete_account(id=id, db=db)
