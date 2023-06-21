@@ -227,6 +227,20 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             'detail': "Đã cập nhật mật khẩu"
         }
 
+    def delete_account(self, id, db: Session):
+        user_db = db.query(self.model).filter(
+            self.model.id == id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        if not user_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Account ID #{id} Not Found")
+        user_db.delete_flag = Const.DELETE_FLAG_DELETED
+        db.merge(user_db)
+        db.commit()
+        return {
+            'detail': "Đã xoá"
+        }
+
     def update_info(self, request, db: Session, user_id):
 
         if not isinstance(request, dict):
