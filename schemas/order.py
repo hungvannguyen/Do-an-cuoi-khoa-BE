@@ -22,7 +22,7 @@ class OrderCreate(BaseModel):
     payment_type_id: Optional[int]
     name: Optional[str]
     phone_number: Optional[str]
-    email: Optional[str]
+    # email: Optional[str]
     address: Optional[str]
     city_id: Optional[int]
     district_id: Optional[int]
