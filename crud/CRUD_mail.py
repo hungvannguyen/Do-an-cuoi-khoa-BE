@@ -61,7 +61,7 @@ def create_confirm_code_email(account, db: Session):
     db.refresh(obj_db)
 
     text = confirm_code_template.replace("11111", str(code))
-    logger.log(Method.POST, Target.MAIL_CONFIRM, comment=f"CREATE CODE CONFIRM MAIL",
+    logger.log(Method.POST, Target.CODE_CONFIRM, comment=f"CREATE CODE CONFIRM MAIL",
                status=Target.SUCCESS,
                id=user_id,
                db=db)
