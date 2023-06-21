@@ -27,6 +27,11 @@ def get_address_by_user_id(db: Session = Depends(deps.get_db),
     return data_db
 
 
+@router.get("/detail")
+def get_detail_by_user_id(user_id: int, db: Session = Depends(deps.get_db)):
+    return crud_address.get_detail_address_by_user_id(user_id=user_id, db=db)
+
+
 @router.get("/city/all")
 def get_all_city(db: Session = Depends(deps.get_db),
                  token: TokenPayload = Depends(deps.get_current_user)):

@@ -90,6 +90,23 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             'detail': data_db.detail
         }
 
+    def get_detail_address_by_user_id(self, user_id, db: Session):
+        data_db = db.query(self.model). \
+            filter(
+            self.model.user_id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        city = self.get_city_by_id(city_id=data_db.city_id,db=db)
+        district = self.get_district_by_id(district_id=data_db.district_id, db=db)
+        ward = self.get_ward_by_id(ward_id=data_db.ward_id, db=db)
+        detail = data_db.detail
+        return {
+            'city': city.name,
+            'district': district.name,
+            'ward': ward.name,
+            'detail': detail
+        }
+
     def get_address_by_user_id(self, user_id, db: Session):
         logger.log(Method.GET, Target.ADDRESS, comment=f"GET ADDRESS BY USER ID #{user_id}", status=Target.SUCCESS,
                    id=0, db=db)

@@ -143,11 +143,10 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         name = request.name
         phone_number = request.phone_number
         email = request.email
-        address = request.address
         status = request.status
 
         order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number,
-                                  email=email, address=address, status=status, insert_at=datetime.now(),
+                                  email=email, address="", status=status, insert_at=datetime.now(),
                                   insert_id=user_id, update_id=user_id, update_at=datetime.now())
 
         db.add(order_obj_db)
@@ -184,6 +183,19 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'detail': request.detail
         }
         crud_address.create_address(request=address_update_info, db=db, user_id=user_id)
+
+        # Update Address in Order
+        address_user = crud_address.get_detail_address_by_user_id(user_id=user_id, db=db)
+        city = address_user['city']
+        district = address_user['district']
+        ward = address_user['ward']
+        detail = address_user['detail']
+
+        address_detail = detail + ", " + ward + ", " + district + ", " + city
+        order_obj_db.address = address_detail
+        db.merge(order_obj_db)
+        db.commit()
+        db.refresh(order_obj_db)
 
         # Update User Info
 
