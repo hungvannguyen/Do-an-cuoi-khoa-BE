@@ -107,7 +107,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         start = (current_page - 1) * Const.ROW_PER_PAGE
 
-        order_db = order_db.offset(start).limit(Const.ROW_PER_PAGE).order_by(self.model.insert_at.desc()).all()
+        order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE).all()
 
         if not order_db:
             logger.log(Method.GET, Target.ORDER, comment=f"GET ALL ORDER BY USER ID #{user_id}",
