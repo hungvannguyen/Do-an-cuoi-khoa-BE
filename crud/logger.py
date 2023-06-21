@@ -56,13 +56,11 @@ def get_log(type, target, status, id, sort, page, row_per_page, date_from, date_
     elif sort == 'desc':
         obj = obj.order_by(Log.insert_at.desc())
 
-    if date_from!= None:
+    if date_from != None:
         obj = obj.filter(Log.insert_at >= date_from)
 
     if date_to != None:
         obj = obj.filter(Log.insert_at <= date_to)
-
-
 
     total_logs = obj.count()
     total_page = int(total_logs / row_per_page)
@@ -74,7 +72,7 @@ def get_log(type, target, status, id, sort, page, row_per_page, date_from, date_
     if current_page > total_page > 0:
         current_page = total_page
 
-    start = (current_page-1)*row_per_page
+    start = (current_page - 1) * row_per_page
     obj = obj.offset(start).limit(row_per_page).all()
     if not obj:
         raise HTTPException(status_code=code_status.HTTP_404_NOT_FOUND, detail=f"Không có Log phù hợp")
