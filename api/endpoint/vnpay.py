@@ -14,5 +14,10 @@ router = APIRouter()
 
 
 @router.post("/create")
-def create_vnpay_url(request: forms.PaymentForm):
-    return views.payment(request=request)
+def create_vnpay_url(request: forms.PaymentForm, token: TokenPayload = Depends(deps.get_current_user)):
+    return views.payment(request=request, user_id=token.id)
+
+
+@router.get("/return")
+def abc():
+    pass

@@ -36,7 +36,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             setattr(prd_data_db, 'sale_price', prd_data_db.price)
         return prd_data_db
 
-    def get_order_by_id(self, order_id, db: Session):
+    def get_order_by_id(self, order_id, db: Session, user_id):
         obj_db = db.query(self.model).filter(
             self.model.id == order_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
@@ -51,8 +51,11 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'address': obj_db.address,
             'note': obj_db.note,
             'status': obj_db.status,
+            'payment_id': obj_db.payment_id,
             'payment_type': '',
             'payment_status': 0,
+            'bankCode': '',
+            'transactionNo': '',
             'insert_at': obj_db.insert_at
         }
         total_price = 0
@@ -81,9 +84,11 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         payment_db = crud_payment.get_payment_by_id(id=payment_id, db=db)
         result['payment_type'] = payment_db['payment_type_name']
         result['payment_status'] = payment_db['status']
+        result['bankCode'] = payment_db['bankCode']
+        result['transactionNo'] = payment_db['transactionNo']
         logger.log(Method.GET, Target.ORDER, comment=f"GET ORDER BY ID #{order_id}",
                    status=Target.SUCCESS,
-                   id=0,
+                   id=user_id,
                    db=db)
         return result
 
@@ -120,7 +125,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         result = []
         for item in order_db:
-            result.append(self.get_order_by_id(order_id=item.id, db=db))
+            result.append(self.get_order_by_id(order_id=item.id, db=db, user_id=user_id))
         logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ORDER BY USER ID #{user_id}",
                    status=Target.SUCCESS,
                    id=user_id,
@@ -134,9 +139,13 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
     def add_order(self, request, db: Session, user_id):
         # Add payment method
         payment_type_id = request.payment_type_id
+        bankCode = ''
+        if payment_type_id == 2:
+            bankCode = "COD"
         request_payment = {
             'payment_type_id': payment_type_id,
-            'status': 0
+            'status': 99,
+            'bankCode': bankCode
         }
         payment_db = crud_payment.add_payment(request=request_payment, db=db, user_id=user_id)
 

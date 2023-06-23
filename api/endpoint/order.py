@@ -17,7 +17,7 @@ router = APIRouter()
 @router.get("/info/{order_id}")
 def get_order_by_id(order_id: int, db: Session = Depends(deps.get_db),
                     token: TokenPayload = Depends(deps.get_current_user)):
-    return crud_order.get_order_by_id(order_id=order_id, db=db)
+    return crud_order.get_order_by_id(order_id=order_id, db=db, user_id=token.id)
 
 
 @router.get("/all")

@@ -32,7 +32,9 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
             'id': data_db.id,
             'payment_type_id': data_db.payment_type_id,
             'payment_type_name': payment_type_db['name'],
-            'status': data_db.status
+            'status': data_db.status,
+            'bankCode': data_db.bankCode,
+            'transactionNo': data_db.transactionNo
         }
 
     def add_payment(self, request, db: Session, user_id):
@@ -50,16 +52,23 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                    db=db)
         return obj_data
 
-    def update_payment(self, request, db: Session, user_id):
-        if not isinstance(request, dict):
-            request = request.dict()
+    def update_payment(self, payment_id, payment_status, bankCode, transactionNo, db: Session, user_id):
+
         data_db = db.query(self.model).filter(
-            self.model.order_id == request.order_id,
+            self.model.id == payment_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
 
-        self.update(db=db, db_obj=data_db, obj_in=request, admin_id=user_id)
-        logger.log(Method.PUT, Target.PAYMENT, comment=f"UPDATE PAYMENT FOR ORDER ID #{request.order_id}",
+        data_db.status = payment_status
+        data_db.bankCode = bankCode
+        data_db.transactionNo = transactionNo
+        data_db.update_id = user_id
+        data_db.update_at = datetime.now()
+
+        db.merge(data_db)
+        db.commit()
+
+        logger.log(Method.PUT, Target.PAYMENT, comment=f"UPDATE PAYMENT ID #{payment_id}",
                    status=Target.SUCCESS,
                    id=user_id,
                    db=db)
