@@ -145,8 +145,9 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         phone_number = request.phone_number
         email = request.email
         status = request.status
+        note = request.note
 
-        order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number,
+        order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number, note=note,
                                   email=email, address="", status=status, insert_at=datetime.now(),
                                   insert_id=user_id, update_id=user_id, update_at=datetime.now())
 
@@ -212,6 +213,44 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                    db=db)
         return {
             'detail': 'Đã đặt hàng thành công'
+        }
+
+    def update_order_status(self, order_status, order_id, db: Session, user_id):
+        obj_db = db.query(self.model).filter(
+            self.model.id == order_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        if obj_db.status == 99:
+            logger.log(Method.PUT, Target.ORDER, comment=f"UPDATE STATUS {order_status} OF ORDER ID #{order_id}",
+                       status=Target.FAIL,
+                       id=user_id, db=db)
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Không thể cập nhật tình trạng cho đơn hàng này")
+
+        if obj_db.status != 0 and order_status == 99:
+            logger.log(Method.PUT, Target.ORDER, comment=f"UPDATE STATUS {order_status} OF ORDER ID #{order_id}",
+                       status=Target.FAIL,
+                       id=user_id, db=db)
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Không thể huỷ đơn hàng đã xác nhận")
+
+        if order_status <= obj_db.status:
+            logger.log(Method.PUT, Target.ORDER, comment=f"UPDATE STATUS {order_status} OF ORDER ID #{order_id}",
+                       status=Target.FAIL,
+                       id=user_id, db=db)
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                detail="Không thể cập nhật tình trạng cho đơn hàng này")
+
+        obj_db.status = order_status
+        obj_db.update_id = user_id
+        obj_db.update_at = datetime.now()
+
+        db.merge(obj_db)
+        db.commit()
+        db.refresh(obj_db)
+
+        return {
+            'detail': "Đã cập nhật trạng thái đơn hàng"
         }
 
 

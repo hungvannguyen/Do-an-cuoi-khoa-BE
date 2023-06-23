@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, BigInteger
+from sqlalchemy import Column, Integer, String, Boolean, BigInteger, TEXT
 
 from models.BaseModel import BaseDBModel
 from database.db import Base
@@ -14,4 +14,5 @@ class Order(Base, BaseDBModel):
     phone_number = Column(String(10))
     email = Column(String(255))
     address = Column(String(255), nullable=False)
+    note = Column(TEXT, nullable=True)
     status = Column(Integer, nullable=False, default=0)
