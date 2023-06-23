@@ -5,7 +5,7 @@ from constants import Method, Target
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
-
+from vnpay_python import views as CRUD_vnpay
 import models
 from models.product import Product
 
@@ -169,10 +169,12 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         order_id = order_obj_db.id
         cart_db = crud_cart.get_cart(user_id=user_id, db=db)
         prd_carts = cart_db['products']
+        total_price = 0
         for item in prd_carts:
             product_id = item['prd_id']
             quantity = item['quantity']
             price = item['price']
+            total_price += price
             order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
                                                                       quantity=quantity,
                                                                       price=price, insert_at=datetime.now(),
@@ -221,9 +223,26 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                    status=Target.SUCCESS,
                    id=user_id,
                    db=db)
-        return {
-            'detail': 'Đã đặt hàng thành công'
-        }
+
+        # Generate VNPAY link
+        vnpay_url = ""
+        if payment_type_id == Const.ONLINE_PAYMENT:
+            request_vnpay = {
+                'amount': total_price,
+                'order_info': f"THANH TOAN DON HANG DHSGUNDAM #{order_id}"
+            }
+            vnpay_url = CRUD_vnpay.payment(request=request_vnpay, user_id=user_id)
+
+        if payment_type_id == 1:
+            result = {
+                'detail': 'Đã đặt hàng thành công',
+                'vnpay_url': vnpay_url
+            }
+        else:
+            result = {
+                'detail': 'Đã đặt hàng thành công'
+            }
+        return result
 
     def update_order_status(self, order_status, order_id, db: Session, user_id):
         obj_db = db.query(self.model).filter(

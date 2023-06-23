@@ -38,8 +38,8 @@ def payment(request, user_id):
     order_id = order_id.replace(".", "")
     amount = form['amount']
     order_info = form['order_info']
-    bank_code = form['bank_code']
-    language = form['language']
+    bank_code = None
+    language = None
 
     # Build URL Payment
     vnp = vnpay()

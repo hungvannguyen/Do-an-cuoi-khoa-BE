@@ -10,5 +10,5 @@ class PaymentForm(BaseModel, Config):
     # order_type: Optional[str]
     amount: Optional[float]
     order_info: Optional[str]
-    bank_code: Optional[str]
-    language: Optional[str]
+    # bank_code: Optional[str]
+    # language: Optional[str]
