@@ -49,6 +49,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'phone_number': obj_db.phone_number,
             'email': obj_db.email,
             'address': obj_db.address,
+            'note': obj_db.note,
             'status': obj_db.status,
             'payment_type': '',
             'payment_status': 0,
