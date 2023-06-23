@@ -15,12 +15,14 @@ from api.endpoint import (
     payment,
     order,
     files,
-    log
+    log,
+    vnpay
 )
 
 api_router = APIRouter()
 
 # api_router.include_router(login_regis.router, prefix="/v1", tags=["TÉT"])
+api_router.include_router(vnpay.router, prefix="/vnpay", tags=['VNPAY'])
 api_router.include_router(log.router, prefix="/log", tags=['LOGS'])
 api_router.include_router(files.router, prefix="/file", tags=["FILES"])
 api_router.include_router(user.router, prefix="/user", tags=["USER"])

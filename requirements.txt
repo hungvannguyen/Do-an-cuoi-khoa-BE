@@ -6,3 +6,12 @@ SQLAlchemy
 mysqlclient
 python-multipart
 PyJWT
+django
+asgiref
+cffi
+milksnake
+pycparser
+pytz
+sqlparse
+urlquote
+requests

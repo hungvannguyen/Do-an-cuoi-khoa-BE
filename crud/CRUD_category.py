@@ -88,11 +88,11 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         if not isinstance(request, dict):
             request = request.dict()
         data_db = self.get_category_by_id(id, db)
+        self.update(db_obj=data_db, obj_in=request, db=db, admin_id=admin_id)
         logger.log(Method.PUT, Target.CATEGORY, comment=f"UPDATE CATEGORY ID {id}",
                    status=Target.SUCCESS,
                    id=admin_id,
                    db=db)
-        self.update(db_obj=data_db, obj_in=request, db=db, admin_id=admin_id)
         return {
             'detail': "Cập nhật thành công"
         }
