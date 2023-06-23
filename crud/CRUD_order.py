@@ -174,7 +174,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             product_id = item['prd_id']
             quantity = item['quantity']
             price = item['price']
-            total_price += price
+            total_price += price*quantity
             order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
                                                                       quantity=quantity,
                                                                       price=price, insert_at=datetime.now(),

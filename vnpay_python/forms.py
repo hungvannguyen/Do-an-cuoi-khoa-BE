@@ -8,7 +8,7 @@ from schemas.Default import Config
 class PaymentForm(BaseModel, Config):
     # order_id: Optional[str]
     # order_type: Optional[str]
-    amount: Optional[float]
+    amount: Optional[int]
     order_info: Optional[str]
     # bank_code: Optional[str]
     # language: Optional[str]
