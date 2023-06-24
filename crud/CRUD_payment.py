@@ -53,7 +53,6 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         return obj_data
 
     def update_payment(self, payment_id, payment_status, bankCode, transactionNo, db: Session, user_id):
-
         data_db = db.query(self.model).filter(
             self.model.id == payment_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
@@ -74,6 +73,33 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                    db=db)
         return {
             'detail': 'Đã cập nhật thành công'
+        }
+
+    def payment_return(self, vnp_Amount,
+                       vnp_BankCode,
+                       vnp_BankTranNo,
+                       vnp_CardType,
+                       vnp_PayDate,
+                       vnp_ResponseCode,
+                       vnp_TmnCode,
+                       vnp_TransactionNo,
+                       vnp_TransactionStatus,
+                       vnp_TxnRef,
+                       vnp_SecureHash, db: Session):
+        obj_db = db.query(self.model).filter(
+            self.model.txnRef == vnp_TxnRef
+        ).first()
+        obj_db.status = vnp_ResponseCode
+        obj_db.bankCode = vnp_BankCode
+        obj_db.transactionNo = vnp_TransactionNo
+        obj_db.update_at = datetime.now()
+
+        db.merge(obj_db)
+        db.commit()
+        logger.log(Method.PUT, Target.PAYMENT, comment=f"UPDATE PAYMENT OF TXNREF #{vnp_TxnRef}", status=Target.SUCCESS,
+                   id=0, db=db)
+        return {
+            'detail': "Đã cập nhật tình trạng thanh toán"
         }
 
 

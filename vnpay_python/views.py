@@ -34,8 +34,13 @@ def payment(request, user_id):
     form = request
     # if form.is_valid():
     order_type = 'topup'
-    order_id = str(user_id) + str(datetime.now().strftime('%Y%m%d%H%M%S'))
+
+    if form['txnRef'] is not None and form['txnRef'] != "":
+        order_id = form['txnRef']
+    else:
+        order_id = str(user_id) + str(datetime.now().strftime('%Y%m%d%H%M%S'))
     order_id = order_id.replace(".", "")
+
     amount = form['amount']
     order_info = form['order_info']
     bank_code = None
@@ -46,7 +51,7 @@ def payment(request, user_id):
     vnp.requestData['vnp_Version'] = '2.1.0'
     vnp.requestData['vnp_Command'] = 'pay'
     vnp.requestData['vnp_TmnCode'] = 'B5TA5KR9'
-    vnp.requestData['vnp_Amount'] = int(amount)*100
+    vnp.requestData['vnp_Amount'] = int(amount) * 100
     vnp.requestData['vnp_CurrCode'] = 'VND'
     vnp.requestData['vnp_TxnRef'] = order_id
     vnp.requestData['vnp_OrderInfo'] = order_info

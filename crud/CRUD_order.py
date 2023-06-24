@@ -140,12 +140,14 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         # Add payment method
         payment_type_id = request.payment_type_id
         bankCode = ''
+        txnRef = str(user_id) + str(datetime.now().strftime('%Y%m%d%H%M%S'))
         if payment_type_id == 2:
             bankCode = "COD"
         request_payment = {
             'payment_type_id': payment_type_id,
             'status': 99,
-            'bankCode': bankCode
+            'bankCode': bankCode,
+            'txnRef': txnRef
         }
         payment_db = crud_payment.add_payment(request=request_payment, db=db, user_id=user_id)
 
@@ -229,7 +231,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         if payment_type_id == Const.ONLINE_PAYMENT:
             request_vnpay = {
                 'amount': total_price,
-                'order_info': f"THANH TOAN DON HANG DHSGUNDAM #{order_id}"
+                'order_info': f"THANH TOAN DON HANG DHSGUNDAM #{order_id}",
+                'txnRef': txnRef
             }
             vnpay_url = CRUD_vnpay.payment(request=request_vnpay, user_id=user_id)
 
