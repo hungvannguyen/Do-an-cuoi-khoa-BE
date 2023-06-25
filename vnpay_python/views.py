@@ -42,7 +42,10 @@ def payment(request, user_id):
     order_id = order_id.replace(".", "")
 
     amount = form['amount']
-    order_info = form['order_info']
+    if form['order_info'] is None or form['order_info'] == "":
+        order_info = f"THANH TOAN DON HANG DHSGUNDAM #{form['order_id']}",
+    else:
+        order_info = form['order_info']
     bank_code = None
     language = None
 

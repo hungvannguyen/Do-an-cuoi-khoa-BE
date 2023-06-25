@@ -6,10 +6,10 @@ from schemas.Default import Config
 
 
 class PaymentForm(BaseModel, Config):
-    # order_id: Optional[str]
-    # order_type: Optional[str]
+    payment_id: Optional[int]
+    order_id: Optional[int]
     amount: Optional[int]
     order_info: Optional[str]
-    txnRef: Optional[str]
+    # txnRef: Optional[str]
     # bank_code: Optional[str]
     # language: Optional[str]
