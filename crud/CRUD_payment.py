@@ -86,6 +86,8 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                        vnp_TransactionStatus,
                        vnp_TxnRef,
                        vnp_SecureHash, db: Session):
+        print(vnp_TxnRef)
+
         obj_db = db.query(self.model).filter(
             self.model.txnRef == vnp_TxnRef
         ).first()
