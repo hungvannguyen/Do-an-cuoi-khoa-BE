@@ -44,7 +44,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         result = {
             'id': order_id,
             'products': [],
-            'total_price': 0,
+            'total_price': obj_db.total_price,
             'name': obj_db.name,
             'phone_number': obj_db.phone_number,
             'email': obj_db.email,
@@ -58,7 +58,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'transactionNo': '',
             'insert_at': obj_db.insert_at
         }
-        total_price = 0
+        # total_price = 0
         if obj_db:
             order_id = obj_db.id
             order_product_db = crud_order_product.get_by_order_id(order_id=order_id, db=db)
@@ -67,7 +67,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                 prd_db = self.get_product_by_id(id=prd_id, db=db)
                 prd_name = prd_db.name
                 prd_img_url = prd_db.img_url
-                total_price += item.price * item.quantity
+                # total_price += item.price * item.quantity
                 prd_obj = {
                     'prd_id': prd_id,
                     'name': prd_name,
@@ -78,7 +78,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                 }
                 result['products'].append(prd_obj)
 
-        result['total_price'] = total_price
+        # result['total_price'] = total_price
 
         payment_id = obj_db.payment_id
         payment_db = crud_payment.get_payment_by_id(id=payment_id, db=db)
@@ -158,8 +158,10 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         email = request.email
         status = request.status
         note = request.note
+        city_id = request.city_id
 
-        order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number, note=note,
+        order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number,
+                                  note=note, total_price=0,
                                   email=email, address="", status=status, insert_at=datetime.now(),
                                   insert_id=user_id, update_id=user_id, update_at=datetime.now())
 
@@ -176,7 +178,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             product_id = item['prd_id']
             quantity = item['quantity']
             price = item['price']
-            total_price += price*quantity
+            total_price += price * quantity
             order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
                                                                       quantity=quantity,
                                                                       price=price, insert_at=datetime.now(),
@@ -186,6 +188,16 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             db.add(order_product_obj_db)
             db.commit()
             db.refresh(order_product_obj_db)
+
+        # Update Total_price
+        if city_id != 1:
+            total_price += 30000
+
+        order_obj_db.total_price = total_price
+        db.merge(order_obj_db)
+        db.commit()
+        db.refresh(order_obj_db)
+
 
         # Delete Cart Info
 
@@ -198,6 +210,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'ward_id': request.ward_id,
             'detail': request.detail
         }
+
         crud_address.create_address(request=address_update_info, db=db, user_id=user_id)
 
         # Update Address in Order
@@ -225,6 +238,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                    status=Target.SUCCESS,
                    id=user_id,
                    db=db)
+
+
 
         # Generate VNPAY link
         vnpay_url = ""

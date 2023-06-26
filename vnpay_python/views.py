@@ -35,10 +35,10 @@ def payment(request, user_id):
     # if form.is_valid():
     order_type = 'topup'
 
-    if form['txnRef'] is not None and form['txnRef'] != "":
-        order_id = form['txnRef']
-    else:
-        order_id = str(user_id) + str(datetime.now().strftime('%Y%m%d%H%M%S'))
+    # if form['txnRef'] is None or form['txnRef'] == "":
+    order_id = form['txnRef']
+    # else:
+    #     order_id = str(user_id) + str(datetime.now().strftime('%Y%m%d%H%M%S'))
     order_id = order_id.replace(".", "")
 
     amount = form['amount']

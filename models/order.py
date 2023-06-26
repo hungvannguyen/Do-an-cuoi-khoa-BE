@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, BigInteger, TEXT
+from sqlalchemy import Column, Integer, String, Boolean, BigInteger, TEXT, Float
 
 from models.BaseModel import BaseDBModel
 from database.db import Base
@@ -10,6 +10,7 @@ class Order(Base, BaseDBModel):
     id = Column(BigInteger, primary_key=True, index=True, unique=True)
     user_id = Column(BigInteger, nullable=False)
     payment_id = Column(BigInteger, nullable=False)
+    total_price = Column(Float, nullable=False)
     name = Column(String(255))
     phone_number = Column(String(10))
     email = Column(String(255))
