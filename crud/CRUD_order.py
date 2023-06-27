@@ -64,9 +64,9 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             order_product_db = crud_order_product.get_by_order_id(order_id=order_id, db=db)
             for item in order_product_db:
                 prd_id = item.product_id
-                prd_db = self.get_product_by_id(id=prd_id, db=db)
-                prd_name = prd_db.name
-                prd_img_url = prd_db.img_url
+                # prd_db = self.get_product_by_id(id=prd_id, db=db)
+                prd_name = item.name
+                prd_img_url = item.img_url
                 # total_price += item.price * item.quantity
                 prd_obj = {
                     'prd_id': prd_id,
@@ -103,7 +103,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             )
 
         total_order = order_db.count()
-        total_page = int(total_order / Const.ROW_PER_PAGE)
+        total_page = int(total_order / Const.ROW_PER_PAGE_ORDER)
         if total_order % Const.ROW_PER_PAGE > 0:
             total_page += 1
         current_page = page
@@ -146,7 +146,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             )
 
         total_order = order_db.count()
-        total_page = int(total_order / Const.ROW_PER_PAGE)
+        total_page = int(total_order / Const.ROW_PER_PAGE_ADMIN)
         if total_order % Const.ROW_PER_PAGE > 0:
             total_page += 1
         current_page = page
@@ -220,10 +220,12 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         for item in prd_carts:
             product_id = item['prd_id']
             quantity = item['quantity']
-            price = item['price']
+            name = item['name']
+            img_url = item['img_url']
+            price = item['sale_price']
             total_price += price * quantity
             order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
-                                                                      quantity=quantity,
+                                                                      quantity=quantity, name=name, img_url=img_url,
                                                                       price=price, insert_at=datetime.now(),
                                                                       insert_id=user_id, update_id=user_id,
                                                                       update_at=datetime.now())
@@ -240,7 +242,6 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         db.merge(order_obj_db)
         db.commit()
         db.refresh(order_obj_db)
-
 
         # Delete Cart Info
 
@@ -281,8 +282,6 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                    status=Target.SUCCESS,
                    id=user_id,
                    db=db)
-
-
 
         # Generate VNPAY link
         vnpay_url = ""

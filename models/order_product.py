@@ -10,5 +10,7 @@ class Order_Product(Base, BaseDBModel):
     id = Column(BigInteger, primary_key=True, index=True, unique=True)
     order_id = Column(BigInteger, nullable=False)
     product_id = Column(BigInteger, nullable=False)
+    name = Column(String(255))
+    img_url = Column(String(255))
     quantity = Column(Integer, default=1)
     price = Column(FLOAT)

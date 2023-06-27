@@ -23,7 +23,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         total_product = db.query(self.model).filter(
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).count()
-        total_page = int(total_product / Const.ROW_PER_PAGE)
+        total_page = int(total_product / Const.ROW_PER_PAGE_ADMIN)
         if total_product % Const.ROW_PER_PAGE > 0:
             total_page += 1
         if current_page > total_page and total_page > 0:
