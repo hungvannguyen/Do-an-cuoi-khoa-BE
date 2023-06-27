@@ -17,5 +17,5 @@ class Product(Base, BaseDBModel):
     sale_percent = Column(Integer, nullable=True, default=0)
     img_url = Column(String(255), nullable=True)
     status = Column(Integer, default=1)
-    is_sale = Column(Integer, default=0)
+    is_sale = Column(Integer, default=99)
     description = Column(TEXT, nullable=True)

@@ -270,7 +270,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                    id=0,
                    db=db)
         for item in data_db:
-            if item.is_sale == 1:
+            if item.is_sale == Const.IS_SALE:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
 
         return {
@@ -283,7 +283,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
         request = request.dict()
         cat_id = request['cat_id']
-        if request['is_sale'] == 0:
+        if request['is_sale'] == Const.IS_NOT_SALE:
             request['sale_percent'] = 0
         if crud_category.get_category_by_id(db=db, id=cat_id):
             data_db = self.model(**request, insert_id=admin_id, update_id=admin_id, insert_at=datetime.now(),
@@ -303,7 +303,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         data_db = self.get_product_by_id(id, db=db)
         if not isinstance(request, dict):
             request = request.dict()
-        if request['is_sale'] == 0:
+        if request['is_sale'] == Const.IS_NOT_SALE:
             request['sale_percent'] = 0
         self.update(db_obj=data_db, obj_in=request, db=db, admin_id=admin_id)
         logger.log(Method.POST, Target.PRODUCT, comment=f"UPDATE PRODUCT ID #{id}",
