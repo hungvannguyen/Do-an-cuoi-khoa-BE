@@ -32,7 +32,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         limit = Const.ROW_PER_PAGE
 
         data_db = db.query(self.model).filter(
-            self.model.status == Const.ACTIVE_STATUS,
+            # self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         )
         if condition['sort'] == 1:
