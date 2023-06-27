@@ -55,7 +55,6 @@ def get_sale_products(page: int = 1, sort: int = 0, min_price: int = 0, max_pric
 @router.get("/new")
 def get_new_products(page: int = 1,
                      db: Session = Depends(deps.get_db)):
-
     return crud_product.get_new_products(page=page, db=db)
 
 
@@ -90,3 +89,9 @@ def create_product(request: ProductCreate, db: Session = Depends(deps.get_db),
 def update_product(id: int, request: ProductUpdate, db: Session = Depends(deps.get_db),
                    token: TokenPayload = Depends(deps.get_employee_user)):
     return crud_product.update_product(id=id, request=request, db=db, admin_id=token.id)
+
+
+@router.put("/add_quantity")
+def add_quantity(prd_id: int, quantity: int = 1, db: Session = Depends(deps.get_db),
+                 token: TokenPayload = Depends(deps.get_employee_user)):
+    return crud_product.add_quantity(prd_id=prd_id, quantity=quantity, db=db, admin_id=token.id)

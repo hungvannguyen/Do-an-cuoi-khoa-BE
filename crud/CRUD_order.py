@@ -136,6 +136,49 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'total_page': total_page
         }
 
+    def get_all_orders(self, page, order_status, db: Session, admin_id):
+        order_db = db.query(self.model).filter(
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        )
+        if order_status:
+            order_db = order_db.filter(
+                self.model.status == order_status
+            )
+
+        total_order = order_db.count()
+        total_page = int(total_order / Const.ROW_PER_PAGE)
+        if total_order % Const.ROW_PER_PAGE > 0:
+            total_page += 1
+        current_page = page
+        if current_page < 1:
+            current_page = 1
+        if current_page > total_page > 0:
+            current_page = total_page
+
+        start = (current_page - 1) * Const.ROW_PER_PAGE
+
+        order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE).all()
+
+        if not order_db:
+            logger.log(Method.GET, Target.ORDER, comment=f"GET ALL ORDERS",
+                       status=Target.FAIL,
+                       id=admin_id,
+                       db=db)
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không có đơn hàng")
+
+        result = []
+        for item in order_db:
+            result.append(self.get_order_by_id(order_id=item.id, db=db, user_id=admin_id))
+        logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ORDERS",
+                   status=Target.SUCCESS,
+                   id=admin_id,
+                   db=db)
+        return {
+            'data': result,
+            'current_page': current_page,
+            'total_page': total_page
+        }
+
     def add_order(self, request, db: Session, user_id):
         # Add payment method
         payment_type_id = request.payment_type_id

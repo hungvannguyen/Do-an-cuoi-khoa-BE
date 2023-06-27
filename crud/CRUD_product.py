@@ -314,5 +314,24 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             'detail': 'Cập nhật thành công'
         }
 
+    def add_quantity(self, prd_id, quantity, db: Session, admin_id):
+        prd_db = db.query(self.model).filter(
+            self.model.id == prd_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+
+        prd_db.quantity = prd_db.quantity + quantity
+        prd_db.update_id = admin_id
+        prd_db.update_at = datetime.now()
+        db.merge(prd_db)
+        db.commit()
+
+        logger.log(Method.PUT, Target.PRODUCT, comment=f"ADD QUANTITY TO PRODUCT ID #{prd_id}", status=Target.SUCCESS,
+                   id=admin_id, db=db)
+
+        return {
+            'detail': "Đã thêm thành công"
+        }
+
 
 crud_product = CRUDProduct(Product)
