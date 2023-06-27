@@ -220,12 +220,12 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         for item in prd_carts:
             product_id = item['prd_id']
             quantity = item['quantity']
-            name = item['name']
+            prd_name = item['name']
             img_url = item['img_url']
             price = item['sale_price']
             total_price += price * quantity
             order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
-                                                                      quantity=quantity, name=name, img_url=img_url,
+                                                                      quantity=quantity, name=prd_name, img_url=img_url,
                                                                       price=price, insert_at=datetime.now(),
                                                                       insert_id=user_id, update_id=user_id,
                                                                       update_at=datetime.now())
