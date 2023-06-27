@@ -97,7 +97,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             self.model.user_id == user_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         )
-        if order_status:
+        if order_status is not None and order_status != -1:
             order_db = order_db.filter(
                 self.model.status == order_status
             )
