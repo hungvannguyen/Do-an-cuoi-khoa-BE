@@ -74,6 +74,18 @@ def get_products_by_cat_id(cat_id: int, page: int = 1, sort: int = 0, min_price:
     return crud_product.get_by_cat_id(cat_id=cat_id, page=page, condition=condition, db=db)
 
 
+@router.get("search")
+def search_products(keyword: str, page: int = 1, sort: int = 0, min_price: int = 0, max_price: int = 0,
+                    db: Session = Depends(deps.get_db)):
+    condition = {
+        'sort': sort,
+        'min_price': min_price,
+        'max_price': max_price
+    }
+
+    return crud_product.search_product(keyword=keyword, page=page, condition=condition, db=db)
+
+
 @router.get("/{id}")
 def get_product_by_id(id: int, db: Session = Depends(deps.get_db)):
     return crud_product.get_product_by_id(id=id, db=db)
