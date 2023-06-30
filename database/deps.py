@@ -23,7 +23,7 @@ def get_current_user(authorization: str = Depends(Authorization)) -> TokenPayloa
         token = check_authenticated(authorization)
         payload = jwt.decode(token, Const.SECRET_KEY, algorithms=Const.SECURITY_ALGORITHM)
         if datetime.fromtimestamp(payload.get('exp')) < datetime.now():
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token expired")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Token hết hạn")
     except(jwt.PyJWTError, ValueError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -21,7 +21,7 @@ def check_authenticated(
     if not authorization or scheme.lower() != "bearer":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
+            detail="Chưa có Token đúng dạng",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
