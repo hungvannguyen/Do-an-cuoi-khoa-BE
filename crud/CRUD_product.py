@@ -380,7 +380,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         db.merge(prd_db)
         db.commit()
 
-        logger.log(Method.PUT, Target.PRODUCT, comment=f"ADD QUANTITY TO PRODUCT ID #{prd_id}", status=Target.SUCCESS,
+        logger.log(Method.PUT, Target.PRODUCT, comment=f"ADD {quantity} QUANTITY TO PRODUCT ID #{prd_id}",
+                   status=Target.SUCCESS,
                    id=admin_id, db=db)
 
         return {
