@@ -53,6 +53,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'status': obj_db.status,
             'payment_id': obj_db.payment_id,
             'payment_type': '',
+            'payment_type_id': 0,
             'payment_status': 0,
             'bankCode': '',
             'transactionNo': '',
@@ -82,6 +83,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         payment_id = obj_db.payment_id
         payment_db = crud_payment.get_payment_by_id(id=payment_id, db=db)
+        result['payment_type_id'] = payment_db['payment_type_id']
         result['payment_type'] = payment_db['payment_type_name']
         result['payment_status'] = payment_db['status']
         result['bankCode'] = payment_db['bankCode']
