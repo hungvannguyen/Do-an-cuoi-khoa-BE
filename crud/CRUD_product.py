@@ -35,11 +35,11 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             # self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         )
-        if condition['sort'] == 1:
-            data_db = data_db.order_by(asc(self.model.price))
-        elif condition['sort'] == 2:
-            data_db = data_db.order_by(desc(self.model.price))
-        elif condition['sort'] == 3:
+        # if condition['sort'] == 1:
+        #     data_db = data_db.order_by(asc(self.model.price))
+        # elif condition['sort'] == 2:
+        #     data_db = data_db.order_by(desc(self.model.price))
+        if condition['sort'] == 3:
             data_db = data_db.filter(
                 self.model.price >= condition['min_price'],
                 self.model.price <= condition['max_price']
@@ -56,8 +56,15 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                    id=0,
                    db=db)
         for item in data_db:
+            setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
+        if condition['sort'] == 1:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=False)
+
         return {
             'data': data_db,
             'current_page': current_page,
@@ -84,11 +91,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         )
-        if condition['sort'] == 1:
-            data_db = data_db.order_by(asc(self.model.price))
-        elif condition['sort'] == 2:
-            data_db = data_db.order_by(desc(self.model.price))
-        elif condition['sort'] == 3:
+        if condition['sort'] == 3:
             data_db = data_db.filter(
                 self.model.price >= condition['min_price'],
                 self.model.price <= condition['max_price']
@@ -105,8 +108,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                    id=0,
                    db=db)
         for item in data_db:
+            setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
+        if condition['sort'] == 1:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=False)
 
         return {
             'data': data_db,
@@ -158,11 +167,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.is_sale == Const.IS_SALE,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         )
-        if condition['sort'] == 1:
-            data_db = data_db.order_by(asc(self.model.price))
-        elif condition['sort'] == 2:
-            data_db = data_db.order_by(desc(self.model.price))
-        elif condition['sort'] == 3:
+        if condition['sort'] == 3:
             data_db = data_db.filter(
                 self.model.price >= condition['min_price'],
                 self.model.price <= condition['max_price']
@@ -179,8 +184,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                    id=0,
                    db=db)
         for item in data_db:
+            setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
+        if condition['sort'] == 1:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=False)
 
         return {
             'data': data_db,
@@ -249,15 +260,13 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.cat_id == cat_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         )
-        if condition['sort'] == 1:
-            data_db = data_db.order_by(asc(self.model.price))
-        elif condition['sort'] == 2:
-            data_db = data_db.order_by(desc(self.model.price))
-        elif condition['sort'] == 3:
+
+        if condition['sort'] == 3:
             data_db = data_db.filter(
                 self.model.price >= condition['min_price'],
                 self.model.price <= condition['max_price']
             )
+
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
             logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCTS BY CATEGORY ID {cat_id}",
@@ -270,8 +279,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                    id=0,
                    db=db)
         for item in data_db:
+            setattr(item, 'sale_price', item.price)
             if item.is_sale == Const.IS_SALE:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
+        if condition['sort'] == 1:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=False)
 
         return {
             'data': data_db,
@@ -303,11 +318,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.name.like(keyword),
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         )
-        if condition['sort'] == 1:
-            data_db = data_db.order_by(asc(self.model.price))
-        elif condition['sort'] == 2:
-            data_db = data_db.order_by(desc(self.model.price))
-        elif condition['sort'] == 3:
+        if condition['sort'] == 3:
             data_db = data_db.filter(
                 self.model.price >= condition['min_price'],
                 self.model.price <= condition['max_price']
@@ -324,8 +335,14 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                    id=0,
                    db=db)
         for item in data_db:
+            setattr(item, 'sale_price', item.price)
             if item.is_sale == Const.IS_SALE:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
+        if condition['sort'] == 1:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=False)
 
         return {
             'data': data_db,
