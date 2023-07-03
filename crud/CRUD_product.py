@@ -61,9 +61,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
 
         if condition['sort'] == 1:
-            data_db.sort(key=lambda x: x.sale_price, reverse=True)
-        elif condition['sort'] == 2:
             data_db.sort(key=lambda x: x.sale_price, reverse=False)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
 
         return {
             'data': data_db,
@@ -113,9 +113,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
 
         if condition['sort'] == 1:
-            data_db.sort(key=lambda x: x.sale_price, reverse=True)
-        elif condition['sort'] == 2:
             data_db.sort(key=lambda x: x.sale_price, reverse=False)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
 
         return {
             'data': data_db,
@@ -189,9 +189,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
 
         if condition['sort'] == 1:
-            data_db.sort(key=lambda x: x.sale_price, reverse=True)
-        elif condition['sort'] == 2:
             data_db.sort(key=lambda x: x.sale_price, reverse=False)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
 
         return {
             'data': data_db,
@@ -284,9 +284,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
 
         if condition['sort'] == 1:
-            data_db.sort(key=lambda x: x.sale_price, reverse=True)
-        elif condition['sort'] == 2:
             data_db.sort(key=lambda x: x.sale_price, reverse=False)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
 
         return {
             'data': data_db,
@@ -340,9 +340,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
 
         if condition['sort'] == 1:
-            data_db.sort(key=lambda x: x.sale_price, reverse=True)
-        elif condition['sort'] == 2:
             data_db.sort(key=lambda x: x.sale_price, reverse=False)
+        elif condition['sort'] == 2:
+            data_db.sort(key=lambda x: x.sale_price, reverse=True)
 
         return {
             'data': data_db,
