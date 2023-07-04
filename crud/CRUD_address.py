@@ -72,22 +72,35 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             filter(
             self.model.user_id == user_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).first()
+        ).all()
         if not data_db:
-            logger.log(Method.GET, Target.ADDRESS, comment=f"GET ADDRESS INFO OF USER #{user_id}", status=Target.FAIL,
+            logger.log(Method.GET, Target.ADDRESS, comment=f"GET ALL ADDRESS INFO OF USER #{user_id}",
+                       status=Target.FAIL,
                        id=user_id, db=db)
             return None
-        city = self.get_city_by_id(city_id=data_db.city_id, db=db)
-        district = self.get_district_by_id(district_id=data_db.district_id, db=db)
-        ward = self.get_ward_by_id(ward_id=data_db.ward_id, db=db)
-        logger.log(Method.GET, Target.ADDRESS, comment=f"GET ADDRESS INFO OF USER #{user_id}", status=Target.SUCCESS,
+        quantity = 0
+        result = []
+
+        for item in data_db:
+            city = self.get_city_by_id(city_id=item.city_id, db=db)
+            district = self.get_district_by_id(district_id=item.district_id, db=db)
+            ward = self.get_ward_by_id(ward_id=item.ward_id, db=db)
+            data = {
+                'id': item.id,
+                'city_id': city.id,
+                'district_id': district.id,
+                'ward_id': ward.id,
+                'detail': item.detail
+            }
+            quantity += 1
+            result.append(data)
+
+        logger.log(Method.GET, Target.ADDRESS, comment=f"GET ALL ADDRESS INFO OF USER #{user_id}",
+                   status=Target.SUCCESS,
                    id=user_id, db=db)
         return {
-            'user_id': user_id,
-            'city_id': city.id,
-            'district_id': district.id,
-            'ward_id': ward.id,
-            'detail': data_db.detail
+            'data': result,
+            'quantity': quantity
         }
 
     def get_detail_address_by_user_id(self, user_id, db: Session):
@@ -95,34 +108,62 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             filter(
             self.model.user_id == user_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).first()
-        city = self.get_city_by_id(city_id=data_db.city_id,db=db)
-        district = self.get_district_by_id(district_id=data_db.district_id, db=db)
-        ward = self.get_ward_by_id(ward_id=data_db.ward_id, db=db)
-        detail = data_db.detail
+        ).all()
+
+        quantity = 0
+        result = []
+
+        for item in data_db:
+            city = self.get_city_by_id(city_id=item.city_id, db=db)
+            district = self.get_district_by_id(district_id=item.district_id, db=db)
+            ward = self.get_ward_by_id(ward_id=item.ward_id, db=db)
+            data = {
+                'id': item.id,
+                'city_id': city.name,
+                'district_id': district.name,
+                'ward_id': ward.name,
+                'detail': item.detail
+            }
+            quantity += 1
+            result.append(data)
+
+        logger.log(Method.GET, Target.ADDRESS, comment=f"GET ALL ADDRESS DETAIL OF USER #{user_id}",
+                   status=Target.SUCCESS,
+                   id=user_id, db=db)
         return {
-            'city': city.name,
-            'district': district.name,
-            'ward': ward.name,
-            'detail': detail
+            'data': result,
+            'quantity': quantity
         }
 
-    def get_address_by_user_id(self, user_id, db: Session):
-        logger.log(Method.GET, Target.ADDRESS, comment=f"GET ADDRESS BY USER ID #{user_id}", status=Target.SUCCESS,
+    def get_address_detail_by_address_id(self, address_id, db: Session):
+        logger.log(Method.GET, Target.ADDRESS, comment=f"GET ADDRESS BY  ID #{address_id}", status=Target.SUCCESS,
                    id=0, db=db)
         data_db = db.query(self.model). \
             filter(
-            self.model.user_id == user_id,
+            self.model.id == address_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
 
-        return data_db
+        city = self.get_city_by_id(city_id=data_db.city_id, db=db)
+        district = self.get_district_by_id(district_id=data_db.district_id, db=db)
+        ward = self.get_ward_by_id(ward_id=data_db.ward_id, db=db)
+
+        data = {
+            'id': data_db.id,
+            'city_id': city.id,
+            'city': city.name,
+            'district': district.name,
+            'ward': ward.name,
+            'detail': data_db.detail
+        }
+
+        return data
 
     def create_address(self, request, db: Session, user_id):
 
-        data_db = self.get_address_by_user_id(user_id=user_id, db=db)
-        if data_db:
-            return self.update_address(request=request, db=db, user_id=user_id)
+        # data_db = self.get_address_by_user_id(user_id=user_id, db=db)
+        # if data_db:
+        #     return self.update_address(request=request, db=db, user_id=user_id)
         if not isinstance(request, dict):
             request = request.dict()
         data_db = self.model(**request, insert_id=user_id, update_id=user_id, user_id=user_id)
@@ -135,29 +176,54 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             'detail': "Đã tạo Địa chỉ thành công"
         }
 
-    def update_address(self, request, db: Session, user_id):
+    def update_address(self, address_id, request, db: Session, user_id):
         logger.log(Method.PUT, Target.ADDRESS, comment=f"UPDATE ADDRESS USER ID #{user_id}", status=Target.SUCCESS,
                    id=user_id, db=db)
-        if not isinstance(request, dict):
-            request = request.dict()
-        data_db = self.get_address_by_user_id(user_id=user_id, db=db)
-        self.update(db=db, obj_in=request, db_obj=data_db, admin_id=user_id)
+
+        add_db = db.query(self.model).filter(
+            self.model.id == address_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+
+        city_id = request.city_id if request.city_id else None
+        district_id = request.district_id if request.district_id else None
+        ward_id = request.ward_id if request.ward_id else None
+        detail = request.detail if request.detail else None
+
+        update_at = datetime.now()
+        update_id = user_id
+
+        add_db.city_id = city_id
+        add_db.district_id = district_id
+        add_db.ward_id = ward_id
+        add_db.detail = detail
+        add_db.update_at = update_at
+        add_db.update_id = update_id
+
+        db.merge(add_db)
+        db.commit()
+
         return {
             'detail': "Cập nhật thành công"
         }
 
-    def delete_address(self, user_id, db: Session, admin_id):
+    def delete_address(self, address_id, user_id, db: Session):
 
-        data_db = self.get_address_by_user_id(user_id, db)
-        if not data_db:
-            logger.log(Method.DELETE, Target.ADDRESS, comment=f"DELETE USER ID #{user_id} ADDRESS ",
-                       status=Target.FAIL,
-                       id=admin_id, db=db)
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                detail=f"User ID #{user_id} chưa có Địa chỉ nào")
-        self.delete(db=db, db_obj=data_db, admin_id=admin_id)
-        logger.log(Method.DELETE, Target.ADDRESS, comment=f"DELETE USER ID #{user_id} ADDRESS ", status=Target.SUCCESS,
-                   id=admin_id, db=db)
+        add_db = db.query(self.model).filter(
+            self.model.id == address_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+
+        add_db.delete_flag = Const.DELETE_FLAG_DELETED
+        add_db.delete_at = datetime.now()
+        add_db.delete_id = user_id
+
+        db.merge(add_db)
+        db.commit()
+
+        logger.log(Method.DELETE, Target.ADDRESS, comment=f"DELETE ADDRESS ID #{address_id} IN USER ID #{user_id}",
+                   status=Target.SUCCESS, db=db, id=user_id)
+
         return {
             'detail': "Đã xoá"
         }

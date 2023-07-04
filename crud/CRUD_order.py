@@ -203,7 +203,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         email = request.email
         status = request.status
         note = request.note
-        city_id = request.city_id
+        # city_id = request.city_id
+        address_id = request.address_id
 
         order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number,
                                   note=note, total_price=0,
@@ -237,6 +238,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             db.refresh(order_product_obj_db)
 
         # Update Total_price
+        address_user = crud_address.get_address_detail_by_address_id(address_id=address_id, db=db)
+        city_id = address_user['city_id']
         if city_id != 1:
             total_price += 30000
 
@@ -250,17 +253,17 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         crud_cart.delete_all_cart(db=db, user_id=user_id)
 
         # Update Address Info
-        address_update_info = {
-            'city_id': request.city_id,
-            'district_id': request.district_id,
-            'ward_id': request.ward_id,
-            'detail': request.detail
-        }
-
-        crud_address.create_address(request=address_update_info, db=db, user_id=user_id)
+        # address_update_info = {
+        #     'city_id': request.city_id,
+        #     'district_id': request.district_id,
+        #     'ward_id': request.ward_id,
+        #     'detail': request.detail
+        # }
+        #
+        # crud_address.create_address(request=address_update_info, db=db, user_id=user_id)
 
         # Update Address in Order
-        address_user = crud_address.get_detail_address_by_user_id(user_id=user_id, db=db)
+
         city = address_user['city']
         district = address_user['district']
         ward = address_user['ward']

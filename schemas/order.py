@@ -24,10 +24,11 @@ class OrderCreate(BaseModel):
     phone_number: Optional[str]
     email: Optional[str]
     note: Optional[str]
-    city_id: Optional[int]
-    district_id: Optional[int]
-    ward_id: Optional[int]
-    detail: Optional[str]
+    # city_id: Optional[int]
+    # district_id: Optional[int]
+    # ward_id: Optional[int]
+    # detail: Optional[str]
+    address_id: Optional[int]
     status: Optional[int]
 
 

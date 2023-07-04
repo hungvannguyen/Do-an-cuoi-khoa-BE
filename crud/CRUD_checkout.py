@@ -49,17 +49,11 @@ def get_checkout_user_info(db: Session, user_id):
         'name': user_info['name'],
         'email': user_info['email'],
         'phone_number': user_info['phone_number'],
-        'city_id': None,
-        'district_id': None,
-        'ward_id': None,
-        'detail': None
+        'address': None
     }
     address_info = crud_address.get_address_info_by_user_id(user_id=user_id, db=db)
     if address_info:
-        result['city_id'] = address_info['city_id']
-        result['district_id'] = address_info['district_id']
-        result['ward_id'] = address_info['ward_id']
-        result['detail'] = address_info['detail']
+        result['address'] = address_info
     logger.log(Method.GET, Target.CHECKOUT, comment=f"CHECK OUT USER INFO OF USER ID #{user_id}",
                status=Target.SUCCESS,
                id=user_id,
