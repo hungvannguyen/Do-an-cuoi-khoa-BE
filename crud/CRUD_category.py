@@ -9,6 +9,7 @@ from fastapi.encoders import jsonable_encoder
 import models
 import schemas.user
 from models.category import Category
+from models.product import Product
 from schemas.category import CategoryCreate, CategoryUpdate
 from crud.base import CRUDBase
 from constants import Const
@@ -50,9 +51,9 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tồn tại Danh mục nào")
         else:
             logger.log(Method.GET, Target.CATEGORY, comment=f"GET ALL CATEGORY",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+                       status=Target.SUCCESS,
+                       id=0,
+                       db=db)
         data_db = db.query(self.model).filter(
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).all()
@@ -97,7 +98,21 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
             'detail': "Cập nhật thành công"
         }
 
-    def delete_category(self, id, db: Session, admin_id):
+    def delete_category(self, id: int, db: Session, admin_id):
+
+        prd_count = db.query(Product).filter(
+            Product.cat_id == id,
+            Product.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).count()
+
+        if prd_count > 0:
+            logger.log(Method.DELETE, Target.CATEGORY, comment=f"DELETE CATEGORY ID {id}",
+                       status=Target.FAIL,
+                       id=admin_id,
+                       db=db)
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                detail=f"Không thể xóa vì có sản phẩm ở danh mục này đang bán")
+
         data_db = self.get_category_by_id(id, db)
         self.delete(db=db, db_obj=data_db, admin_id=admin_id)
         logger.log(Method.DELETE, Target.CATEGORY, comment=f"DELETE CATEGORY ID {id}",
