@@ -19,7 +19,7 @@ router = APIRouter()
 
 @router.get("/")
 def get_addresses_by_user_id(db: Session = Depends(deps.get_db),
-                           token: TokenPayload = Depends(deps.get_current_user)):
+                             token: TokenPayload = Depends(deps.get_current_user)):
     data_db = crud_address.get_address_info_by_user_id(user_id=token.id, db=db)
     if not data_db:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -28,8 +28,13 @@ def get_addresses_by_user_id(db: Session = Depends(deps.get_db),
 
 
 @router.get("/detail")
-def get_detail_by_user_id(user_id: int, db: Session = Depends(deps.get_db)):
-    return crud_address.get_detail_address_by_user_id(user_id=user_id, db=db)
+def get_detail_by_user_id(db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_address.get_detail_address_by_user_id(user_id=token.id, db=db)
+
+
+@router.get("/detail/")
+def get_detail_by_address_id(address_id: int, db: Session = Depends(deps.get_db)):
+    return crud_address.get_address_detail_by_address_id(address_id=address_id, db=db)
 
 
 @router.get("/city/all")
@@ -60,6 +65,12 @@ def create_address(request: AddressCreate, db: Session = Depends(deps.get_db),
 def update_address(address_id: int, request: AddressUpdate, db: Session = Depends(deps.get_db),
                    token: TokenPayload = Depends(deps.get_current_user)):
     return crud_address.update_address(address_id=address_id, request=request, db=db, user_id=token.id)
+
+
+@router.get("/set_default")
+def set_address_default(address_id: int, db: Session = Depends(deps.get_db),
+                        token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_address.set_address_default(address_id=address_id, db=db, user_id=token.id)
 
 
 @router.delete("/delete")

@@ -13,3 +13,4 @@ class Address(Base, BaseDBModel):
     district_id = Column(BigInteger, nullable=False)
     ward_id = Column(BigInteger, nullable=False)
     detail = Column(String(255), nullable=False)
+    is_default = Column(Integer, default=99)

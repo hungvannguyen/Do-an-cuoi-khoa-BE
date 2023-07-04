@@ -90,7 +90,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
                 'city_id': city.id,
                 'district_id': district.id,
                 'ward_id': ward.id,
-                'detail': item.detail
+                'detail': item.detail,
+                'is_default': item.is_default
             }
             quantity += 1
             result.append(data)
@@ -122,7 +123,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
                 'city_id': city.name,
                 'district_id': district.name,
                 'ward_id': ward.name,
-                'detail': item.detail
+                'detail': item.detail,
+                'is_default': item.is_default
             }
             quantity += 1
             result.append(data)
@@ -152,21 +154,30 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             'id': data_db.id,
             'city_id': city.id,
             'city': city.name,
+            'district_id': district.id,
             'district': district.name,
+            'ward_id': ward.id,
             'ward': ward.name,
-            'detail': data_db.detail
+            'detail': data_db.detail,
+            'is_default': data_db.is_default
         }
 
         return data
 
     def create_address(self, request, db: Session, user_id):
 
-        # data_db = self.get_address_by_user_id(user_id=user_id, db=db)
-        # if data_db:
-        #     return self.update_address(request=request, db=db, user_id=user_id)
+        check_db = db.query(self.model).filter(
+            self.model.user_id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).count()
+
+        is_default = Const.ADDRESS_DEFAULT
+        if check_db > 0:
+            is_default = Const.ADDRESS_NOT_DEFAULT
+
         if not isinstance(request, dict):
             request = request.dict()
-        data_db = self.model(**request, insert_id=user_id, update_id=user_id, user_id=user_id)
+        data_db = self.model(**request, is_default=is_default, insert_id=user_id, update_id=user_id, user_id=user_id)
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
@@ -205,6 +216,31 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
 
         return {
             'detail': "Cập nhật thành công"
+        }
+
+    def set_address_default(self, address_id: int, db: Session, user_id):
+        add_db = db.query(self.model).filter(
+            self.model.user_id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
+
+        for item in add_db:
+
+            if item.is_default == Const.ADDRESS_DEFAULT:
+                item.is_default = Const.ADDRESS_NOT_DEFAULT
+                db.merge(item)
+                db.commit()
+
+            if item.id == address_id:
+                item.is_default = Const.ADDRESS_DEFAULT
+                db.merge(item)
+                db.commit()
+
+        logger.log(Method.PUT, Target.ADDRESS, comment=f"SET ADDRESS DEFAULT IN USER ID #{user_id}",
+                   status=Target.SUCCESS, id=user_id, db=db)
+
+        return {
+            'detail': "Đã cập nhật lại địa chỉ mặc định"
         }
 
     def delete_address(self, address_id, user_id, db: Session):
