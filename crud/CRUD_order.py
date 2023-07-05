@@ -85,6 +85,11 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         payment_id = obj_db.payment_id
         payment_db = crud_payment.get_payment_by_id(id=payment_id, db=db)
+
+        payment_insert_at = payment_db['insert_at']
+
+
+
         result['payment_type_id'] = payment_db['payment_type_id']
         result['payment_type'] = payment_db['payment_type_name']
         result['payment_status'] = payment_db['status']

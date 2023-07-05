@@ -34,7 +34,8 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
             'payment_type_name': payment_type_db['name'],
             'status': data_db.status,
             'bankCode': data_db.bankCode,
-            'transactionNo': data_db.transactionNo
+            'transactionNo': data_db.transactionNo,
+            'insert_at': data_db.insert_at
         }
 
     def add_payment(self, request, db: Session, user_id):
