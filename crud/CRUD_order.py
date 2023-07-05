@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 from crud import logger
 from constants import Method, Target
@@ -87,8 +87,23 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         payment_db = crud_payment.get_payment_by_id(id=payment_id, db=db)
 
         payment_insert_at = payment_db['insert_at']
+        payment_type_id = payment_db['payment_type_id']
+        payment_status = payment_db['status']
+        if payment_type_id == Const.ONLINE_PAYMENT and payment_status == 99:
+            insert_at = payment_insert_at + timedelta(
+                seconds=30*60
+            )
 
+            if insert_at < datetime.now():
+                obj_db.status = Const.ORDER_CANCEL
+                obj_db.update_at = insert_at
+                obj_db.update_id = Const.SYSTEM_ID
 
+                db.merge(obj_db)
+                db.commit()
+                db.refresh(obj_db)
+
+                result['status'] = obj_db.status
 
         result['payment_type_id'] = payment_db['payment_type_id']
         result['payment_type'] = payment_db['payment_type_name']
@@ -384,7 +399,6 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         return {
             'detail': "Đã hủy đơn hàng thành công"
         }
-
 
 
 crud_order = CRUDOrder(Order)
