@@ -320,5 +320,32 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             'detail': "Đã đặt lại mật khẩu"
         }
 
+    def get_all_users_by_role(self, db: Session, role_id):
+        obj_db = db.query(self.model).filter(
+            self.model.role_id == role_id,
+            self.model.is_confirmed == Const.IS_CONFIRMED,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
+
+        if not obj_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không có người dùng nào")
+        result = []
+
+        for item in obj_db:
+            user = {
+                'id': item.id,
+                'name': item.name,
+                'phone_number': item.phone_number,
+                'account': item.account,
+                'email': item.email,
+                'role_id': item.role_id,
+                'insert_at': item.insert_at
+            }
+
+            result.append(user)
+
+        return result
+
+
 
 crud_user = CRUDUser(User)
