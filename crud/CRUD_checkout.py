@@ -17,7 +17,6 @@ from security.security import hash_password, verify_password, gen_token
 
 
 def get_checkout_info(db: Session, user_id):
-
     carts = crud_cart.get_cart(user_id=user_id, db=db)
     checkout = []
     total = 0
@@ -46,9 +45,9 @@ def get_checkout_info(db: Session, user_id):
 def get_checkout_user_info(db: Session, user_id):
     user_info = crud_user.get_user_info(db, user_id)
     result = {
-        'name': user_info['name'],
-        'email': user_info['email'],
-        'phone_number': user_info['phone_number'],
+        # 'name': user_info['name'],
+        # 'email': user_info['email'],
+        # 'phone_number': user_info['phone_number'],
         'address': None
     }
     address_info = crud_address.get_address_info_by_user_id(user_id=user_id, db=db)

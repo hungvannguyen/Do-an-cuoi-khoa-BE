@@ -90,8 +90,11 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
                 'name': item.name,
                 'phone_number': item.phone_number,
                 'city_id': city.id,
+                'city': city.name,
                 'district_id': district.id,
+                'district': district.name,
                 'ward_id': ward.id,
+                'ward': ward.name,
                 'detail': item.detail,
                 'is_default': item.is_default
             }

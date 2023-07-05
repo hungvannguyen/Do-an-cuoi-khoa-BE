@@ -7,6 +7,7 @@ from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 
 from models.address import Address
+from models.user import User
 from vnpay_python import views as CRUD_vnpay
 import models
 from models.product import Product
@@ -208,7 +209,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         payment_type_id = request.payment_type_id
         bankCode = ''
         txnRef = str(user_id) + str(datetime.now().strftime('%Y%m%d%H%M%S'))
-        if payment_type_id == 2:
+        if payment_type_id == Const.COD_PAYMENT:
             bankCode = "COD"
         request_payment = {
             'payment_type_id': payment_type_id,
@@ -306,12 +307,18 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         # Update User Info
 
-        # user_update_info = {
-        #     'name': name,
-        #     'email': email,
-        #     'phone_number': phone_number
-        # }
-        # crud_user.update_info(request=user_update_info, db=db, user_id=user_id)
+        user_db = db.query(User).filter(
+            User.id == user_id,
+            User.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+
+        if user_db.name is None:
+            user_update_info = {
+                'name': name,
+                'phone_number': phone_number
+            }
+            crud_user.update_info(request=user_update_info, db=db, user_id=user_id)
+
         logger.log(Method.POST, Target.ORDER, comment=f"CREATE ORDER FOR USER ID #{user_id}",
                    status=Target.SUCCESS,
                    id=user_id,
