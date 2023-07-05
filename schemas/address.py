@@ -17,7 +17,8 @@ class AddressInfo(AddressBase):
 
 
 class AddressCreate(BaseModel):
-
+    name: Optional[str]
+    phone_number: Optional[str]
     city_id: Optional[int]
     district_id: Optional[int]
     ward_id: Optional[int]

@@ -9,6 +9,8 @@ class Address(Base, BaseDBModel):
 
     id = Column(BigInteger, primary_key=True, index=True, unique=True)
     user_id = Column(BigInteger, nullable=False)
+    name = Column(String(255), nullable=False)
+    phone_number = Column(String(10), nullable=False)
     city_id = Column(BigInteger, nullable=False)
     district_id = Column(BigInteger, nullable=False)
     ward_id = Column(BigInteger, nullable=False)

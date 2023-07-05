@@ -87,6 +87,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             ward = self.get_ward_by_id(ward_id=item.ward_id, db=db)
             data = {
                 'id': item.id,
+                'name': item.name,
+                'phone_number': item.phone_number,
                 'city_id': city.id,
                 'district_id': district.id,
                 'ward_id': ward.id,
@@ -120,6 +122,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
             ward = self.get_ward_by_id(ward_id=item.ward_id, db=db)
             data = {
                 'id': item.id,
+                'name': item.name,
+                'phone_number': item.phone_number,
                 'city_id': city.name,
                 'district_id': district.name,
                 'ward_id': ward.name,
@@ -152,6 +156,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
 
         data = {
             'id': data_db.id,
+            'name': data_db.name,
+            'phone_number': data_db.phone_number,
             'city_id': city.id,
             'city': city.name,
             'district_id': district.id,
@@ -200,7 +206,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         district_id = request.district_id if request.district_id else None
         ward_id = request.ward_id if request.ward_id else None
         detail = request.detail if request.detail else None
-
+        name = request.name if request.name else None
+        phone_number = request.phone_number if request.phone_number else None
         update_at = datetime.now()
         update_id = user_id
 
@@ -208,6 +215,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         add_db.district_id = district_id
         add_db.ward_id = ward_id
         add_db.detail = detail
+        add_db.name = name
+        add_db.phone_number = phone_number
         add_db.update_at = update_at
         add_db.update_id = update_id
 

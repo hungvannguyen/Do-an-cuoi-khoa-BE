@@ -20,8 +20,8 @@ class OrderInfo(OrderBase):
 
 class OrderCreate(BaseModel):
     payment_type_id: Optional[int]
-    name: Optional[str]
-    phone_number: Optional[str]
+    # name: Optional[str]
+    # phone_number: Optional[str]
     email: Optional[str]
     note: Optional[str]
     # city_id: Optional[int]
@@ -29,7 +29,7 @@ class OrderCreate(BaseModel):
     # ward_id: Optional[int]
     # detail: Optional[str]
     address_id: Optional[int]
-    status: Optional[int]
+    # status: Optional[int]
 
 
 class OrderUpdate(OrderCreate):

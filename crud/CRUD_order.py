@@ -5,6 +5,8 @@ from constants import Method, Target
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
+
+from models.address import Address
 from vnpay_python import views as CRUD_vnpay
 import models
 from models.product import Product
@@ -196,15 +198,21 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         }
         payment_db = crud_payment.add_payment(request=request_payment, db=db, user_id=user_id)
 
+        # Get Address Info
+        address_id = request.address_id
+        address_db = db.query(Address).filter(
+            Address.id == address_id,
+            Address.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        name = address_db.name
+        phone_number = address_db.phone_number
+
         # Add Order Info
         payment_id = payment_db.id
-        name = request.name
-        phone_number = request.phone_number
         email = request.email
-        status = request.status
+        status = 0
         note = request.note
-        # city_id = request.city_id
-        address_id = request.address_id
+
 
         order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number,
                                   note=note, total_price=0,
@@ -278,12 +286,12 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         # Update User Info
 
-        user_update_info = {
-            'name': name,
-            'email': email,
-            'phone_number': phone_number
-        }
-        crud_user.update_info(request=user_update_info, db=db, user_id=user_id)
+        # user_update_info = {
+        #     'name': name,
+        #     'email': email,
+        #     'phone_number': phone_number
+        # }
+        # crud_user.update_info(request=user_update_info, db=db, user_id=user_id)
         logger.log(Method.POST, Target.ORDER, comment=f"CREATE ORDER FOR USER ID #{user_id}",
                    status=Target.SUCCESS,
                    id=user_id,
