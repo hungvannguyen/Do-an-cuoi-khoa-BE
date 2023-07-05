@@ -104,6 +104,5 @@ def update_product(id: int, request: ProductUpdate, db: Session = Depends(deps.g
 
 
 @router.post("/add_quantity")
-def add_quantity(prd_id: int, quantity: int = 1, db: Session = Depends(deps.get_db),
-                 token: TokenPayload = Depends(deps.get_employee_user)):
-    return crud_product.add_quantity(prd_id=prd_id, quantity=quantity, db=db, admin_id=token.id)
+def add_quantity(prd_id: int, quantity: int = 1, db: Session = Depends(deps.get_db)):
+    return crud_product.add_quantity(prd_id=prd_id, quantity=quantity, db=db, admin_id=1)
