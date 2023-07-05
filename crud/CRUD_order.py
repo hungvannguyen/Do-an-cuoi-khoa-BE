@@ -213,7 +213,6 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         status = 0
         note = request.note
 
-
         order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number,
                                   note=note, total_price=0,
                                   email=email, address="", status=status, insert_at=datetime.now(),
@@ -238,7 +237,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             total_price += price * quantity
             order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
                                                                       quantity=quantity, name=prd_name, img_url=img_url,
-                                                                      price=price, insert_at=datetime.now(), import_price = import_price,
+                                                                      price=price, insert_at=datetime.now(),
+                                                                      import_price=import_price,
                                                                       insert_id=user_id, update_id=user_id,
                                                                       update_at=datetime.now())
 
@@ -355,6 +355,31 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         return {
             'detail': "Đã cập nhật trạng thái đơn hàng"
         }
+
+    def cancel_order(self, order_id, db: Session, user_id):
+
+        order_db = db.query(self.model).filter(
+            self.model.id == order_id,
+            self.model.user_id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+
+        if order_db.status != Const.ORDER_PENDING:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Không thể hủy đơn hàng này")
+
+        order_db.status = Const.ORDER_CANCEL
+        order_db.update_at = datetime.now()
+        order_db.update_id = user_id
+
+        db.merge(order_db)
+        db.commit()
+
+        logger.log(Method.DELETE, Target.ORDER, comment=f"CANCEL ORDER #{order_id}", status=Target.FAIL, id=user_id,
+                   db=db)
+        return {
+            'detail': "Đã hủy đơn hàng thành công"
+        }
+
 
 
 crud_order = CRUDOrder(Order)

@@ -41,4 +41,10 @@ def add_order(request: OrderCreate, db: Session = Depends(deps.get_db),
 @router.get("/update")
 def update_order_status(order_status: int, order_id: int, db: Session = Depends(deps.get_db),
                         token: TokenPayload = Depends(deps.get_current_user)):
-    crud_order.update_order_status(order_status=order_status, order_id=order_id, db=db, user_id=token.id)
+    return crud_order.update_order_status(order_status=order_status, order_id=order_id, db=db, user_id=token.id)
+
+
+@router.delete("/cancel")
+def cancel_order(order_id: int, db: Session = Depends(deps.get_db),
+                 token: TokenPayload = Depends(deps.get_current_user)):
+    return crud_order.cancel_order(order_id=order_id, db=db, user_id=token.id)
