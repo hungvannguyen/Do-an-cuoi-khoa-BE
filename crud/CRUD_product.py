@@ -41,8 +41,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         #     data_db = data_db.order_by(desc(self.model.price))
         if condition['sort'] == 3:
             data_db = data_db.filter(
-                self.model.price >= condition['min_price'],
-                self.model.price <= condition['max_price']
+                self.model.price * (100-self.model.sale_percent)/100 >= condition['min_price'],
+                self.model.price * (100-self.model.sale_percent)/100 <= condition['max_price']
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
@@ -93,8 +93,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         )
         if condition['sort'] == 3:
             data_db = data_db.filter(
-                self.model.price >= condition['min_price'],
-                self.model.price <= condition['max_price']
+                self.model.price * (100 - self.model.sale_percent) / 100 >= condition['min_price'],
+                self.model.price * (100 - self.model.sale_percent) / 100 <= condition['max_price']
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
@@ -169,8 +169,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         )
         if condition['sort'] == 3:
             data_db = data_db.filter(
-                self.model.price >= condition['min_price'],
-                self.model.price <= condition['max_price']
+                self.model.price * (100 - self.model.sale_percent) / 100 >= condition['min_price'],
+                self.model.price * (100 - self.model.sale_percent) / 100 <= condition['max_price']
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
@@ -263,8 +263,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
         if condition['sort'] == 3:
             data_db = data_db.filter(
-                self.model.price >= condition['min_price'],
-                self.model.price <= condition['max_price']
+                self.model.price * (100 - self.model.sale_percent) / 100 >= condition['min_price'],
+                self.model.price * (100 - self.model.sale_percent) / 100 <= condition['max_price']
             )
 
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
@@ -320,8 +320,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         )
         if condition['sort'] == 3:
             data_db = data_db.filter(
-                self.model.price >= condition['min_price'],
-                self.model.price <= condition['max_price']
+                self.model.price * (100 - self.model.sale_percent) / 100 >= condition['min_price'],
+                self.model.price * (100 - self.model.sale_percent) / 100 <= condition['max_price']
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
