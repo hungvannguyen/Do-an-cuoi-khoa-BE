@@ -44,6 +44,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                 data['total_price'] = prd_data['sale_price'] * data['quantity']
                 data['name'] = prd_data['name']
                 data['price'] = prd_data['price']
+                data['import_price'] = prd_data['import_price']
                 data['img_url'] = prd_data['img_url']
                 result.append(data)
         else:

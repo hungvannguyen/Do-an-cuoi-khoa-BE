@@ -226,10 +226,11 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             prd_name = item['name']
             img_url = item['img_url']
             price = item['sale_price']
+            import_price = item['import_price']
             total_price += price * quantity
             order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
                                                                       quantity=quantity, name=prd_name, img_url=img_url,
-                                                                      price=price, insert_at=datetime.now(),
+                                                                      price=price, insert_at=datetime.now(), import_price = import_price,
                                                                       insert_id=user_id, update_id=user_id,
                                                                       update_at=datetime.now())
 

@@ -32,7 +32,9 @@ class CRUDOrderProduct(CRUDBase[Order_Product, OrderProductCreate, OrderProductU
         prd_id = request['prd_id']
         price = request['price']
         quantity = request['quantity']
+        import_price = request['import_price']
         obj_db = self.model(ord_id=order_id, prd_id=prd_id, price=price, quantity=quantity, insert_id=user_id,
+                            import_price=import_price,
                             insert_at=datetime.now(), update_id=user_id, update_at=datetime.now())
         db.add(obj_db)
         db.commit()

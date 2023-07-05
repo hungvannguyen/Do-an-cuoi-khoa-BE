@@ -13,4 +13,5 @@ class Order_Product(Base, BaseDBModel):
     name = Column(String(255))
     img_url = Column(String(255))
     quantity = Column(Integer, default=1)
+    import_price = Column(FLOAT)
     price = Column(FLOAT)

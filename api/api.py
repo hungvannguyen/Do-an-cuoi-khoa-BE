@@ -16,7 +16,8 @@ from api.endpoint import (
     order,
     files,
     log,
-    vnpay
+    vnpay,
+    summary
 )
 
 api_router = APIRouter()
@@ -37,3 +38,4 @@ api_router.include_router(checkout.router, prefix="/checkout", tags=['CHECKOUT']
 api_router.include_router(payment.router, prefix="/payment", tags=['PAYMENT'])
 api_router.include_router(paymentType.router, prefix="/payment/type", tags=['PAYMENT TYPE'])
 api_router.include_router(order.router, prefix="/order", tags=['ORDER'])
+api_router.include_router(summary.router, prefix="/summary", tags=['SUMMARY'])
