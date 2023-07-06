@@ -74,3 +74,43 @@ def order_count(db: Session):
         'delivered_order': delivered_count,
         'success_order': success_count
     }
+
+
+def order_count_by_user_id(user_id: int, db: Session):
+    total_count = 0
+    cancel_count = 0
+    pending_count = 0
+    confirm_count = 0
+    delivering_count = 0
+    delivered_count = 0
+    success_count = 0
+
+    order_db = db.query(Order).filter(
+        Order.user_id == user_id,
+        Order.delete_flag == Const.DELETE_FLAG_NORMAL
+    ).all()
+
+    for item in order_db:
+        total_count += 1
+        if item.status == Const.ORDER_CANCEL:
+            cancel_count += 1
+        if item.status == Const.ORDER_PENDING:
+            pending_count += 1
+        if item.status == Const.ORDER_CONFIRMED:
+            confirm_count += 1
+        if item.status == Const.ORDER_DELIVERING:
+            delivering_count += 1
+        if item.status == Const.ORDER_DELIVERED:
+            delivered_count += 1
+        if item.status == Const.ORDER_SUCCESS:
+            success_count += 1
+
+    return {
+        'total_order': total_count,
+        'cancel_order': cancel_count,
+        'pending_order': pending_count,
+        'confirmed_order': confirm_count,
+        'delivering_order': delivering_count,
+        'delivered_order': delivered_count,
+        'success_order': success_count
+    }

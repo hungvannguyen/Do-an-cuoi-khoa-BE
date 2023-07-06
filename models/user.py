@@ -15,4 +15,4 @@ class User(Base, BaseDBModel):
     phone_number = Column(String(10), nullable=True)
     role_id = Column(Integer, nullable=False, default=99)
     is_confirmed = Column(Integer, default=0)
-
+    is_locked = Column(Integer, default=99)

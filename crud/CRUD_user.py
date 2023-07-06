@@ -42,6 +42,24 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         data_db = jsonable_encoder(data_db)
         return data_db
 
+    def get_detail_by_user_id(self, user_id, db: Session):
+        user_db = db.query(self.model).filter(
+            self.model.id == user_id
+        ).first()
+
+        result = {
+            'id': user_db.id,
+            'name': user_db.name,
+            'phone_number': user_db.phone_number,
+            'email': user_db.email,
+            'account': user_db.account,
+            'role_id': user_db.role_id,
+            'is_locked': user_db.is_locked,
+            'insert_at': user_db.insert_at
+        }
+
+        return result
+
     def login(self, db: Session, account, password):
 
         data_db = db.query(self.model).filter(
@@ -63,6 +81,10 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
                            status=Target.SUCCESS,
                            id=0,
                            db=db)
+
+                if data_db['is_locked'] == Const.IS_LOCKED:
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tài khoản này đã bị khóa")
+
                 return gen_token(data_db), data_db['role_id']
         logger.log(Method.GET, Target.USER, comment=f"LOGIN INTO ACCOUNT {account}",
                    status=Target.FAIL,
@@ -346,6 +368,47 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
 
         return result
 
+    def lock_account(self, user_id, db: Session, admin_id):
+        user_db = db.query(self.model).filter(
+            self.model.id == user_id,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        if user_db is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy tài khoản này")
+
+        if user_db.is_locked == Const.IS_LOCKED:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tài khoản này đã bị khóa")
+
+        user_db.is_locked = Const.IS_LOCKED
+        user_db.update_at = datetime.now()
+        user_db.update_id = admin_id
+
+        db.merge(user_db)
+        db.commit()
+
+        return {
+            'detail': "Đã khóa"
+        }
+
+    def unlock_account(self, user_id, db: Session, admin_id):
+        user_db = db.query(self.model).filter(
+            self.model.id == user_id,
+            self.model.is_locked == Const.IS_LOCKED,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        if user_db is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy tài khoản này")
+
+        user_db.is_locked = Const.IS_NOT_LOCKED
+        user_db.update_at = datetime.now()
+        user_db.update_id = admin_id
+
+        db.merge(user_db)
+        db.commit()
+
+        return {
+            'detail': "Đã mở khóa"
+        }
 
 
 crud_user = CRUDUser(User)

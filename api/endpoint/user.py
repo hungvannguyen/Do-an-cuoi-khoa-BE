@@ -88,6 +88,12 @@ def get_user_info(db: Session = Depends(deps.get_db), token: TokenPayload = Depe
     return crud_user.get_user_info(db=db, id=token.id)
 
 
+@router.get("/info_detail")
+def get_detail_user_by_id(user_id: int, db: Session = Depends(deps.get_db),
+                          token: TokenPayload = Depends(deps.get_employee_user)):
+    return crud_user.get_detail_by_user_id(user_id=user_id, db=db)
+
+
 @router.post("/update")
 def update_user_info(request: UserUpdateInfo, db: Session = Depends(deps.get_db),
                      token: TokenPayload = Depends(deps.get_current_user)):
@@ -97,3 +103,15 @@ def update_user_info(request: UserUpdateInfo, db: Session = Depends(deps.get_db)
 @router.delete("/delete/{id}")
 def del_acc(id: int, db: Session = Depends(deps.get_db)):
     return crud_user.delete_account(id=id, db=db)
+
+
+@router.delete("/lock")
+def lock_account(user_id: int, db: Session = Depends(deps.get_db),
+                 token: TokenPayload = Depends(deps.get_admin_user)):
+    return crud_user.lock_account(user_id=user_id, db=db, admin_id=token.id)
+
+
+@router.put("/unlock")
+def unlock_account(user_id: int, db: Session = Depends(deps.get_db),
+                   token: TokenPayload = Depends(deps.get_admin_user)):
+    return crud_user.unlock_account(user_id=user_id, db=db, admin_id=token.id)

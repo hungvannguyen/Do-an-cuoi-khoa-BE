@@ -43,7 +43,7 @@ def get_checkout_info(db: Session, user_id):
 
 
 def get_checkout_user_info(db: Session, user_id):
-    user_info = crud_user.get_user_info(db, user_id)
+    # user_info = crud_user.get_user_info(db, user_id)
     result = {
         # 'name': user_info['name'],
         # 'email': user_info['email'],
@@ -58,3 +58,5 @@ def get_checkout_user_info(db: Session, user_id):
                id=user_id,
                db=db)
     return result
+
+
