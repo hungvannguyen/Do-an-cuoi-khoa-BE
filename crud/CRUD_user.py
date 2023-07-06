@@ -276,7 +276,24 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
                    id=user_id,
                    db=db)
         return {
-            'detail': 'Đã cập nhật địa chỉ'
+            'detail': 'Đã cập nhật'
+        }
+
+    def admin_update_user_info(self, user_id, request, db: Session, admin_id):
+        user_db = db.query(self.model).filter(
+            self.model.id == user_id
+        ).first()
+
+        if not isinstance(request, dict):
+            request = request.dict()
+
+        self.update(db=db, db_obj=user_db, obj_in=request, admin_id=admin_id)
+        logger.log(Method.PUT, Target.USER, comment=f"UPDATE USER INFO FOR USER ID #{user_id}",
+                   status=Target.SUCCESS,
+                   id=user_id,
+                   db=db)
+        return {
+            'detail': 'Đã cập nhật'
         }
 
     def confirm_code(self, request, db: Session):

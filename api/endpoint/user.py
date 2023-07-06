@@ -100,6 +100,12 @@ def update_user_info(request: UserUpdateInfo, db: Session = Depends(deps.get_db)
     return crud_user.update_info(request=request, db=db, user_id=token.id)
 
 
+@router.put("/admin/update")
+def admin_update_user_info(user_id: int, request: UserUpdateInfo, db: Session = Depends(deps.get_db),
+                           token: TokenPayload = Depends(deps.get_employee_user)):
+    return crud_user.admin_update_user_info(user_id=user_id, request=request, db=db, admin_id=token.id)
+
+
 @router.delete("/delete/{id}")
 def del_acc(id: int, db: Session = Depends(deps.get_db)):
     return crud_user.delete_account(id=id, db=db)
