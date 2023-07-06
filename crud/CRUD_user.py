@@ -61,10 +61,10 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         return result
 
     def login(self, db: Session, account, password):
-
+        account = str(account).lower()
         data_db = db.query(self.model).filter(
-            User.account == account,
-            User.delete_flag == Const.DELETE_FLAG_NORMAL
+            self.model.account == account,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
             # User.is_confirmed == Const.IS_CONFIRMED
         ).first()
         if data_db:
@@ -94,16 +94,16 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
                             detail="Tài khoản hoặc mật khẩu không chính xác")
 
     def create_user(self, db: Session, request) -> Any:
-        account = request.account
+        account = str(request.account).lower()
         if not request.password == request.confirm_password:
             logger.log(Method.POST, Target.USER, comment=f"CREATE NEW USER {account}",
                        status=Target.FAIL,
                        id=0,
                        db=db)
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Mật khẩu không khớp")
-
+        email = str(request.email).lower()
         email_db = db.query(self.model).filter(
-            self.model.email == request.email,
+            self.model.email == email,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if email_db:
@@ -113,7 +113,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
                        db=db)
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Email này đã tồn tại")
         data_db = db.query(self.model).filter(
-            self.model.account == request.account,
+            self.model.account == account,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if data_db:
@@ -127,7 +127,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             password = request['password']
             hashed_password = hash_password(password)
             request['password'] = hashed_password
-            data_db = self.model(account=request['account'], password=request['password'], email=request['email'])
+            data_db = self.model(account=account, password=request['password'], email=email)
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
@@ -182,6 +182,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             return {"result": "Tạo thành công"}
 
     def confirm_email(self, email, db: Session):
+        email = str(email).lower()
         data_db = db.query(self.model).filter(
             self.model.email == email,
             self.model.is_confirmed == Const.IS_NOT_CONFIRMED,
@@ -378,6 +379,9 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
 
         if user_db.is_locked == Const.IS_LOCKED:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Tài khoản này đã bị khóa")
+
+        if user_db.role_id == Const.ADMIN_ID:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Không thể khóa tài khoản admin")
 
         user_db.is_locked = Const.IS_LOCKED
         user_db.update_at = datetime.now()
