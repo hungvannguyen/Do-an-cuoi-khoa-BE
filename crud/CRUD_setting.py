@@ -43,17 +43,28 @@ class CRUDSetting(CRUDBase[Settings, SettingCreate, SettingUpdate]):
         if not isinstance(request, dict):
             request = request.dict()
 
-        banner_1 = request['banner_1'] if "banner_1" in request and request['banner_1'] is not None else setting_db.banner_1
-        banner_2 = request['banner_2'] if "banner_2" in request and request['banner_2'] is not None else setting_db.banner_2
-        banner_3 = request['banner_3'] if "banner_3" in request and request['banner_3'] is not None else setting_db.banner_3
-        banner_4 = request['banner_4'] if "banner_4" in request and request['banner_4'] is not None else setting_db.banner_4
-        banner_5 = request['banner_5'] if "banner_5" in request and request['banner_5'] is not None else setting_db.banner_5
-        sale_banner = request['sale_banner'] if "sale_banner" in request and request['sale_banner'] is not None else setting_db.sale_banner
-        intro_banner = request['intro_banner'] if "intro_banner" in request and request['intro_banner'] is not None else setting_db.intro_banner
-        intro_text_1 = request['intro_text_1'] if "intro_text_1" in request and request['intro_text_1'] is not None else setting_db.intro_text_1
-        intro_text_2 = request['intro_text_2'] if "intro_text_2" in request and request['intro_text_2'] is not None else setting_db.intro_text_2
-        intro_text_3 = request['intro_text_3'] if "intro_text_3" in request and request['intro_text_3'] is not None else setting_db.intro_text_3
-        intro_text_footer = request['intro_text_footer'] if "intro_text_footer" in request and request['intro_text_footer'] is not None else setting_db.intro_text_footer
+        banner_1 = request['banner_1'] if "banner_1" in request \
+                                          and request['banner_1'] is not None else setting_db.banner_1
+        banner_2 = request['banner_2'] if "banner_2" in request \
+                                          and request['banner_2'] is not None else setting_db.banner_2
+        banner_3 = request['banner_3'] if "banner_3" in request \
+                                          and request['banner_3'] is not None else setting_db.banner_3
+        banner_4 = request['banner_4'] if "banner_4" in request \
+                                          and request['banner_4'] is not None else setting_db.banner_4
+        banner_5 = request['banner_5'] if "banner_5" in request \
+                                          and request['banner_5'] is not None else setting_db.banner_5
+        sale_banner = request['sale_banner'] if "sale_banner" in request \
+                                                and request['sale_banner'] is not None else setting_db.sale_banner
+        intro_banner = request['intro_banner'] if "intro_banner" in request \
+                                                  and request['intro_banner'] is not None else setting_db.intro_banner
+        intro_text_1 = request['intro_text_1'] if "intro_text_1" in request \
+                                                  and request['intro_text_1'] is not None else setting_db.intro_text_1
+        intro_text_2 = request['intro_text_2'] if "intro_text_2" in request \
+                                                  and request['intro_text_2'] is not None else setting_db.intro_text_2
+        intro_text_3 = request['intro_text_3'] if "intro_text_3" in request \
+                                                  and request['intro_text_3'] is not None else setting_db.intro_text_3
+        intro_text_footer = request['intro_text_footer'] if "intro_text_footer" in request \
+                                                            and request['intro_text_footer'] is not None else setting_db.intro_text_footer
 
         setting_db.banner_1 = banner_1
         setting_db.banner_2 = banner_2
