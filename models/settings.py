@@ -14,3 +14,9 @@ class Settings(Base, BaseDBModel):
     banner_4 = Column(String(100), nullable=True)
     banner_5 = Column(String(100), nullable=True)
     sale_banner = Column(String(100), nullable=True)
+    intro_banner = Column(String(100), nullable=True)
+    intro_text_1 = Column(String(255), nullable=True)
+    intro_text_2 = Column(String(255), nullable=True)
+    intro_text_3 = Column(String(255), nullable=True)
+    intro_text_footer = Column(String(255), nullable=True)
+    

@@ -129,7 +129,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         total_order = order_db.count()
         total_page = int(total_order / Const.ROW_PER_PAGE_ORDER)
-        if total_order % Const.ROW_PER_PAGE > 0:
+        # total_order = int(total_order / Const.ROW_PER_PAGE_ORDER)
+        if total_order % Const.ROW_PER_PAGE_ORDER > 0:
             total_page += 1
         current_page = page
         if current_page < 1:
@@ -137,7 +138,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         if current_page > total_page > 0:
             current_page = total_page
 
-        start = (current_page - 1) * Const.ROW_PER_PAGE
+        start = (current_page - 1) * Const.ROW_PER_PAGE_ORDER
 
         order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE).all()
 
@@ -172,7 +173,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         total_order = order_db.count()
         total_page = int(total_order / Const.ROW_PER_PAGE_ADMIN)
-        if total_order % Const.ROW_PER_PAGE > 0:
+        if total_order % Const.ROW_PER_PAGE_ADMIN > 0:
             total_page += 1
         current_page = page
         if current_page < 1:
@@ -180,7 +181,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         if current_page > total_page > 0:
             current_page = total_page
 
-        start = (current_page - 1) * Const.ROW_PER_PAGE
+        start = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
 
         order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE).all()
 

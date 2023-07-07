@@ -8,6 +8,7 @@ from fastapi.encoders import jsonable_encoder
 import models
 import schemas.user
 from crud.base import CRUDBase
+from models.order import Order
 from models.payment import Payment
 from schemas.payment import *
 from constants import Const
@@ -66,6 +67,16 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         data_db.update_at = datetime.now()
 
         db.merge(data_db)
+        db.commit()
+
+        order_db = db.query(Order).filter(
+            Order.payment_id == payment_id
+        ).first()
+
+        order_db.status = Const.ORDER_CONFIRMED
+        order_db.update_at = datetime.now()
+
+        db.merge(order_db)
         db.commit()
 
         logger.log(Method.PUT, Target.PAYMENT, comment=f"UPDATE PAYMENT ID #{payment_id}",

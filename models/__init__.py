@@ -11,7 +11,8 @@ from models import (
     paymentType,
     role,
     code_confirm,
-    log
+    log,
+    settings
 )
 
 from database.db import Base

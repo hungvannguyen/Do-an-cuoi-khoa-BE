@@ -17,12 +17,14 @@ from api.endpoint import (
     files,
     log,
     vnpay,
-    summary
+    summary,
+    setting
 )
 
 api_router = APIRouter()
 
 # api_router.include_router(login_regis.router, prefix="/v1", tags=["TÉT"])
+api_router.include_router(setting.router, prefix="/setting", tags=['SETTING'])
 api_router.include_router(vnpay.router, prefix="/vnpay", tags=['VNPAY'])
 api_router.include_router(log.router, prefix="/log", tags=['LOGS'])
 api_router.include_router(files.router, prefix="/file", tags=["FILES"])
@@ -39,3 +41,4 @@ api_router.include_router(payment.router, prefix="/payment", tags=['PAYMENT'])
 api_router.include_router(paymentType.router, prefix="/payment/type", tags=['PAYMENT TYPE'])
 api_router.include_router(order.router, prefix="/order", tags=['ORDER'])
 api_router.include_router(summary.router, prefix="/summary", tags=['SUMMARY'])
+
