@@ -205,7 +205,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'total_page': total_page
         }
 
-    def add_order(self, request, db: Session, user_id):
+    def add_order(self, request, db: Session, user_id, email):
         # Add payment method
         payment_type_id = request.payment_type_id
         bankCode = ''
@@ -231,7 +231,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         # Add Order Info
         payment_id = payment_db.id
-        email = request.email
+        email = email
         status = 0
         note = request.note
 

@@ -87,6 +87,23 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
             'detail': 'Đã cập nhật thành công'
         }
 
+
+    def complete_cod_payment(self, payment_id, db:Session):
+        payment_db = db.query(self.model).filter(
+            self.model.id == payment_id,
+            self.model.status == Const.UNPAID
+        ).first()
+
+        payment_db.status = Const.PAID
+        payment_db.update_at = datetime.now()
+
+        db.merge(payment_db)
+        db.commit()
+
+        return {
+            'detail': "Đã cập nhật"
+        }
+
     def payment_return(self, vnp_Amount,
                        vnp_BankCode,
                        vnp_BankTranNo,

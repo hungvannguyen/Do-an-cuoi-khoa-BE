@@ -1,5 +1,8 @@
 from datetime import datetime
 from typing import Any
+
+import sqlalchemy
+
 from crud import logger
 from constants import Method, Target
 from sqlalchemy import asc, desc
@@ -7,6 +10,9 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from crud.CRUD_category import crud_category
+from crud.CRUD_order_product import crud_order_product
+from models.order import Order
+from models.order_product import Order_Product
 from models.product import Product
 from schemas.product import *
 from crud.base import CRUDBase
@@ -41,8 +47,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         #     data_db = data_db.order_by(desc(self.model.price))
         if condition['sort'] == 3:
             data_db = data_db.filter(
-                self.model.price * (100-self.model.sale_percent)/100 >= condition['min_price'],
-                self.model.price * (100-self.model.sale_percent)/100 <= condition['max_price']
+                self.model.price * (100 - self.model.sale_percent) / 100 >= condition['min_price'],
+                self.model.price * (100 - self.model.sale_percent) / 100 <= condition['max_price']
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
@@ -238,6 +244,22 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             'current_page': current_page,
             'total_page': total_page
         }
+
+    def get_best_seller_products(self, db: Session):
+
+        order_product_db = db.query(Order_Product.product_id, sqlalchemy.func.sum(Order_Product.quantity))\
+            .group_by(Order_Product.product_id)\
+            .order_by(sqlalchemy.func.sum(Order_Product.quantity).desc())\
+            .all()
+
+        print(order_product_db[0][0])
+        result = []
+        # for item in order_product_db:
+        #     product = {
+        #         'id': it
+        #     }
+
+        return result
 
     def get_by_cat_id(self, cat_id, page, condition, db: Session):
         current_page = page

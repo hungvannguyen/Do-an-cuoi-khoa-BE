@@ -8,4 +8,5 @@ class TokenPayload(BaseModel):
     name: Optional[str]
     address: Optional[str]
     phone_number: Optional[str]
+    email: Optional[str]
     role_id: int

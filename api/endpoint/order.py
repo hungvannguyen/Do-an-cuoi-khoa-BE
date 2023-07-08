@@ -35,7 +35,10 @@ def get_all_order_for_admin(page: int = 1, order_status: int = None, db: Session
 @router.post("/add")
 def add_order(request: OrderCreate, db: Session = Depends(deps.get_db),
               token: TokenPayload = Depends(deps.get_current_user)):
-    return crud_order.add_order(request=request, db=db, user_id=token.id)
+
+    abc = 1
+
+    return crud_order.add_order(request=request, db=db, user_id=token.id, email=token.email)
 
 
 @router.get("/update")

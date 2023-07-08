@@ -60,7 +60,7 @@ def get_new_products(page: int = 1,
 
 @router.get("/best-seller")
 def get_best_seller_products(db: Session = Depends(deps.get_db)):
-    pass
+    return crud_product.get_best_seller_products(db=db)
 
 
 @router.get("/category/{cat_id}")
