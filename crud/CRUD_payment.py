@@ -100,6 +100,15 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         db.merge(payment_db)
         db.commit()
 
+        order_db = db.query(Order).filter(
+            Order.payment_id == payment_id
+        ).first()
+
+        order_db.status = Const.ORDER_SUCCESS
+        order_db.update_at = datetime.now()
+        db.merge(order_db)
+        db.commit()
+
         return {
             'detail': "Đã cập nhật"
         }
