@@ -247,19 +247,42 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
     def get_best_seller_products(self, db: Session):
 
-        order_product_db = db.query(Order_Product.product_id, sqlalchemy.func.sum(Order_Product.quantity))\
-            .group_by(Order_Product.product_id)\
-            .order_by(sqlalchemy.func.sum(Order_Product.quantity).desc())\
+        order_product_db = db.query(Order_Product.product_id, sqlalchemy.func.sum(Order_Product.quantity)) \
+            .group_by(Order_Product.product_id) \
+            .order_by(sqlalchemy.func.sum(Order_Product.quantity).desc()) \
             .all()
 
-        print(order_product_db[0][0])
+        # print(order_product_db[0][0])
         result = []
-        # for item in order_product_db:
-        #     product = {
-        #         'id': it
-        #     }
+        count = 0
+        for item in order_product_db:
+            product_id = item[0]
+            product_db = self.get_product_by_id(id=product_id, db=db)
 
-        return result
+            if product_db is not None and product_db.status == 1:
+                count += 1
+                product = {
+                    "is_sale": product_db.is_sale,
+                    "name": product_db.name,
+                    "price": product_db.price,
+                    'sale_price': product_db.sale_price,
+                    "id": product_db.id,
+                    "sale_percent": product_db.sale_percent,
+                    "cat_id": product_db.cat_id,
+                    "img_url": product_db.img_url,
+                }
+                result.append(product)
+
+            if count == 3:
+                return {
+                    'data': result,
+                    'count': count
+                }
+
+        return {
+            'data': result,
+            'count': count
+        }
 
     def get_by_cat_id(self, cat_id, page, condition, db: Session):
         current_page = page

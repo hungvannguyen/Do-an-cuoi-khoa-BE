@@ -36,8 +36,6 @@ def get_all_order_for_admin(page: int = 1, order_status: int = None, db: Session
 def add_order(request: OrderCreate, db: Session = Depends(deps.get_db),
               token: TokenPayload = Depends(deps.get_current_user)):
 
-    abc = 1
-
     return crud_order.add_order(request=request, db=db, user_id=token.id, email=token.email)
 
 
