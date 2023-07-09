@@ -123,7 +123,7 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                        vnp_TransactionStatus,
                        vnp_TxnRef,
                        vnp_SecureHash, db: Session):
-        print(vnp_TxnRef)
+        # print(vnp_TxnRef)
 
         obj_db = db.query(self.model).filter(
             self.model.txnRef == vnp_TxnRef
@@ -135,6 +135,17 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
 
         db.merge(obj_db)
         db.commit()
+
+        payment_id = obj_db.id
+        order_db = db.query(Order).filter(
+            Order.payment_id == payment_id
+        ).first()
+
+        order_db.status = Const.ORDER_CONFIRMED
+        db.merge(order_db)
+        db.commit()
+
+
         logger.log(Method.PUT, Target.PAYMENT, comment=f"UPDATE PAYMENT OF TXNREF #{vnp_TxnRef}", status=Target.SUCCESS,
                    id=0, db=db)
         return {
