@@ -12,9 +12,9 @@ def uploadFile(file: UploadFile = File(...)):
         except Exception as e:
             print(e)
     file_name_replace = file.filename.replace(" ", "-")
-    dot_position = file.filename.find(".")
-    extension = file.filename[dot_position:len(file.filename)]
-    file_name = file.filename[0:dot_position]
+    dot_position = file_name_replace.find(".")
+    extension = file_name_replace[dot_position:len(file.filename)]
+    file_name = file_name_replace[0:dot_position]
     file_name_db = file_name + "_" + str(datetime.timestamp(datetime.now())) + extension
     filename = os.getcwd() + "/img/" + file_name_db
     with open(filename, "wb+") as f:

@@ -87,8 +87,7 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
             'detail': 'Đã cập nhật thành công'
         }
 
-
-    def complete_cod_payment(self, payment_id, db:Session):
+    def complete_cod_payment(self, payment_id, db: Session):
         payment_db = db.query(self.model).filter(
             self.model.id == payment_id,
             self.model.status == Const.UNPAID
