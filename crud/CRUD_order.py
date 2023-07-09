@@ -7,6 +7,7 @@ from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 
 from models.address import Address
+from models.payment import Payment
 from models.user import User
 from vnpay_python import views as CRUD_vnpay
 import models
@@ -371,6 +372,24 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                        id=user_id, db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Không thể cập nhật tình trạng cho đơn hàng này")
+
+        if order_status == Const.ORDER_DELIVERED:
+            payment_id = obj_db.payment_id
+            payment_db = db.query(Payment).filter(
+                Payment.id == payment_id
+            ).first()
+
+            if payment_db.status == 0:
+                obj_db.status = Const.ORDER_SUCCESS
+                obj_db.update_id = user_id
+                obj_db.update_at = datetime.now()
+
+                db.merge(obj_db)
+                db.commit()
+                db.refresh(obj_db)
+                return {
+                    'detail': "Đã cập nhật trạng thái đơn hàng"
+                }
 
         obj_db.status = order_status
         obj_db.update_id = user_id
