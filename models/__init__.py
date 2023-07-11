@@ -9,10 +9,11 @@ from models import (
     order_product,
     payment,
     paymentType,
-    role,
+    # role,
     code_confirm,
     log,
-    settings
+    settings,
+# warehouse
 )
 
 from database.db import Base

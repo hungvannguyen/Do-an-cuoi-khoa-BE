@@ -42,8 +42,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
     def get_order_by_id(self, order_id, db: Session, user_id):
         obj_db = db.query(self.model).filter(
-            self.model.id == order_id,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+            self.model.id == order_id
         ).first()
         result = {
             'id': order_id,
@@ -93,7 +92,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         payment_status = payment_db['status']
         if payment_type_id == Const.ONLINE_PAYMENT and payment_status == 99:
             insert_at = payment_insert_at + timedelta(
-                seconds=30*60
+                seconds=30 * 60
             )
 
             if insert_at < datetime.now():
@@ -112,16 +111,17 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         result['payment_status'] = payment_db['status']
         result['bankCode'] = payment_db['bankCode']
         result['transactionNo'] = payment_db['transactionNo']
+
         logger.log(Method.GET, Target.ORDER, comment=f"GET ORDER BY ID #{order_id}",
                    status=Target.SUCCESS,
                    id=user_id,
                    db=db)
+
         return result
 
     def get_all_orders_by_user_id(self, page, order_status, user_id, db: Session):
         order_db = db.query(self.model).filter(
-            self.model.user_id == user_id,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+            self.model.user_id == user_id
         )
         if order_status is not None and order_status != -1:
             order_db = order_db.filter(
@@ -144,19 +144,12 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE).all()
 
         if not order_db:
-            logger.log(Method.GET, Target.ORDER, comment=f"GET ALL ORDER BY USER ID #{user_id}",
-                       status=Target.FAIL,
-                       id=user_id,
-                       db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không có đơn hàng")
 
         result = []
         for item in order_db:
             result.append(self.get_order_by_id(order_id=item.id, db=db, user_id=user_id))
-        logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ORDER BY USER ID #{user_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
+
         return {
             'data': result,
             'current_page': current_page,
@@ -164,9 +157,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         }
 
     def get_all_orders(self, page, order_status, db: Session, admin_id):
-        order_db = db.query(self.model).filter(
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        )
+        order_db = db.query(self.model)
         if order_status:
             order_db = order_db.filter(
                 self.model.status == order_status
@@ -184,22 +175,15 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         start = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
 
-        order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE).all()
+        order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE_ADMIN).all()
 
         if not order_db:
-            logger.log(Method.GET, Target.ORDER, comment=f"GET ALL ORDERS",
-                       status=Target.FAIL,
-                       id=admin_id,
-                       db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không có đơn hàng")
 
         result = []
         for item in order_db:
             result.append(self.get_order_by_id(order_id=item.id, db=db, user_id=admin_id))
-        logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ORDERS",
-                   status=Target.SUCCESS,
-                   id=admin_id,
-                   db=db)
+
         return {
             'data': result,
             'current_page': current_page,
@@ -217,7 +201,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'payment_type_id': payment_type_id,
             'status': 99,
             'bankCode': bankCode,
-            'txnRef': txnRef
+            'txnRef': txnRef,
+            'insert_at': datetime.now()
         }
         payment_db = crud_payment.add_payment(request=request_payment, db=db, user_id=user_id)
 
@@ -260,10 +245,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             total_price += price * quantity
             order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
                                                                       quantity=quantity, name=prd_name, img_url=img_url,
-                                                                      price=price, insert_at=datetime.now(),
-                                                                      import_price=import_price,
-                                                                      insert_id=user_id, update_id=user_id,
-                                                                      update_at=datetime.now())
+                                                                      price=price, import_price=import_price)
 
             db.add(order_product_obj_db)
             db.commit()
@@ -349,8 +331,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
     def update_order_status(self, order_status, order_id, db: Session, user_id):
         obj_db = db.query(self.model).filter(
-            self.model.id == order_id,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+            self.model.id == order_id
         ).first()
         if obj_db.status == 99:
             logger.log(Method.PUT, Target.ORDER, comment=f"UPDATE STATUS {order_status} OF ORDER ID #{order_id}",
@@ -381,8 +362,6 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
             if payment_db.status == 0:
                 obj_db.status = Const.ORDER_SUCCESS
-                obj_db.update_id = user_id
-                obj_db.update_at = datetime.now()
 
                 db.merge(obj_db)
                 db.commit()
@@ -407,8 +386,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         order_db = db.query(self.model).filter(
             self.model.id == order_id,
-            self.model.user_id == user_id,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+            self.model.user_id == user_id
         ).first()
 
         if order_db.status != Const.ORDER_PENDING:

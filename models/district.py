@@ -4,7 +4,7 @@ from models.BaseModel import BaseDBModel
 from database.db import Base
 
 
-class District(Base, BaseDBModel):
+class District(Base):
     __tablename__ = "districts"
 
     id = Column(BigInteger, primary_key=True, index=True, unique=True)

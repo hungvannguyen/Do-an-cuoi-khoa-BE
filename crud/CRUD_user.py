@@ -329,8 +329,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
                        db=db)
             raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Mã xác thực đã hết hạn")
         code_db.delete_flag = Const.DELETE_FLAG_DELETED
-        code_db.delete_at = datetime.now()
-        code_db.delete_id = user_id
+
         db.merge(code_db)
         db.commit()
         db.refresh(code_db)
@@ -379,7 +378,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
                 'account': item.account,
                 'email': item.email,
                 'role_id': item.role_id,
-                'insert_at': item.insert_at
+                'insert_at': item.insert_at,
+                'is_locked': item.is_locked
             }
 
             result.append(user)
@@ -418,7 +418,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if user_db is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy tài khoản này")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tài khoản này không tồn tại hoặc không bị khoá")
 
         user_db.is_locked = Const.IS_NOT_LOCKED
         user_db.update_at = datetime.now()

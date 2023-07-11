@@ -18,13 +18,9 @@ class CRUDOrderProduct(CRUDBase[Order_Product, OrderProductCreate, OrderProductU
 
     def get_by_order_id(self, order_id, db: Session):
         data_db = db.query(self.model).filter(
-            self.model.order_id == order_id,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+            self.model.order_id == order_id
         ).all()
-        logger.log(Method.GET, Target.ORDER_PRODUCT, comment=f"GET ALL ORDER_PRODUCT BY ORDER ID #{order_id}",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         return data_db
 
     def create_order_product(self, request, db: Session, user_id):
@@ -33,16 +29,13 @@ class CRUDOrderProduct(CRUDBase[Order_Product, OrderProductCreate, OrderProductU
         price = request['price']
         quantity = request['quantity']
         import_price = request['import_price']
-        obj_db = self.model(ord_id=order_id, prd_id=prd_id, price=price, quantity=quantity, insert_id=user_id,
-                            import_price=import_price,
-                            insert_at=datetime.now(), update_id=user_id, update_at=datetime.now())
+        obj_db = self.model(ord_id=order_id, prd_id=prd_id, price=price, quantity=quantity,
+                            import_price=import_price)
+
         db.add(obj_db)
         db.commit()
         db.refresh(obj_db)
-        logger.log(Method.POST, Target.ORDER_PRODUCT, comment=f"CREATE ORDER_PRODUCT IN ORDER ID #{order_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
+
         return {
             'data': 'success'
         }

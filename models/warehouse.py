@@ -4,7 +4,7 @@ from models.BaseModel import BaseDBModel
 from database.db import Base
 
 
-class Warehouse(Base, BaseDBModel):
+class Warehouse(Base):
     __tablename__ = "warehouses"
 
     id = Column(BigInteger, primary_key=True, index=True, unique=True)

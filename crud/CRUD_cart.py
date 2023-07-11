@@ -91,7 +91,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                            id=user_id,
                            db=db)
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Sản phẩm đạt giới hạn")
-            data_db = self.model(**request, insert_id=user_id, update_id=user_id, user_id=user_id)
+            data_db = self.model(**request, user_id=user_id)
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
@@ -128,8 +128,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                        db=db)
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Sản phẩm đạt giới hạn")
         if data_db:
-            data_db.update_id = user_id
-            data_db.update_at = datetime.now()
+
             data_db.quantity = quantity
             db.add(data_db)
             db.commit()
@@ -138,6 +137,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                    status=Target.SUCCESS,
                    id=user_id,
                    db=db)
+
         return {
             'detail': "Đã cập nhật giỏ hàng"
         }
@@ -156,8 +156,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail=f"Không tìm thấy sản phẩm này trong giỏ hàng")
         data_db.delete_flag = Const.DELETE_FLAG_DELETED
-        data_db.delete_at = datetime.now()
-        data_db.delete_id = user_id
+
         db.add(data_db)
         db.commit()
         db.refresh(data_db)

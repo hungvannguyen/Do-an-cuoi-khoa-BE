@@ -20,8 +20,7 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
 
     def get_payment_by_id(self, id, db: Session):
         data_db = db.query(self.model).filter(
-            self.model.id == id,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+            self.model.id == id
         ).first()
 
         payment_type_db = crud_paymentType.get_payment_type(paymentType_id=data_db.payment_type_id, db=db)
@@ -42,29 +41,25 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
     def add_payment(self, request, db: Session, user_id):
         if not isinstance(request, dict):
             request = request.dict()
-        obj_data = self.model(**request, insert_id=user_id, update_id=user_id, insert_at=datetime.now(),
-                              update_at=datetime.now())
+        obj_data = self.model(**request)
 
         db.add(obj_data)
         db.commit()
         db.refresh(obj_data)
         logger.log(Method.POST, Target.PAYMENT, comment=f"CREATE NEW PAYMENT FOR USER ID #{user_id}",
                    status=Target.SUCCESS,
-                   id=user_id,
+                   id=0,
                    db=db)
         return obj_data
 
     def update_payment(self, payment_id, payment_status, bankCode, transactionNo, db: Session, user_id):
         data_db = db.query(self.model).filter(
-            self.model.id == payment_id,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+            self.model.id == payment_id
         ).first()
 
         data_db.status = payment_status
         data_db.bankCode = bankCode
         data_db.transactionNo = transactionNo
-        data_db.update_id = user_id
-        data_db.update_at = datetime.now()
 
         db.merge(data_db)
         db.commit()
@@ -83,6 +78,7 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                    status=Target.SUCCESS,
                    id=user_id,
                    db=db)
+
         return {
             'detail': 'Đã cập nhật thành công'
         }
@@ -99,14 +95,14 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         db.merge(payment_db)
         db.commit()
 
-        order_db = db.query(Order).filter(
-            Order.payment_id == payment_id
-        ).first()
-
-        order_db.status = Const.ORDER_SUCCESS
-        order_db.update_at = datetime.now()
-        db.merge(order_db)
-        db.commit()
+        # order_db = db.query(Order).filter(
+        #     Order.payment_id == payment_id
+        # ).first()
+        #
+        # order_db.status = Const.ORDER_SUCCESS
+        # order_db.update_at = datetime.now()
+        # db.merge(order_db)
+        # db.commit()
 
         return {
             'detail': "Đã cập nhật"
@@ -131,7 +127,6 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         obj_db.status = vnp_ResponseCode
         obj_db.bankCode = vnp_BankCode
         obj_db.transactionNo = vnp_TransactionNo
-        obj_db.update_at = datetime.now()
 
         db.merge(obj_db)
         db.commit()
@@ -145,9 +140,9 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         db.merge(order_db)
         db.commit()
 
-
         logger.log(Method.PUT, Target.PAYMENT, comment=f"UPDATE PAYMENT OF TXNREF #{vnp_TxnRef}", status=Target.SUCCESS,
                    id=0, db=db)
+
         return {
             'detail': "Đã cập nhật tình trạng thanh toán"
         }

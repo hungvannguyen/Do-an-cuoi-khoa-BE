@@ -19,8 +19,7 @@ def total_income(db: Session):
     total_profit = 0
     count = 0
     order_db = db.query(Order).filter(
-        Order.status == Const.ORDER_SUCCESS,
-        Order.delete_flag == Const.DELETE_FLAG_NORMAL
+        Order.status >= Const.ORDER_DELIVERED
     ).all()
 
     for item in order_db:
@@ -46,9 +45,7 @@ def order_count(db: Session):
     delivered_count = 0
     success_count = 0
 
-    order_db = db.query(Order).filter(
-        Order.delete_flag == Const.DELETE_FLAG_NORMAL
-    ).all()
+    order_db = db.query(Order).all()
 
     for item in order_db:
         total_count += 1
@@ -86,8 +83,7 @@ def order_count_by_user_id(user_id: int, db: Session):
     success_count = 0
 
     order_db = db.query(Order).filter(
-        Order.user_id == user_id,
-        Order.delete_flag == Const.DELETE_FLAG_NORMAL
+        Order.user_id == user_id
     ).all()
 
     for item in order_db:

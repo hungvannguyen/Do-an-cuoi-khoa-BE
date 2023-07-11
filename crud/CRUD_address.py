@@ -22,9 +22,7 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
 
         logger.log(Method.GET, Target.CITY, comment="GET ALL CITIES", status=Target.SUCCESS, id=0, db=db)
 
-        data_db = db.query(City).filter(
-            City.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).all()
+        data_db = db.query(City).all()
         return data_db
 
     def get_city_by_id(self, city_id, db: Session):
@@ -32,8 +30,7 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         logger.log(Method.GET, Target.CITY, comment="GET CITY BY ID", status=Target.SUCCESS, id=0, db=db)
 
         data_db = db.query(City).filter(
-            City.id == city_id,
-            City.delete_flag == Const.DELETE_FLAG_NORMAL
+            City.id == city_id
         ).first()
         return data_db
 
@@ -41,29 +38,26 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
 
         logger.log(Method.GET, Target.DISTRICT, comment="GET ALL DISTRICTS", status=Target.SUCCESS, id=0, db=db)
 
-        data_db = db.query(District).filter(District.city_id == city_id,
-                                            District.delete_flag == Const.DELETE_FLAG_NORMAL).all()
+        data_db = db.query(District).filter(District.city_id == city_id).all()
         return data_db
 
     def get_district_by_id(self, district_id, db: Session):
 
         logger.log(Method.GET, Target.DISTRICT, comment="GET DISTRICT BY ID", status=Target.SUCCESS, id=0, db=db)
 
-        data_db = db.query(District).filter(District.id == district_id,
-                                            District.delete_flag == Const.DELETE_FLAG_NORMAL).first()
+        data_db = db.query(District).filter(District.id == district_id).first()
         return data_db
 
     def get_all_wards(self, city_id, district_id, db: Session):
 
         logger.log(Method.GET, Target.WARD, comment="GET ALL WARDS", status=Target.SUCCESS, id=0, db=db)
 
-        data_db = db.query(Ward).filter(Ward.city_id == city_id, Ward.district_id == district_id,
-                                        Ward.delete_flag == Const.DELETE_FLAG_NORMAL).all()
+        data_db = db.query(Ward).filter(Ward.city_id == city_id, Ward.district_id == district_id).all()
         return data_db
 
     def get_ward_by_id(self, ward_id, db: Session):
         logger.log(Method.GET, Target.WARD, comment="GET WARD BY ID", status=Target.SUCCESS, id=0, db=db)
-        data_db = db.query(Ward).filter(Ward.id == ward_id, Ward.delete_flag == Const.DELETE_FLAG_NORMAL).first()
+        data_db = db.query(Ward).filter(Ward.id == ward_id).first()
         return data_db
 
     def get_address_info_by_user_id(self, user_id, db: Session):
@@ -186,7 +180,8 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
 
         if not isinstance(request, dict):
             request = request.dict()
-        data_db = self.model(**request, is_default=is_default, insert_id=user_id, update_id=user_id, user_id=user_id)
+
+        data_db = self.model(**request, is_default=is_default, user_id=user_id)
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
@@ -211,8 +206,6 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         detail = request.detail if request.detail else None
         name = request.name if request.name else None
         phone_number = request.phone_number if request.phone_number else None
-        update_at = datetime.now()
-        update_id = user_id
 
         add_db.city_id = city_id
         add_db.district_id = district_id
@@ -220,8 +213,6 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         add_db.detail = detail
         add_db.name = name
         add_db.phone_number = phone_number
-        add_db.update_at = update_at
-        add_db.update_id = update_id
 
         db.merge(add_db)
         db.commit()
@@ -265,9 +256,9 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         if add_db.is_default == Const.ADDRESS_DEFAULT:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Không thể xóa địa chỉ mặc định")
 
-        add_db.delete_flag = Const.DELETE_FLAG_DELETED
-        add_db.delete_at = datetime.now()
-        add_db.delete_id = user_id
+        # add_db.delete_flag = Const.DELETE_FLAG_DELETED
+        # add_db.delete_at = datetime.now()
+        # add_db.delete_id = user_id
 
         db.merge(add_db)
         db.commit()

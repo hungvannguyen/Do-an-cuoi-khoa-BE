@@ -4,7 +4,7 @@ from models.BaseModel import BaseDBModel
 from database.db import Base
 
 
-class Order_Product(Base, BaseDBModel):
+class Order_Product(Base):
     __tablename__ = "order_product"
 
     id = Column(BigInteger, primary_key=True, index=True, unique=True)

@@ -4,8 +4,8 @@ from models.BaseModel import BaseDBModel
 from database.db import Base
 
 
-class Address(Base, BaseDBModel):
-    __tablename__ = "addresses"
+class Address(Base):
+    __tablename__ = "user_info"
 
     id = Column(BigInteger, primary_key=True, index=True, unique=True)
     user_id = Column(BigInteger, nullable=False)
@@ -16,3 +16,4 @@ class Address(Base, BaseDBModel):
     ward_id = Column(BigInteger, nullable=False)
     detail = Column(String(255), nullable=False)
     is_default = Column(Integer, default=99)
+    delete_flag = Column(Integer, index=True, default=0, nullable=False)

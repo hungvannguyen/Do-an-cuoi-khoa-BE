@@ -30,12 +30,12 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).count()
         total_page = int(total_product / Const.ROW_PER_PAGE_ADMIN)
-        if total_product % Const.ROW_PER_PAGE > 0:
+        if total_product % Const.ROW_PER_PAGE_ADMIN > 0:
             total_page += 1
         if current_page > total_page and total_page > 0:
             current_page = total_page
-        offset = (current_page - 1) * Const.ROW_PER_PAGE
-        limit = Const.ROW_PER_PAGE
+        offset = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
+        limit = Const.ROW_PER_PAGE_ADMIN
 
         data_db = db.query(self.model).filter(
             # self.model.status == Const.ACTIVE_STATUS,
