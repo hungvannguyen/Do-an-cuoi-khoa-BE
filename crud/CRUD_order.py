@@ -251,7 +251,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         order_id = order_obj_db.id
         cart_db = []
 
-        prd_ids = request.prd_ids
+        prd_ids = list(str(request.prd_ids).split(","))
         for prd_id in prd_ids:
             product_db = db.query(Product).filter(
                 Product.id == prd_id
