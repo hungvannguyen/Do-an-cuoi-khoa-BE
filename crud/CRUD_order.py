@@ -7,6 +7,7 @@ from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 
 from models.address import Address
+from models.cart import Cart
 from models.payment import Payment
 from models.user import User
 from vnpay_python import views as CRUD_vnpay
@@ -83,6 +84,22 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                 result['products'].append(prd_obj)
 
         # result['total_price'] = total_price
+
+        if obj_db.status == Const.ORDER_DELIVERED:
+            confirm_time = obj_db.update_at + timedelta(
+                #  Chuyển về 5 ngày
+                seconds=300
+            )
+            if confirm_time <= datetime.now():
+                obj_db.status = Const.ORDER_SUCCESS
+                obj_db.update_at = confirm_time
+                obj_db.update_id = user_id
+
+                db.merge(obj_db)
+                db.commit()
+                db.refresh(obj_db)
+
+                result['status'] = obj_db.status
 
         payment_id = obj_db.payment_id
         payment_db = crud_payment.get_payment_by_id(id=payment_id, db=db)
@@ -232,8 +249,41 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         # Add Order_Product Info
         order_id = order_obj_db.id
-        cart_db = crud_cart.get_cart(user_id=user_id, db=db)
-        prd_carts = cart_db['products']
+        cart_db = []
+
+        prd_ids = request.prd_ids
+        for prd_id in prd_ids:
+            product_db = db.query(Product).filter(
+                Product.id == prd_id
+            ).first()
+
+            setattr(product_db, 'sale_price', product_db.price)
+            if product_db.is_sale == 1:
+                setattr(product_db, 'sale_price', product_db.price * (100 - product_db.sale_percent) / 100)
+
+            cart_obj = db.query(Cart).filter(
+                Cart.user_id == user_id,
+                Cart.prd_id == prd_id,
+                Cart.delete_flag == Const.DELETE_FLAG_NORMAL
+            ).first()
+
+            obj = {
+                'prd_id': prd_id,
+                'quantity': cart_obj.quantity,
+                'name': product_db.name,
+                'img_url': product_db.img_url,
+                'sale_price': product_db.sale_price,
+                'import_price': product_db.import_price
+            }
+
+            cart_db.append(obj)
+
+            cart_obj.delete_flag = Const.DELETE_FLAG_DELETED
+            db.merge(cart_obj)
+            db.commit()
+            db.refresh(cart_obj)
+
+        prd_carts = cart_db
         total_price = 0
         for item in prd_carts:
             product_id = item['prd_id']
@@ -264,7 +314,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         # Delete Cart Info
 
-        crud_cart.delete_all_cart(db=db, user_id=user_id)
+        # crud_cart.delete_all_cart(db=db, user_id=user_id)
 
         # Update Address Info
         # address_update_info = {
@@ -357,18 +407,14 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         if order_status == Const.ORDER_DELIVERED:
             payment_id = obj_db.payment_id
             payment_db = db.query(Payment).filter(
-                Payment.id == payment_id
+                Payment.id == payment_id,
+
             ).first()
 
-            if payment_db.status == 0:
-                obj_db.status = Const.ORDER_SUCCESS
+            payment_db.status = Const.PAID
+            db.merge(payment_db)
+            db.commit()
 
-                db.merge(obj_db)
-                db.commit()
-                db.refresh(obj_db)
-                return {
-                    'detail': "Đã cập nhật trạng thái đơn hàng"
-                }
 
         obj_db.status = order_status
         obj_db.update_id = user_id

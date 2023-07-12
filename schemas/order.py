@@ -20,6 +20,7 @@ class OrderInfo(OrderBase):
 
 class OrderCreate(BaseModel):
     payment_type_id: Optional[int]
+    prd_ids: list[Optional[int]]
     # name: Optional[str]
     # phone_number: Optional[str]
     # email: Optional[str]
