@@ -447,7 +447,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             db.merge(payment_db)
             db.commit()
 
-        if status == Const.ORDER_REFUND_REQUEST or status == Const.ORDER_CANCEL:
+        if order_status == Const.ORDER_REFUND_REQUEST:
             obj_db.cancel_reason = cancel_reason
 
         obj_db.status = order_status
