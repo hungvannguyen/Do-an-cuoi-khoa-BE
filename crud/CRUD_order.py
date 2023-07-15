@@ -73,7 +73,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'payment_status': 0,
             'bankCode': '',
             'transactionNo': '',
-            'insert_at': obj_db.insert_at
+            'insert_at': obj_db.insert_at,
+            'cancel_reason': obj_db.cancel_reason
         }
         # total_price = 0
         if obj_db:
