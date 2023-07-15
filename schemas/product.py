@@ -27,7 +27,7 @@ class ProductCreate(BaseModel):
     price: Optional[float]
     sale_percent: Optional[int]
     img_url: Optional[str]
-    # status: Optional[int]
+    status: Optional[int]
     is_sale: Optional[int]
     description: Optional[str]
 

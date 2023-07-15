@@ -461,7 +461,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         if request['is_sale'] == Const.IS_NOT_SALE:
             request['sale_percent'] = 0
         if crud_category.get_category_by_id(db=db, id=cat_id):
-            data_db = self.model(**request,import_price = 0, quantity = 0,status = Const.NOT_ACTIVE_STATUS, insert_id=admin_id, update_id=admin_id, insert_at=datetime.now(),
+            data_db = self.model(**request,import_price = 0, quantity = 0, insert_id=admin_id, update_id=admin_id, insert_at=datetime.now(),
                                  update_at=datetime.now())
             db.add(data_db)
             db.commit()
