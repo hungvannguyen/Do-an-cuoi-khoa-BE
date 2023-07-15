@@ -39,7 +39,7 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
             quantity = int(item['quantity'])
             prd_id = int(item['prd_id'])
             name = item['name']
-            import_price = int(item['import_price'])
+            import_price = float(item['import_price'])
             import_quantity += quantity
             total_import_price += quantity * import_price
 
