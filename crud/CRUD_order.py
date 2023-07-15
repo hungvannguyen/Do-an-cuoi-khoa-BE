@@ -100,7 +100,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         if obj_db.status == Const.ORDER_DELIVERED:
             confirm_time = obj_db.update_at + timedelta(
                 #  Chuyển về 5 ngày
-                seconds=300
+                seconds=3600 * 5
             )
             if confirm_time <= datetime.now():
                 obj_db.status = Const.ORDER_SUCCESS
