@@ -44,7 +44,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                 data['total_price'] = prd_data['sale_price'] * data['quantity']
                 data['name'] = prd_data['name']
                 data['price'] = prd_data['price']
-                data['import_price'] = prd_data['import_price']
+                # data['import_price'] = prd_data['import_price']
                 data['img_url'] = prd_data['img_url']
                 result.append(data)
         else:
@@ -59,10 +59,13 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         }
 
     def count_cart(self, db: Session, user_id):
-        count = db.query(self.model).filter(
+        obj_db = db.query(self.model).filter(
             self.model.user_id == user_id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).count()
+        ).all()
+        count = 0
+        for item in obj_db:
+            count += item.quantity
         logger.log(Method.GET, Target.CART, comment=f"COUNT CART USER ID #{user_id}", status=Target.SUCCESS, id=user_id,
                    db=db)
         return count
@@ -128,7 +131,6 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                        db=db)
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Sản phẩm đạt giới hạn")
         if data_db:
-
             data_db.quantity = quantity
             db.add(data_db)
             db.commit()
@@ -200,10 +202,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         if data_db:
             for item in data_db:
                 prd_id = item.prd_id
-                prd_data = db.query(product.Product).filter(
-                    product.Product.id == prd_id,
-                    product.Product.delete_flag == Const.DELETE_FLAG_NORMAL
-                ).first()
+                prd_data = crud_product.get_product_by_id(id=prd_id, db=db)
                 if item.quantity > prd_data.quantity:
                     logger.log(Method.GET, Target.CART, comment=f"CHECK CART TO ORDER USER ID #{user_id}",
                                status=Target.FAIL,

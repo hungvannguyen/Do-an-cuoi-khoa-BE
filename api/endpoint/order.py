@@ -35,17 +35,17 @@ def get_all_order_for_admin(page: int = 1, order_status: int = None, db: Session
 @router.post("/add")
 def add_order(request: OrderCreate, db: Session = Depends(deps.get_db),
               token: TokenPayload = Depends(deps.get_current_user)):
-
     return crud_order.add_order(request=request, db=db, user_id=token.id, email=token.email)
 
 
 @router.get("/update")
-def update_order_status(order_status: int, order_id: int, db: Session = Depends(deps.get_db),
+def update_order_status(order_status: int, order_id: int, cancel_reason: str = None, db: Session = Depends(deps.get_db),
                         token: TokenPayload = Depends(deps.get_current_user)):
-    return crud_order.update_order_status(order_status=order_status, order_id=order_id, db=db, user_id=token.id)
+    return crud_order.update_order_status(order_status=order_status, order_id=order_id, cancel_reason=cancel_reason,
+                                          db=db, user_id=token.id)
 
 
 @router.delete("/cancel")
-def cancel_order(order_id: int, db: Session = Depends(deps.get_db),
+def cancel_order(order_id: int, cancel_reason: str = None, db: Session = Depends(deps.get_db),
                  token: TokenPayload = Depends(deps.get_current_user)):
-    return crud_order.cancel_order(order_id=order_id, db=db, user_id=token.id)
+    return crud_order.cancel_order(order_id=order_id, cancel_reason=cancel_reason, db=db, user_id=token.id)

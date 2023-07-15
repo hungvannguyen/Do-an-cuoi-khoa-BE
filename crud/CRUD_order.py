@@ -9,6 +9,7 @@ from fastapi.encoders import jsonable_encoder
 from models.address import Address
 from models.cart import Cart
 from models.payment import Payment
+from models.product_quantity import ProductQuantity
 from models.user import User
 from vnpay_python import views as CRUD_vnpay
 import models
@@ -29,17 +30,28 @@ from security.security import hash_password, verify_password, gen_token
 
 class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
-    def get_product_by_id(self, id, db: Session):
-        prd_data_db = db.query(Product).filter(
-            Product.id == id
-        ).first()
-        if not prd_data_db:
-            return None
-        if prd_data_db.is_sale == 1:
-            setattr(prd_data_db, 'sale_price', prd_data_db.price * (100 - prd_data_db.sale_percent) / 100)
-        else:
-            setattr(prd_data_db, 'sale_price', prd_data_db.price)
-        return prd_data_db
+    # def get_product_by_id(self, id, db: Session):
+    #     prd_data_db = db.query(Product).filter(
+    #         Product.id == id
+    #     ).first()
+    #     if not prd_data_db:
+    #         return None
+    #     if prd_data_db.is_sale == 1:
+    #         setattr(prd_data_db, 'sale_price', prd_data_db.price * (100 - prd_data_db.sale_percent) / 100)
+    #     else:
+    #         setattr(prd_data_db, 'sale_price', prd_data_db.price)
+    #
+    #     prd_id = id
+    #     quantity_obj = db.query(ProductQuantity).filter(
+    #         ProductQuantity.prd_id == prd_id
+    #     ).all()
+    #     total_quantity = 0
+    #     for item in quantity_obj:
+    #         total_quantity += item.quantity
+    #
+    #     setattr(prd_data_db, 'quantity', total_quantity)
+    #
+    #     return prd_data_db
 
     def get_order_by_id(self, order_id, db: Session, user_id):
         obj_db = db.query(self.model).filter(
@@ -291,15 +303,46 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             prd_name = item['name']
             img_url = item['img_url']
             price = item['sale_price']
-            import_price = item['import_price']
-            total_price += price * quantity
-            order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
-                                                                      quantity=quantity, name=prd_name, img_url=img_url,
-                                                                      price=price, import_price=import_price)
 
-            db.add(order_product_obj_db)
-            db.commit()
-            db.refresh(order_product_obj_db)
+            total_price += price * quantity
+
+            quantity_obj = db.query(ProductQuantity).filter(
+                ProductQuantity.prd_id == product_id
+            ).order_by(ProductQuantity.import_price.asc()).all()
+
+            for qtt in quantity_obj:
+                if quantity == 0:
+                    break
+                prd_quantity = qtt.quantity
+                import_price = qtt.import_price
+                if quantity <= prd_quantity:
+                    order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
+                                                                              quantity=quantity, name=prd_name,
+                                                                              img_url=img_url,
+                                                                              price=price, import_price=import_price)
+
+                    db.add(order_product_obj_db)
+                    db.commit()
+                    db.refresh(order_product_obj_db)
+                    quantity = 0
+                    qtt.quantity = prd_quantity - quantity
+                    db.merge(qtt)
+                    db.commit()
+                else:
+                    qtt.quantity = 0
+                    db.merge(qtt)
+                    db.commit()
+
+                    order_product_obj_db = models.order_product.Order_Product(order_id=order_id, product_id=product_id,
+                                                                              quantity=prd_quantity, name=prd_name,
+                                                                              img_url=img_url,
+                                                                              price=price, import_price=import_price)
+
+                    db.add(order_product_obj_db)
+                    db.commit()
+                    db.refresh(order_product_obj_db)
+
+                    quantity -= prd_quantity
 
         # Update Total_price
         address_user = crud_address.get_address_detail_by_address_id(address_id=address_id, db=db)
@@ -313,18 +356,6 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         db.refresh(order_obj_db)
 
         # Delete Cart Info
-
-        # crud_cart.delete_all_cart(db=db, user_id=user_id)
-
-        # Update Address Info
-        # address_update_info = {
-        #     'city_id': request.city_id,
-        #     'district_id': request.district_id,
-        #     'ward_id': request.ward_id,
-        #     'detail': request.detail
-        # }
-        #
-        # crud_address.create_address(request=address_update_info, db=db, user_id=user_id)
 
         # Update Address in Order
 
@@ -379,7 +410,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             }
         return result
 
-    def update_order_status(self, order_status, order_id, db: Session, user_id):
+    def update_order_status(self, order_status, order_id, cancel_reason, db: Session, user_id):
         obj_db = db.query(self.model).filter(
             self.model.id == order_id
         ).first()
@@ -415,6 +446,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             db.merge(payment_db)
             db.commit()
 
+        if status == Const.ORDER_REFUND_REQUEST or status == Const.ORDER_CANCEL:
+            obj_db.cancel_reason = cancel_reason
 
         obj_db.status = order_status
         obj_db.update_id = user_id
@@ -428,7 +461,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'detail': "Đã cập nhật trạng thái đơn hàng"
         }
 
-    def cancel_order(self, order_id, db: Session, user_id):
+    def cancel_order(self, order_id, cancel_reason, db: Session, user_id):
 
         order_db = db.query(self.model).filter(
             self.model.id == order_id,
@@ -441,6 +474,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         order_db.status = Const.ORDER_CANCEL
         order_db.update_at = datetime.now()
         order_db.update_id = user_id
+        order_db.cancel_reason = cancel_reason
 
         db.merge(order_db)
         db.commit()

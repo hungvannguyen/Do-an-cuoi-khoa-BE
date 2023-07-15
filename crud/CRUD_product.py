@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import Any
 
@@ -14,6 +15,7 @@ from crud.CRUD_order_product import crud_order_product
 from models.order import Order
 from models.order_product import Order_Product
 from models.product import Product
+from models.product_quantity import ProductQuantity
 from schemas.product import *
 from crud.base import CRUDBase
 from constants import Const
@@ -55,6 +57,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 self.model.price * (100 - self.model.sale_percent) / 100 <= condition['max_price']
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+
         if not data_db:
             logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL PRODUCTS",
                        status=Target.FAIL,
@@ -69,6 +72,13 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
+            prd_id = item.id
+            quantity_obj = db.query(ProductQuantity).filter(
+                ProductQuantity.prd_id == prd_id
+            ).all()
+
+            setattr(item, 'details', quantity_obj)
 
         # if condition['sort'] == 1:
         #     data_db.sort(key=lambda x: x.sale_price, reverse=False)
@@ -130,6 +140,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
 
+
         # if condition['sort'] == 1:
         #     data_db.sort(key=lambda x: x.sale_price, reverse=False)
         # elif condition['sort'] == 2:
@@ -161,6 +172,17 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             setattr(data_db, 'sale_price', data_db.price * (100 - data_db.sale_percent) / 100)
         else:
             setattr(data_db, 'sale_price', data_db.price)
+
+        prd_id = data_db.id
+        quantity_obj = db.query(ProductQuantity).filter(
+            ProductQuantity.prd_id == prd_id
+        ).all()
+        total_quantity = 0
+        for item in quantity_obj:
+            total_quantity += item.quantity
+
+        setattr(data_db, 'quantity', total_quantity)
+
 
         return data_db
 
@@ -215,6 +237,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
 
         # if condition['sort'] == 1:
         #     data_db.sort(key=lambda x: x.sale_price, reverse=False)
@@ -433,13 +456,12 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         }
 
     def create_product(self, request, db: Session, admin_id):
-
         request = request.dict()
         cat_id = request['cat_id']
         if request['is_sale'] == Const.IS_NOT_SALE:
             request['sale_percent'] = 0
         if crud_category.get_category_by_id(db=db, id=cat_id):
-            data_db = self.model(**request, insert_id=admin_id, update_id=admin_id, insert_at=datetime.now(),
+            data_db = self.model(**request,import_price = 0, quantity = 0,status = Const.NOT_ACTIVE_STATUS, insert_id=admin_id, update_id=admin_id, insert_at=datetime.now(),
                                  update_at=datetime.now())
             db.add(data_db)
             db.commit()

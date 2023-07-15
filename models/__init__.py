@@ -13,7 +13,9 @@ from models import (
     code_confirm,
     log,
     settings,
-# warehouse
+    product_import,
+    product_import_detail,
+    # warehouse
 )
 
 from database.db import Base

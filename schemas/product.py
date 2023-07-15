@@ -22,12 +22,12 @@ class ProductCreate(BaseModel):
     cat_id: int
     # warehouse_id: int
     name: Optional[str]
-    quantity: Optional[int]
-    import_price: Optional[float]
+    # quantity: Optional[int]
+    # import_price: Optional[float]
     price: Optional[float]
     sale_percent: Optional[int]
     img_url: Optional[str]
-    status: Optional[int]
+    # status: Optional[int]
     is_sale: Optional[int]
     description: Optional[str]
 
