@@ -256,9 +256,9 @@ class CRUDAddress(CRUDBase[Address, AddressCreate, AddressUpdate]):
         if add_db.is_default == Const.ADDRESS_DEFAULT:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Không thể xóa địa chỉ mặc định")
 
-        # add_db.delete_flag = Const.DELETE_FLAG_DELETED
-        # add_db.delete_at = datetime.now()
-        # add_db.delete_id = user_id
+        add_db.delete_flag = Const.DELETE_FLAG_DELETED
+        add_db.delete_at = datetime.now()
+        add_db.delete_id = user_id
 
         db.merge(add_db)
         db.commit()
