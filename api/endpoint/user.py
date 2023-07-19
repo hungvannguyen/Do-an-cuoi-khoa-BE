@@ -117,7 +117,7 @@ def lock_account(user_id: int, db: Session = Depends(deps.get_db),
     return crud_user.lock_account(user_id=user_id, db=db, admin_id=token.id)
 
 
-@router.put("/unlock")
+@router.get("/unlock")
 def unlock_account(user_id: int, db: Session = Depends(deps.get_db),
                    token: TokenPayload = Depends(deps.get_admin_user)):
     return crud_user.unlock_account(user_id=user_id, db=db, admin_id=token.id)
