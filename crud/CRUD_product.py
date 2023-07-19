@@ -183,6 +183,12 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
         setattr(data_db, 'quantity', total_quantity)
 
+        prd_id = data_db.id
+        quantity_obj = db.query(ProductQuantity).filter(
+            ProductQuantity.prd_id == prd_id
+        ).all()
+
+        setattr(data_db, 'details', quantity_obj)
 
         return data_db
 
