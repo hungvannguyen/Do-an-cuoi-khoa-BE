@@ -34,3 +34,7 @@ class ProductCreate(BaseModel):
 
 class ProductUpdate(ProductCreate):
     pass
+
+
+class ProductUpdateQuantity(BaseModel):
+    data: Optional[str]

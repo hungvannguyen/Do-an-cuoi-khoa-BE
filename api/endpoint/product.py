@@ -97,11 +97,16 @@ def create_product(request: ProductCreate, db: Session = Depends(deps.get_db),
     return crud_product.create_product(request=request, db=db, admin_id=token.id)
 
 
+@router.put("/update/quantity")
+def update_quantity(request: ProductUpdateQuantity, db: Session = Depends(deps.get_db),
+                    token: TokenPayload = Depends(deps.get_employee_user)):
+    return crud_product.update_quantity(request=request.data, db=db)
+
+
 @router.put("/update/{id}")
 def update_product(id: int, request: ProductUpdate, db: Session = Depends(deps.get_db),
                    token: TokenPayload = Depends(deps.get_employee_user)):
     return crud_product.update_product(id=id, request=request, db=db, admin_id=token.id)
-
 
 # @router.post("/add_quantity")
 # def add_quantity(prd_id: int, quantity: int = 1, db: Session = Depends(deps.get_db)):

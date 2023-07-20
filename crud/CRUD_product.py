@@ -140,7 +140,6 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
 
-
         # if condition['sort'] == 1:
         #     data_db.sort(key=lambda x: x.sale_price, reverse=False)
         # elif condition['sort'] == 2:
@@ -243,7 +242,6 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
-
 
         # if condition['sort'] == 1:
         #     data_db.sort(key=lambda x: x.sale_price, reverse=False)
@@ -467,7 +465,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         if request['is_sale'] == Const.IS_NOT_SALE:
             request['sale_percent'] = 0
         if crud_category.get_category_by_id(db=db, id=cat_id):
-            data_db = self.model(**request,import_price = 0, quantity = 0, insert_id=admin_id, update_id=admin_id, insert_at=datetime.now(),
+            data_db = self.model(**request, import_price=0, quantity=0, insert_id=admin_id, update_id=admin_id,
+                                 insert_at=datetime.now(),
                                  update_at=datetime.now())
             db.add(data_db)
             db.commit()
@@ -493,6 +492,27 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                    db=db)
         return {
             'detail': 'Cập nhật thành công'
+        }
+
+    def update_quantity(self, request, db: Session):
+        data = str(request).replace("'", '"')
+        data = json.loads(data)
+
+        for item in data:
+            detail_id = int(item['id'])
+            quantity = int(item['quantity'])
+
+            obj_db = db.query(ProductQuantity).filter(
+                ProductQuantity.id == detail_id
+            ).first()
+
+            obj_db.quantity = quantity
+
+            db.merge(obj_db)
+            db.commit()
+
+        return {
+            'detail': "Cập nhật thành công"
         }
 
     def add_quantity(self, prd_id, quantity, db: Session, admin_id):
