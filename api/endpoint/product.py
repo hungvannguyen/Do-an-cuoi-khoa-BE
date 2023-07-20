@@ -91,6 +91,11 @@ def get_product_by_id(id: int, db: Session = Depends(deps.get_db)):
     return crud_product.get_product_by_id(id=id, db=db)
 
 
+@router.get("/import/all")
+def get_all_for_import(db: Session = Depends(deps.get_db)):
+    return crud_product.get_all_for_import(db=db)
+
+
 @router.post("/add")
 def create_product(request: ProductCreate, db: Session = Depends(deps.get_db),
                    token: TokenPayload = Depends(deps.get_employee_user)):

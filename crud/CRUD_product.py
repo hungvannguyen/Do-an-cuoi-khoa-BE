@@ -535,5 +535,12 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             'detail': "Đã thêm thành công"
         }
 
+    def get_all_for_import(self, db: Session):
+        prd_db = db.query(self.model).filter(
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
+
+        return prd_db
+
 
 crud_product = CRUDProduct(Product)
