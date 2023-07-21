@@ -434,7 +434,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             db.commit()
             db.refresh(data_db)
         prd_name = request.name
-        logger.log(Method.POST, Target.PRODUCT, comment=f"CREATE NEW PRODUCT {prd_name}",
+        logger.log(Method.POST, Target.PRODUCT, comment=f"TẠO MỚI SẢN PHẨM {prd_name}",
                    status=Target.SUCCESS,
                    id=admin_id,
                    db=db)
@@ -449,7 +449,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         if request['is_sale'] == Const.IS_NOT_SALE:
             request['sale_percent'] = 0
         self.update(db_obj=data_db, obj_in=request, db=db, admin_id=admin_id)
-        logger.log(Method.POST, Target.PRODUCT, comment=f"UPDATE PRODUCT ID #{id}",
+        logger.log(Method.POST, Target.PRODUCT, comment=f"CẬP NHẬT SẢN PHẨM ID #{id}",
                    status=Target.SUCCESS,
                    id=admin_id,
                    db=db)

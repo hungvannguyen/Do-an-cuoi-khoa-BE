@@ -12,11 +12,9 @@ from models.product_import_detail import ProductImportDetail
 from models.payment import Payment
 from models.product_quantity import ProductQuantity
 
-
 from crud.base import CRUDBase
 from models.order import Order
 from schemas.order import *
-
 
 
 class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
@@ -71,6 +69,10 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
         import_db.total_import_price = total_import_price
         db.merge(import_db)
         db.commit()
+
+        logger.log(Method.POST, Target.PRODUCT,
+                   comment=f"NHẬP HÀNG: SỐ LƯỢNG {import_quantity}, TỔNG TIỀN: {total_import_price}VNĐ",
+                   status=Target.SUCCESS, id=admin_id, db=db)
 
         return {
             'detail': "Đã nhập hàng thành công"

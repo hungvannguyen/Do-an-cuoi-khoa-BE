@@ -139,7 +139,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
-            logger.log(Method.POST, Target.USER, comment=f"ADD NEW EMPLOYEE {account}",
+            logger.log(Method.POST, Target.USER, comment=f"THÊM MỚI NHÂN VIÊN {account}",
                        status=Target.SUCCESS,
                        id=0,
                        db=db)
@@ -334,7 +334,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         db.merge(user_db)
         db.commit()
 
-        logger.log(Method.PUT, Target.USER, comment=f"LOCK USER ID #{user_id}", status=Target.SUCCESS, id=admin_id,
+        logger.log(Method.PUT, Target.USER, comment=f"KHOÁ TÀI KHOẢN ID #{user_id}", status=Target.SUCCESS, id=admin_id,
                    db=db)
 
         return {
@@ -357,7 +357,7 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
 
         db.merge(user_db)
         db.commit()
-        logger.log(Method.PUT, Target.USER, comment=f"UNLOCK USER ID #{user_id}", status=Target.SUCCESS, id=admin_id,
+        logger.log(Method.PUT, Target.USER, comment=f"MỞ KHOÁ TÀI KHOẢN ID #{user_id}", status=Target.SUCCESS, id=admin_id,
                    db=db)
         return {
             'detail': "Đã mở khóa"

@@ -60,7 +60,7 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
-        logger.log(Method.POST, Target.CATEGORY, comment=f"CREATE NEW CATEGORY {cat_name}",
+        logger.log(Method.POST, Target.CATEGORY, comment=f"TẠO MỚI DANH MỤC {cat_name}",
                    status=Target.SUCCESS,
                    id=admin_id,
                    db=db)
@@ -73,7 +73,7 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
             request = request.dict()
         data_db = self.get_category_by_id(id, db)
         self.update(db_obj=data_db, obj_in=request, db=db, admin_id=admin_id)
-        logger.log(Method.PUT, Target.CATEGORY, comment=f"UPDATE CATEGORY ID {id}",
+        logger.log(Method.PUT, Target.CATEGORY, comment=f"CẬP NHẬT DANH MỤC ID {id}",
                    status=Target.SUCCESS,
                    id=admin_id,
                    db=db)
@@ -96,7 +96,7 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         data_db = self.get_category_by_id(id, db)
         cat_name = data_db.cat_name
         self.delete(db=db, db_obj=data_db, admin_id=admin_id)
-        logger.log(Method.DELETE, Target.CATEGORY, comment=f"DELETE CATEGORY {cat_name}",
+        logger.log(Method.DELETE, Target.CATEGORY, comment=f"XOÁ DANH MỤC {cat_name}",
                    status=Target.SUCCESS,
                    id=admin_id,
                    db=db)
