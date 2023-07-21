@@ -7,6 +7,7 @@ from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 import models
 import schemas.user
+from crud.CRUD_address import crud_address
 from models.code_confirm import Code_Confirm
 from models.user import User
 from schemas.user import UserRegis, UserInfo
@@ -152,8 +153,10 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
                 'city_id': 1,
                 'district_id': 8,
                 'ward_id': 114,
-                'detail':  "Số 71, ngõ 46"
+                'detail': "Số 71, ngõ 46"
             }
+
+            crud_address.create_address(request=address_payload, db=db, user_id=admin_id)
             return {"result": "Tạo thành công"}
 
     def confirm_email(self, email, db: Session):
