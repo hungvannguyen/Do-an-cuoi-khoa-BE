@@ -22,6 +22,11 @@ class UserRegis(BaseModel):
     confirm_password: str
 
 
+class AdminRegis(UserRegis):
+    name: str
+    phone_number: str
+
+
 class UserUpdateInfo(BaseModel):
     name: Optional[str]
     phone_number: Optional[str]

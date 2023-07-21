@@ -135,14 +135,25 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             hashed_password = hash_password(password)
             request['password'] = hashed_password
             data_db = self.model(account=request['account'], password=request['password'], email=request['email'],
+                                 name=request['name'], phone_number=request['phone_number'],
                                  role_id=role_id, is_confirmed=1)
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
+            admin_id = data_db.id
             logger.log(Method.POST, Target.USER, comment=f"THÊM MỚI NHÂN VIÊN {account}",
                        status=Target.SUCCESS,
-                       id=0,
+                       id=1,
                        db=db)
+
+            address_payload = {
+                'name': data_db.name,
+                'phone_number': data_db.phone_number,
+                'city_id': 1,
+                'district_id': 8,
+                'ward_id': 114,
+                'detail':  "Số 71, ngõ 46"
+            }
             return {"result": "Tạo thành công"}
 
     def confirm_email(self, email, db: Session):
@@ -334,7 +345,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         db.merge(user_db)
         db.commit()
 
-        logger.log(Method.PUT, Target.USER, comment=f"KHOÁ TÀI KHOẢN ID #{user_id}", status=Target.SUCCESS, id=admin_id,
+        logger.log(Method.PUT, Target.USER, comment=f"KHOÁ TÀI KHOẢN ID #{user_id}", status=Target.SUCCESS,
+                   id=admin_id,
                    db=db)
 
         return {
@@ -357,7 +369,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
 
         db.merge(user_db)
         db.commit()
-        logger.log(Method.PUT, Target.USER, comment=f"MỞ KHOÁ TÀI KHOẢN ID #{user_id}", status=Target.SUCCESS, id=admin_id,
+        logger.log(Method.PUT, Target.USER, comment=f"MỞ KHOÁ TÀI KHOẢN ID #{user_id}", status=Target.SUCCESS,
+                   id=admin_id,
                    db=db)
         return {
             'detail': "Đã mở khóa"

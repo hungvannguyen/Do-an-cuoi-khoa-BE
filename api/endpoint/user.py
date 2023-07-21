@@ -11,7 +11,7 @@ from schemas.mail import CodeConfirm
 from security.security import verify_password
 from fastapi.encoders import jsonable_encoder
 from crud.CRUD_user import crud_user
-from schemas.user import UserRegis, UserInfo, UserLogin, UserUpdatePassword, UserUpdateInfo, UserResetPassword
+from schemas.user import UserRegis, UserInfo, UserLogin, UserUpdatePassword, UserUpdateInfo, UserResetPassword, AdminRegis
 from schemas.token import TokenPayload
 from database import deps
 
@@ -24,7 +24,7 @@ def create_user(request: UserRegis, db: Session = Depends(deps.get_db)):
 
 
 @router.post("/admin/{role_id}")
-def create_admin(request: UserRegis, role_id: int, db: Session = Depends(deps.get_db)):
+def create_admin(request: AdminRegis, role_id: int, db: Session = Depends(deps.get_db)):
     return crud_user.create_admin(db=db, request=request, role_id=role_id)
 
 

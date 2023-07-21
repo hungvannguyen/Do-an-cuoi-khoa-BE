@@ -14,6 +14,5 @@ class Log(Base):
     target = Column(String(255))
     comment = Column(String(255))
     status = Column(String(50))
-    role_id = Column(Integer)
     insert_id = Column(BigInteger, nullable=False, default=0)
     insert_at = Column(DateTime, nullable=False, default=datetime.now())
