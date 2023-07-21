@@ -62,7 +62,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
 
-        total_quantity = 0
+        # total_quantity = 0
         for item in data_db:
             setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
@@ -72,11 +72,13 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             quantity_obj = db.query(ProductQuantity).filter(
                 ProductQuantity.prd_id == prd_id
             ).all()
-
+            total_quantity = 0
             setattr(item, 'details', quantity_obj)
-            total_quantity += quantity_obj.quantity
+            for item2 in quantity_obj:
 
-        data_db.quantity = total_quantity
+                total_quantity += item2.quantity
+
+            item.quantity = total_quantity
 
         # if condition['sort'] == 1:
         #     data_db.sort(key=lambda x: x.sale_price, reverse=False)
