@@ -74,8 +74,8 @@ def get_all_roles(db: Session = Depends(deps.get_db), token: TokenPayload = Depe
 
 
 @router.get("/all_user")
-def get_all_users_by_role_id(role_id: int = 99, db: Session = Depends(deps.get_db)):
-    return crud_user.get_all_users_by_role(role_id=role_id, db=db)
+def get_all_users_by_role_id(role_id: int = 99, page: int = 1, db: Session = Depends(deps.get_db)):
+    return crud_user.get_all_users_by_role(role_id=role_id, db=db, page=page)
 
 
 @router.put("/password/reset/{account}")

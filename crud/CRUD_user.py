@@ -300,12 +300,29 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             'detail': "Đã đặt lại mật khẩu"
         }
 
-    def get_all_users_by_role(self, db: Session, role_id):
+    def get_all_users_by_role(self, db: Session, role_id, page: int):
+        current_page = page
+        if current_page <= 0:
+            current_page = 1
+        user_count = db.query(self.model).filter(
+            self.model.role_id == role_id,
+            self.model.is_confirmed == Const.IS_CONFIRMED,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).count()
+
+        total_page = int(user_count / 7)
+        if user_count % 7 > 0:
+            total_page += 1
+        if current_page > total_page and total_page > 0:
+            current_page = total_page
+        offset = (current_page - 1) * 7
+        limit = 7
+
         obj_db = db.query(self.model).filter(
             self.model.role_id == role_id,
             self.model.is_confirmed == Const.IS_CONFIRMED,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).all()
+        ).offset(offset).limit(limit).all()
 
         if not obj_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không có người dùng nào")
@@ -325,7 +342,11 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
 
             result.append(user)
 
-        return result
+        return {
+            'data': result,
+            'current_page': current_page,
+            'total_page': total_page
+        }
 
     def lock_account(self, user_id, db: Session, admin_id):
         user_db = db.query(self.model).filter(
