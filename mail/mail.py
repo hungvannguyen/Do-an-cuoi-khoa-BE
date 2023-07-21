@@ -35,8 +35,5 @@ def send_mail(mail_to, title, content, db: Session):
     smtp.sendmail(from_addr="dhsgundam@gmail.com",
                   to_addrs=mail_to, msg=msg.as_string())
     # smtp.quit()
-    logger.log(Method.POST, Target.MAIL, comment=f"SEND MAIL TO {mail_to}",
-               status=Target.SUCCESS,
-               id=Const.ADMIN_ID,
-               db=db)
+
     return f"Email sent to {mail_to}"

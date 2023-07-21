@@ -142,10 +142,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         result['bankCode'] = payment_db['bankCode']
         result['transactionNo'] = payment_db['transactionNo']
 
-        logger.log(Method.GET, Target.ORDER, comment=f"GET ORDER BY ID #{order_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
+
 
         return result
 
@@ -220,16 +217,19 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             'total_page': total_page
         }
 
-    def add_order(self, request, db: Session, user_id, email):
+    def add_order(self, request, db: Session, user_id, email, role_id):
         # Add payment method
         payment_type_id = request.payment_type_id
         bankCode = ''
         txnRef = str(user_id) + str(datetime.now().strftime('%Y%m%d%H%M%S'))
         if payment_type_id == Const.COD_PAYMENT:
             bankCode = "COD"
+        payment_status = Const.UNPAID
+        if role_id == 1 or role_id == 10:
+            payment_status = Const.PAID
         request_payment = {
             'payment_type_id': payment_type_id,
-            'status': 99,
+            'status': payment_status,
             'bankCode': bankCode,
             'txnRef': txnRef,
             'insert_at': datetime.now()
@@ -249,6 +249,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         payment_id = payment_db.id
         email = email
         status = 0
+        if role_id == 1 or role_id == 10:
+            status = Const.ORDER_SUCCESS
         note = request.note
 
         order_obj_db = self.model(user_id=user_id, payment_id=payment_id, name=name, phone_number=phone_number,
@@ -385,10 +387,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             }
             crud_user.update_info(request=user_update_info, db=db, user_id=user_id)
 
-        logger.log(Method.POST, Target.ORDER, comment=f"CREATE ORDER FOR USER ID #{user_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
+
 
         # Generate VNPAY link
         vnpay_url = ""
@@ -416,23 +415,17 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             self.model.id == order_id
         ).first()
         if obj_db.status == 99:
-            logger.log(Method.PUT, Target.ORDER, comment=f"UPDATE STATUS {order_status} OF ORDER ID #{order_id}",
-                       status=Target.FAIL,
-                       id=user_id, db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Không thể cập nhật tình trạng cho đơn hàng này")
 
         if obj_db.status != 0 and order_status == 99:
-            logger.log(Method.PUT, Target.ORDER, comment=f"UPDATE STATUS {order_status} OF ORDER ID #{order_id}",
-                       status=Target.FAIL,
-                       id=user_id, db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Không thể huỷ đơn hàng đã xác nhận")
 
         if order_status <= obj_db.status:
-            logger.log(Method.PUT, Target.ORDER, comment=f"UPDATE STATUS {order_status} OF ORDER ID #{order_id}",
-                       status=Target.FAIL,
-                       id=user_id, db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail="Không thể cập nhật tình trạng cho đơn hàng này")
 
@@ -480,8 +473,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
         db.merge(order_db)
         db.commit()
 
-        logger.log(Method.DELETE, Target.ORDER, comment=f"CANCEL ORDER #{order_id}", status=Target.FAIL, id=user_id,
-                   db=db)
+
         return {
             'detail': "Đã hủy đơn hàng thành công"
         }

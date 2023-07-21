@@ -50,10 +50,7 @@ class CRUDOrderProduct(CRUDBase[Order_Product, OrderProductCreate, OrderProductU
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
-        logger.log(Method.DELETE, Target.ORDER_PRODUCT, comment=f"DELETE ORDER_PRODUCT ID #{order_product_id}",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         return {
             'detail': 'success'
         }

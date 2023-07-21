@@ -24,10 +24,7 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         ).first()
 
         payment_type_db = crud_paymentType.get_payment_type(paymentType_id=data_db.payment_type_id, db=db)
-        logger.log(Method.GET, Target.PAYMENT, comment=f"GET PAYMENT BY ID #{id}",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         return {
             'id': data_db.id,
             'payment_type_id': data_db.payment_type_id,
@@ -46,10 +43,7 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         db.add(obj_data)
         db.commit()
         db.refresh(obj_data)
-        logger.log(Method.POST, Target.PAYMENT, comment=f"CREATE NEW PAYMENT FOR USER ID #{user_id}",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         return obj_data
 
     def update_payment(self, payment_id, payment_status, bankCode, transactionNo, db: Session, user_id):
@@ -73,11 +67,6 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
 
         db.merge(order_db)
         db.commit()
-
-        logger.log(Method.PUT, Target.PAYMENT, comment=f"UPDATE PAYMENT ID #{payment_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
 
         return {
             'detail': 'Đã cập nhật thành công'
@@ -139,9 +128,6 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
         order_db.status = Const.ORDER_CONFIRMED
         db.merge(order_db)
         db.commit()
-
-        logger.log(Method.PUT, Target.PAYMENT, comment=f"UPDATE PAYMENT OF TXNREF #{vnp_TxnRef}", status=Target.SUCCESS,
-                   id=0, db=db)
 
         return {
             'detail': "Đã cập nhật tình trạng thanh toán"

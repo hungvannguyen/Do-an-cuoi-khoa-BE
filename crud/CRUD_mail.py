@@ -15,10 +15,7 @@ def create_confirm_mail(mail_to, db: Session):
     link = f"http://localhost:3000/email/confirm?email={mail_to}"
     text = confirm_email_template
     text = text.replace('<a href="http://dhsgundam3" class="es-button"', f'<a href="{link}" class="es-button"')
-    logger.log(Method.POST, Target.MAIL_CONFIRM, comment=f"CREATE CONFIRM MAIL",
-               status=Target.SUCCESS,
-               id=0,
-               db=db)
+
     return send_mail(mail_to=mail_to, title="[DhsGundam] Please confirm your Email!", content=text, db=db)
 
 
@@ -29,10 +26,7 @@ def create_confirm_code_email(account, db: Session):
         User.delete_flag == Const.DELETE_FLAG_NORMAL
     ).first()
     if not user_db:
-        logger.log(Method.POST, Target.CODE_CONFIRM, comment=f"CREATE CODE CONFIRM MAIL FOR ACCOUNT {account}",
-                   status=Target.FAIL,
-                   id=0,
-                   db=db)
+
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy tài khoản")
 
     user_id = user_db.id
@@ -65,8 +59,5 @@ def create_confirm_code_email(account, db: Session):
     db.refresh(obj_db)
 
     text = confirm_code_template.replace("11111", str(code))
-    logger.log(Method.POST, Target.CODE_CONFIRM, comment=f"CREATE CODE CONFIRM MAIL FOR ACCOUNT {account}",
-               status=Target.SUCCESS,
-               id=user_id,
-               db=db)
+
     return send_mail(mail_to=mail_to, title="[DhsGundam] Đây là mã xác thực của bạn!", content=text, db=db)

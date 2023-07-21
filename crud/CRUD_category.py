@@ -24,15 +24,9 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).count()
         if not data_db:
-            logger.log(Method.GET, Target.CATEGORY, comment=f"GET CATEGORY ID #{id}",
-                       status=Target.FAIL,
-                       id=0,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Không tìm thấy danh mục ID #{id}")
-        logger.log(Method.GET, Target.CATEGORY, comment=f"GET CATEGORY ID #{id}",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         data_db = db.query(self.model).filter(
             self.model.id == id,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
@@ -44,32 +38,21 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).count()
         if not data_db:
-            logger.log(Method.GET, Target.CATEGORY, comment=f"GET ALL CATEGORY",
-                       status=Target.FAIL,
-                       id=0,
-                       db=db)
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tồn tại Danh mục nào")
-        else:
-            logger.log(Method.GET, Target.CATEGORY, comment=f"GET ALL CATEGORY",
-                       status=Target.SUCCESS,
-                       id=0,
-                       db=db)
+
         data_db = db.query(self.model).filter(
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).all()
         return data_db
 
     def create_category(self, request, admin_id, db: Session):
-
+        cat_name = str(request.cat_name)
         data_db = db.query(self.model).filter(
-            self.model.cat_name == request.cat_name,
+            self.model.cat_name.lower() == cat_name.lower(),
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if data_db:
-            logger.log(Method.POST, Target.CATEGORY, comment=f"CREATE NEW CATEGORY ",
-                       status=Target.FAIL,
-                       id=admin_id,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Danh mục đã tồn tại")
 
         request = request.dict()
@@ -77,7 +60,7 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
-        logger.log(Method.POST, Target.CATEGORY, comment=f"CREATE NEW CATEGORY ",
+        logger.log(Method.POST, Target.CATEGORY, comment=f"CREATE NEW CATEGORY {cat_name}",
                    status=Target.SUCCESS,
                    id=admin_id,
                    db=db)
@@ -106,16 +89,14 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
         ).count()
 
         if prd_count > 0:
-            logger.log(Method.DELETE, Target.CATEGORY, comment=f"DELETE CATEGORY ID {id}",
-                       status=Target.FAIL,
-                       id=admin_id,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail=f"Không thể xóa vì có sản phẩm ở danh mục này đang bán")
 
         data_db = self.get_category_by_id(id, db)
+        cat_name = data_db.cat_name
         self.delete(db=db, db_obj=data_db, admin_id=admin_id)
-        logger.log(Method.DELETE, Target.CATEGORY, comment=f"DELETE CATEGORY ID {id}",
+        logger.log(Method.DELETE, Target.CATEGORY, comment=f"DELETE CATEGORY {cat_name}",
                    status=Target.SUCCESS,
                    id=admin_id,
                    db=db)

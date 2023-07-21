@@ -48,11 +48,9 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                 data['img_url'] = prd_data['img_url']
                 result.append(data)
         else:
-            logger.log(Method.GET, Target.CART, comment=f"GET CART USER ID #{user_id}", status=Target.FAIL, id=user_id,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Giỏ hàng trống")
-        logger.log(Method.GET, Target.CART, comment=f"GET CART USER ID #{user_id}", status=Target.SUCCESS, id=user_id,
-                   db=db)
+
         return {
             'products': result,
             'total_price': total
@@ -66,18 +64,14 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         count = 0
         for item in obj_db:
             count += item.quantity
-        logger.log(Method.GET, Target.CART, comment=f"COUNT CART USER ID #{user_id}", status=Target.SUCCESS, id=user_id,
-                   db=db)
+
         return count
 
     def add_to_cart(self, request, db: Session, user_id):
         prd_id = request.prd_id
         prd_data = crud_product.get_product_by_id(id=request.prd_id, db=db)
         if not prd_data:
-            logger.log(Method.POST, Target.CART, comment=f"ADD PRODUCT ID #{prd_id} TO CART USER ID #{user_id}",
-                       status=Target.FAIL,
-                       id=user_id,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Không có sản phẩm ID #{request.prd_id}")
         data_db = db.query(self.model).filter(
@@ -88,11 +82,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         if not data_db:
             request = request.dict()
             if request['quantity'] > prd_data.quantity:
-                logger.log(Method.POST, Target.CART,
-                           comment=f"ADD PRODUCT ID #{prd_id} TO CART USER ID #{user_id}",
-                           status=Target.FAIL,
-                           id=user_id,
-                           db=db)
+
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Sản phẩm đạt giới hạn")
             data_db = self.model(**request, user_id=user_id)
             db.add(data_db)
@@ -100,18 +90,11 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
             db.refresh(data_db)
         else:
             if data_db.quantity + request.quantity > prd_data.quantity:
-                logger.log(Method.POST, Target.CART,
-                           comment=f"ADD PRODUCT ID #{prd_id} TO CART USER ID #{user_id}",
-                           status=Target.FAIL,
-                           id=user_id,
-                           db=db)
+
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Sản phẩm đạt giới hạn")
             self.update_cart(data_db.prd_id, request.quantity + data_db.quantity, db, user_id)
 
-        logger.log(Method.POST, Target.CART, comment=f"ADD PRODUCT ID #{prd_id} TO CART USER ID #{user_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
+
         return {
             'detail': "Đã thêm vào giỏ hàng"
         }
@@ -125,20 +108,14 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         prd_data = crud_product.get_product_by_id(id=prd_id, db=db)
 
         if prd_data.quantity < quantity:
-            logger.log(Method.PUT, Target.CART, comment=f"UPDATE PRODUCT ID #{prd_id} IN CART USER ID #{user_id}",
-                       status=Target.FAIL,
-                       id=user_id,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Sản phẩm đạt giới hạn")
         if data_db:
             data_db.quantity = quantity
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
-        logger.log(Method.PUT, Target.CART, comment=f"UPDATE PRODUCT ID #{prd_id} IN CART USER ID #{user_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
+
 
         return {
             'detail': "Đã cập nhật giỏ hàng"
@@ -151,10 +128,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if not data_db:
-            logger.log(Method.DELETE, Target.CART, comment=f"DELETE PRODUCT ID #{prd_id} IN CART USER ID #{user_id}",
-                       status=Target.FAIL,
-                       id=user_id,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                 detail=f"Không tìm thấy sản phẩm này trong giỏ hàng")
         data_db.delete_flag = Const.DELETE_FLAG_DELETED
@@ -162,10 +136,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         db.add(data_db)
         db.commit()
         db.refresh(data_db)
-        logger.log(Method.DELETE, Target.CART, comment=f"DELETE PRODUCT ID #{prd_id} IN CART USER ID #{user_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
+
         return {
             'detail': "Đã xoá sản phẩm trong giỏ hàng"
         }
@@ -177,19 +148,13 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         ).all()
 
         if not data_db:
-            logger.log(Method.DELETE, Target.CART, comment=f"DELETE ALL CART USER ID #{user_id}",
-                       status=Target.FAIL,
-                       id=user_id,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Giỏ hàng trống")
 
         for item in data_db:
             self.delete_cart(prd_id=item.prd_id, db=db, user_id=user_id)
-        logger.log(Method.DELETE, Target.CART, comment=f"DELETE ALL CART USER ID #{user_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
+
         return {
             'detail': "Đã xoá toàn bộ giỏ hàng"
         }
@@ -204,16 +169,10 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
                 prd_id = item.prd_id
                 prd_data = crud_product.get_product_by_id(id=prd_id, db=db)
                 if item.quantity > prd_data.quantity:
-                    logger.log(Method.GET, Target.CART, comment=f"CHECK CART TO ORDER USER ID #{user_id}",
-                               status=Target.FAIL,
-                               id=user_id,
-                               db=db)
+
                     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                                         detail="Số lượng sản phẩm quá lớn")
-        logger.log(Method.GET, Target.CART, comment=f"CHECK CART TO ORDER USER ID #{user_id}",
-                   status=Target.SUCCESS,
-                   id=user_id,
-                   db=db)
+
         return {
             'detail': 'success'
         }

@@ -32,10 +32,7 @@ def get_checkout_info(db: Session, user_id):
             }
             total += item['sale_price'] * item['quantity']
             checkout.append(tmp)
-    logger.log(Method.GET, Target.CHECKOUT, comment=f"CHECK OUT CART OF USER ID #{user_id}",
-               status=Target.SUCCESS,
-               id=user_id,
-               db=db)
+
     return {
         'products': checkout,
         'total': total
@@ -53,10 +50,6 @@ def get_checkout_user_info(db: Session, user_id):
     address_info = crud_address.get_address_info_by_user_id(user_id=user_id, db=db)
     if address_info:
         result['address'] = address_info
-    logger.log(Method.GET, Target.CHECKOUT, comment=f"CHECK OUT USER INFO OF USER ID #{user_id}",
-               status=Target.SUCCESS,
-               id=user_id,
-               db=db)
     return result
 
 

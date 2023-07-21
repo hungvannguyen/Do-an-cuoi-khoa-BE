@@ -59,15 +59,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
 
         if not data_db:
-            logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL PRODUCTS",
-                       status=Target.FAIL,
-                       id=0,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL PRODUCTS",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         total_quantity = 0
         for item in data_db:
             setattr(item, 'sale_price', item.price)
@@ -130,15 +124,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
-            logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ACTIVE PRODUCTS",
-                       status=Target.FAIL,
-                       id=0,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        logger.log(Method.GET, Target.PRODUCT, comment=f"GET ALL ACTIVE PRODUCTS",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         for item in data_db:
             setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
@@ -162,15 +150,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if not data_db:
-            logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCT BY ID {id}",
-                       status=Target.FAIL,
-                       id=0,
-                       db=db)
+
             return None
-        logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCT BY ID {id}",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         if data_db.is_sale == 1:
             setattr(data_db, 'sale_price', data_db.price * (100 - data_db.sale_percent) / 100)
         else:
@@ -233,15 +215,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
-            logger.log(Method.GET, Target.PRODUCT, comment=f"GET SALE PRODUCTS",
-                       status=Target.FAIL,
-                       id=0,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        logger.log(Method.GET, Target.PRODUCT, comment=f"GET SALE PRODUCTS",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         for item in data_db:
             setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
@@ -279,15 +255,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
-            logger.log(Method.GET, Target.PRODUCT, comment=f"GET NEW PRODUCTS",
-                       status=Target.FAIL,
-                       id=0,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        logger.log(Method.GET, Target.PRODUCT, comment=f"GET NEW PRODUCTS",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         for item in data_db:
             if item.is_sale == 1:
                 setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
@@ -374,15 +344,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
-            logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCTS BY CATEGORY ID {cat_id}",
-                       status=Target.FAIL,
-                       id=0,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCTS BY CATEGORY ID {cat_id}",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         for item in data_db:
             setattr(item, 'sale_price', item.price)
             if item.is_sale == Const.IS_SALE:
@@ -438,15 +402,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             )
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
-            logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCTS BY KEYWORD '{keyword}'",
-                       status=Target.FAIL,
-                       id=0,
-                       db=db)
+
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
-        logger.log(Method.GET, Target.PRODUCT, comment=f"GET PRODUCTS BY KEYWORD '{keyword}'",
-                   status=Target.SUCCESS,
-                   id=0,
-                   db=db)
+
         for item in data_db:
             setattr(item, 'sale_price', item.price)
             if item.is_sale == Const.IS_SALE:
@@ -475,7 +433,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
-        logger.log(Method.POST, Target.PRODUCT, comment=f"CREATE NEW PRODUCT",
+        prd_name = request.name
+        logger.log(Method.POST, Target.PRODUCT, comment=f"CREATE NEW PRODUCT {prd_name}",
                    status=Target.SUCCESS,
                    id=admin_id,
                    db=db)
@@ -531,9 +490,6 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         db.merge(prd_db)
         db.commit()
 
-        logger.log(Method.PUT, Target.PRODUCT, comment=f"ADD {quantity} QUANTITY TO PRODUCT ID #{prd_id}",
-                   status=Target.SUCCESS,
-                   id=admin_id, db=db)
 
         return {
             'detail': "Đã thêm thành công"
