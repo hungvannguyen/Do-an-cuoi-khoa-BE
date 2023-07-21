@@ -68,6 +68,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                    status=Target.SUCCESS,
                    id=0,
                    db=db)
+        total_quantity = 0
         for item in data_db:
             setattr(item, 'sale_price', item.price)
             if item.is_sale == 1:
@@ -79,6 +80,9 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             ).all()
 
             setattr(item, 'details', quantity_obj)
+            total_quantity += quantity_obj.quantity
+
+        data_db.quantity = total_quantity
 
         # if condition['sort'] == 1:
         #     data_db.sort(key=lambda x: x.sale_price, reverse=False)
