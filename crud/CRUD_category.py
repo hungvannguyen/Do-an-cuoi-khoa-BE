@@ -48,7 +48,7 @@ class CRUDCategory(CRUDBase[Category, CategoryCreate, CategoryUpdate]):
     def create_category(self, request, admin_id, db: Session):
         cat_name = str(request.cat_name)
         data_db = db.query(self.model).filter(
-            self.model.cat_name.lower() == cat_name.lower(),
+            self.model.cat_name == cat_name,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if data_db:
