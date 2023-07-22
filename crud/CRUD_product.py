@@ -28,16 +28,16 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         current_page = page
         if current_page <= 0:
             current_page = 1
-        total_product = db.query(self.model).filter(
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).count()
-        total_page = int(total_product / Const.ROW_PER_PAGE_ADMIN)
-        if total_product % Const.ROW_PER_PAGE_ADMIN > 0:
-            total_page += 1
-        if current_page > total_page and total_page > 0:
-            current_page = total_page
-        offset = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
-        limit = Const.ROW_PER_PAGE_ADMIN
+        # total_product = db.query(self.model).filter(
+        #     self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        # ).count()
+        # total_page = int(total_product / Const.ROW_PER_PAGE_ADMIN)
+        # if total_product % Const.ROW_PER_PAGE_ADMIN > 0:
+        #     total_page += 1
+        # if current_page > total_page and total_page > 0:
+        #     current_page = total_page
+        # offset = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
+        # limit = Const.ROW_PER_PAGE_ADMIN
 
         data_db = db.query(self.model).filter(
             # self.model.status == Const.ACTIVE_STATUS,
@@ -56,6 +56,17 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 self.model.price * (100 - self.model.sale_percent) / 100 >= condition['min_price'],
                 self.model.price * (100 - self.model.sale_percent) / 100 <= condition['max_price']
             )
+
+        count = data_db.count()
+
+        total_page = int(count / Const.ROW_PER_PAGE_ADMIN)
+        if count % Const.ROW_PER_PAGE_ADMIN > 0:
+            total_page += 1
+        if current_page > total_page and total_page > 0:
+            current_page = total_page
+        offset = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
+        limit = Const.ROW_PER_PAGE_ADMIN
+
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
 
         if not data_db:
@@ -95,18 +106,18 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         current_page = page
         if current_page <= 0:
             current_page = 1
-        total_product = db.query(self.model).filter(
-            self.model.status == Const.ACTIVE_STATUS,
-            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).count()
-        total_page = int(total_product / Const.ROW_PER_PAGE)
-        if total_product % Const.ROW_PER_PAGE > 0:
-            total_page += 1
-        if current_page > total_page and total_page > 0:
-            current_page = total_page
-
-        offset = (current_page - 1) * Const.ROW_PER_PAGE
-        limit = Const.ROW_PER_PAGE
+        # total_product = db.query(self.model).filter(
+        #     self.model.status == Const.ACTIVE_STATUS,
+        #     self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        # ).count()
+        # total_page = int(total_product / Const.ROW_PER_PAGE)
+        # if total_product % Const.ROW_PER_PAGE > 0:
+        #     total_page += 1
+        # if current_page > total_page and total_page > 0:
+        #     current_page = total_page
+        #
+        # offset = (current_page - 1) * Const.ROW_PER_PAGE
+        # limit = Const.ROW_PER_PAGE
         data_db = db.query(self.model).filter(
             self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
@@ -124,6 +135,17 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
                 self.model.price * (100 - self.model.sale_percent) / 100 >= condition['min_price'],
                 self.model.price * (100 - self.model.sale_percent) / 100 <= condition['max_price']
             )
+
+        count = data_db.count()
+
+        total_page = int(count / Const.ROW_PER_PAGE_ADMIN)
+        if count % Const.ROW_PER_PAGE_ADMIN > 0:
+            total_page += 1
+        if current_page > total_page and total_page > 0:
+            current_page = total_page
+        offset = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
+        limit = Const.ROW_PER_PAGE_ADMIN
+
         data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         if not data_db:
 
