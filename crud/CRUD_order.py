@@ -185,7 +185,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
     def get_all_orders(self, page, order_status, db: Session, admin_id):
         order_db = db.query(self.model)
-        if order_status:
+        if order_status is not None:
             order_db = order_db.filter(
                 self.model.status == order_status
             )
