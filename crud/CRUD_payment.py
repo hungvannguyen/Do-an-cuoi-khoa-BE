@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any
-from crud import logger
+from crud import logger, CRUD_mail
 from constants import Method, Target
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
@@ -67,6 +67,11 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
 
         db.merge(order_db)
         db.commit()
+        db.refresh(order_db)
+
+        order_id = order_db.id
+
+        CRUD_mail.create_order_detail_email(order_id=order_id, db=db)
 
         return {
             'detail': 'Đã cập nhật thành công'

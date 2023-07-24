@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-
+from crud import CRUD_mail
 from models.address import Address
 from models.cart import Cart
 from models.payment import Payment
@@ -362,7 +362,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             }
             crud_user.update_info(request=user_update_info, db=db, user_id=user_id)
 
-
+        if payment_type_id == Const.COD_PAYMENT:
+            CRUD_mail.create_order_detail_email(order_id=order_id, db=db)
 
         # Generate VNPAY link
         vnpay_url = ""
