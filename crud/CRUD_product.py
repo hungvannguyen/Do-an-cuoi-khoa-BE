@@ -457,7 +457,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
-        prd_name = request.name
+        prd_name = request['name']
         logger.log(Method.POST, Target.PRODUCT, comment=f"TẠO MỚI SẢN PHẨM {prd_name}",
                    status=Target.SUCCESS,
                    id=admin_id,

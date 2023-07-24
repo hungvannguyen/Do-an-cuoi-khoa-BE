@@ -19,7 +19,8 @@ def total_income(db: Session):
     total_profit = 0
     count = 0
     order_db = db.query(Order).filter(
-        Order.status >= Const.ORDER_DELIVERED
+        Order.status >= Const.ORDER_DELIVERED,
+        Order.status != Const.ORDER_REFUND
     ).all()
 
     for item in order_db:
@@ -36,7 +37,7 @@ def total_income(db: Session):
     }
 
 
-def order_count(db: Session):
+def order_count(db: Session, year, month):
     total_count = 0
     cancel_count = 0
     pending_count = 0
