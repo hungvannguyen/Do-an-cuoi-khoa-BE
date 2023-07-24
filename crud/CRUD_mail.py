@@ -134,7 +134,8 @@ def create_order_detail_email(order_id, db: Session):
         sub_template = one_order_detail
         prd_name = item.name
         prd_quantity = item.quantity
-        price = "{:,.1f}".format(item.price * prd_quantity)
+        price = item.price * prd_quantity
+        price = "{:,.1f}".format(price)
 
         sub_template = sub_template.replace("price", f"{STT}")
         sub_template = sub_template.replace("Name", f"{prd_name}")
