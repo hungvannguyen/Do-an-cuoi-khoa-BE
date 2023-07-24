@@ -140,7 +140,7 @@ def create_order_detail_email(order_id, db: Session):
         sub_template = sub_template.replace("price", f"{STT}")
         sub_template = sub_template.replace("Name", f"{prd_name}")
         sub_template = sub_template.replace("quantity", f"Số lượng: {prd_quantity}")
-        sub_template = sub_template.replace("price", f"{price} VNĐ")
+        sub_template = sub_template.replace("total_pr", f"{price} VNĐ")
 
         body_product = body_product + sub_template
 
