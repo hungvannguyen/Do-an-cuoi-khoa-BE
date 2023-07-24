@@ -20,8 +20,8 @@ def get_total_income(db: Session = Depends(deps.get_db)):
 
 
 @router.get("/order_count")
-def count_order(db: Session = Depends(deps.get_db)):
-    return CRUD_summary.order_count(db=db)
+def count_order(year: int = None, db: Session = Depends(deps.get_db)):
+    return CRUD_summary.order_count(db=db, year=year, month=0)
 
 
 @router.get("/order/count")

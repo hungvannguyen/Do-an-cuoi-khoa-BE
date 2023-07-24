@@ -44,9 +44,12 @@ def order_count(db: Session, year, month):
     confirm_count = 0
     delivering_count = 0
     delivered_count = 0
+    pending_refund = 0
+    refunded_count = 0
     success_count = 0
 
-    order_db = db.query(Order).all()
+    order_db = db.query(Order)\
+        .filter(datetime.year(Order.insert_at) == year).all()
 
     for item in order_db:
         total_count += 1
@@ -60,6 +63,10 @@ def order_count(db: Session, year, month):
             delivering_count += 1
         if item.status == Const.ORDER_DELIVERED:
             delivered_count += 1
+        if item.status == Const.ORDER_REFUND:
+            refunded_count += 1
+        if item.status == Const.ORDER_REFUND_REQUEST:
+            pending_refund += 1
         if item.status == Const.ORDER_SUCCESS:
             success_count += 1
 
@@ -70,6 +77,8 @@ def order_count(db: Session, year, month):
         'confirmed_order': confirm_count,
         'delivering_order': delivering_count,
         'delivered_order': delivered_count,
+        'pending_refund_order': pending_refund,
+        'refunded_order': refunded_count,
         'success_order': success_count
     }
 
