@@ -9,10 +9,12 @@ from models.user import User
 from models.code_confirm import Code_Confirm
 from mail.template import confirm_code_template, confirm_email_template
 from security.generator import *
+from security.security import hash_password
 
 
 def create_confirm_mail(mail_to, db: Session):
-    link = f"http://localhost:3000/email/confirm?email={mail_to}"
+    hash_mail = hash_password(mail_to)
+    link = f"http://dhsgundam.online/email/confirm?email={hash_mail}"
     text = confirm_email_template
     text = text.replace('<a href="http://dhsgundam3" class="es-button"', f'<a href="{link}" class="es-button"')
 
