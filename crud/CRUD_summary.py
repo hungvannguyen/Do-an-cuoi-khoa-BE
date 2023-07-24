@@ -31,6 +31,7 @@ def total_income(db: Session, month_count):
     order_db = db.query(Order).filter(
         Order.status >= Const.ORDER_DELIVERED,
         Order.status != Const.ORDER_REFUND,
+        Order.status != Const.ORDER_CANCEL,
         Order.insert_at >= time_to_count
     ).all()
 
