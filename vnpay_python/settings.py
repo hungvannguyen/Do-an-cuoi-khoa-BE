@@ -118,7 +118,7 @@ STATICFILES_DIRS = (
 )
 STATIC_URL = '/static/'
 # VNPAY CONFIG
-VNPAY_RETURN_URL = 'http://45.124.95.80/payment_return'  # get from config
+VNPAY_RETURN_URL = 'http://45.124.95.80:443/payment_return'  # get from config
 VNPAY_PAYMENT_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'  # get from config
 VNPAY_API_URL = 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction'
 VNPAY_TMN_CODE = 'B5TA5KR9'  # Website ID in VNPAY System, get from config
