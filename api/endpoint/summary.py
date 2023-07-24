@@ -15,15 +15,26 @@ router = APIRouter()
 
 
 @router.get("/total_income")
-def get_total_income(db: Session = Depends(deps.get_db)):
-    return CRUD_summary.total_income(db=db)
+def get_total_income(month_count: int = 1, db: Session = Depends(deps.get_db)):
+    return CRUD_summary.total_income(db=db, month_count=month_count)
 
 
 @router.get("/order_count")
-def count_order(year: int = None, db: Session = Depends(deps.get_db)):
-    return CRUD_summary.order_count(db=db, year=year, month=0)
+def count_order(month_count: int = 1, db: Session = Depends(deps.get_db)):
+    return CRUD_summary.order_count(db=db, month_count=month_count)
 
 
 @router.get("/order/count")
 def count_by_user_id(user_id: int, db: Session = Depends(deps.get_db)):
     return CRUD_summary.order_count_by_user_id(user_id=user_id, db=db)
+
+
+@router.get("/order/count/pending")
+def count_pending_orders(db: Session = Depends(deps.get_db)):
+    return CRUD_summary.get_total_pending_orders(db=db)
+
+
+@router.get("/order/count/pending_refund")
+def count_pending_refund_orders(db: Session = Depends(deps.get_db)):
+    return CRUD_summary.get_total_pending_refund_orders(db=db)
+

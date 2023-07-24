@@ -1,26 +1,37 @@
 import json
-from datetime import datetime
-from typing import Any
+from datetime import datetime, timedelta
+
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
-from fastapi.encoders import jsonable_encoder
-from crud import logger
-from constants import Method, Target
-from models import product
+
 from models.order import Order
-from schemas.cart import *
-from crud.base import CRUDBase
-from crud.CRUD_order import crud_product, crud_order_product
+
+from crud.CRUD_order import crud_order_product
 from constants import Const
 
 
-def total_income(db: Session):
+def total_income(db: Session, month_count):
     total_income = 0
     total_profit = 0
     count = 0
+
+    month_count -= 1
+    now = datetime.utcnow()
+    month = now.month
+    year = now.year
+    day = 1
+
+    days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+    first_date_current_month = datetime(year=year, month=month, day=1)
+
+    time_to_count = first_date_current_month - timedelta(
+        days=month_count * days_in_month[month - 1] - 1
+    )
+
     order_db = db.query(Order).filter(
         Order.status >= Const.ORDER_DELIVERED,
-        Order.status != Const.ORDER_REFUND
+        Order.status != Const.ORDER_REFUND,
+        Order.insert_at >= time_to_count
     ).all()
 
     for item in order_db:
@@ -37,7 +48,7 @@ def total_income(db: Session):
     }
 
 
-def order_count(db: Session, year, month):
+def order_count(db: Session, month_count):
     total_count = 0
     cancel_count = 0
     pending_count = 0
@@ -48,8 +59,21 @@ def order_count(db: Session, year, month):
     refunded_count = 0
     success_count = 0
 
-    order_db = db.query(Order)\
-        .filter(datetime.year(Order.insert_at) == year).all()
+    month_count -= 1
+    now = datetime.utcnow()
+    month = now.month
+    year = now.year
+    day = 1
+
+    days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
+    first_date_current_month = datetime(year=year, month=month, day=1)
+
+    time_to_count = first_date_current_month - timedelta(
+        days=month_count * days_in_month[month - 1] - 1
+    )
+
+    order_db = db.query(Order).filter(Order.insert_at >= time_to_count).all()
 
     for item in order_db:
         total_count += 1
@@ -90,6 +114,8 @@ def order_count_by_user_id(user_id: int, db: Session):
     confirm_count = 0
     delivering_count = 0
     delivered_count = 0
+    pending_refund = 0
+    refunded_count = 0
     success_count = 0
 
     order_db = db.query(Order).filter(
@@ -108,6 +134,10 @@ def order_count_by_user_id(user_id: int, db: Session):
             delivering_count += 1
         if item.status == Const.ORDER_DELIVERED:
             delivered_count += 1
+        if item.status == Const.ORDER_REFUND:
+            refunded_count += 1
+        if item.status == Const.ORDER_REFUND_REQUEST:
+            pending_refund += 1
         if item.status == Const.ORDER_SUCCESS:
             success_count += 1
 
@@ -118,5 +148,27 @@ def order_count_by_user_id(user_id: int, db: Session):
         'confirmed_order': confirm_count,
         'delivering_order': delivering_count,
         'delivered_order': delivered_count,
+        'pending_refund_order': pending_refund,
+        'refunded_order': refunded_count,
         'success_order': success_count
+    }
+
+
+def get_total_pending_orders(db: Session):
+    count = db.query(Order).filter(
+        Order.status == Const.ORDER_PENDING
+    ).count()
+
+    return {
+        'count': count
+    }
+
+
+def get_total_pending_refund_orders(db: Session):
+    count = db.query(Order).filter(
+        Order.status == Const.ORDER_REFUND_REQUEST
+    ).count()
+
+    return {
+        'count': count
     }

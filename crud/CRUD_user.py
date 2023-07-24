@@ -1,14 +1,15 @@
 from datetime import datetime
 from typing import Any
 from crud import logger
+# from crud.CRUD_summary import order_count_by_user_id
 from constants import Method, Target
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
 import models
-import schemas.user
 from crud.CRUD_address import crud_address
 from models.code_confirm import Code_Confirm
+from models.order import Order
 from models.user import User
 from schemas.user import UserRegis, UserInfo
 from crud.base import CRUDBase
@@ -106,7 +107,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
             password = request['password']
             hashed_password = hash_password(password)
             request['password'] = hashed_password
-            data_db = self.model(account=account, password=request['password'], email=email, name=request['name'], phone_number = request['phone_number'])
+            data_db = self.model(account=account, password=request['password'], email=email, name=request['name'],
+                                 phone_number=request['phone_number'])
             db.add(data_db)
             db.commit()
             db.refresh(data_db)
@@ -331,6 +333,10 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
         result = []
 
         for item in obj_db:
+            user_id = item.id
+            count_order = db.query(Order).filter(
+                Order.user_id == user_id
+            ).count()
             user = {
                 'id': item.id,
                 'name': item.name,
@@ -339,7 +345,8 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
                 'email': item.email,
                 'role_id': item.role_id,
                 'insert_at': item.insert_at,
-                'is_locked': item.is_locked
+                'is_locked': item.is_locked,
+                'order_count': count_order
             }
 
             result.append(user)

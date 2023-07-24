@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Any
-from crud import logger
-from constants import Method, Target
+
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from fastapi.encoders import jsonable_encoder
+
 
 from models.address import Address
 from models.cart import Cart
@@ -19,39 +17,16 @@ from crud.base import CRUDBase
 from models.order import Order
 from schemas.order import *
 from crud.CRUD_order_product import crud_order_product
-from crud.CRUD_product import crud_product
+
 from crud.CRUD_payment import crud_payment
-from crud.CRUD_cart import crud_cart
+
 from crud.CRUD_address import crud_address
 from crud.CRUD_user import crud_user
 from constants import Const
-from security.security import hash_password, verify_password, gen_token
+
 
 
 class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
-
-    # def get_product_by_id(self, id, db: Session):
-    #     prd_data_db = db.query(Product).filter(
-    #         Product.id == id
-    #     ).first()
-    #     if not prd_data_db:
-    #         return None
-    #     if prd_data_db.is_sale == 1:
-    #         setattr(prd_data_db, 'sale_price', prd_data_db.price * (100 - prd_data_db.sale_percent) / 100)
-    #     else:
-    #         setattr(prd_data_db, 'sale_price', prd_data_db.price)
-    #
-    #     prd_id = id
-    #     quantity_obj = db.query(ProductQuantity).filter(
-    #         ProductQuantity.prd_id == prd_id
-    #     ).all()
-    #     total_quantity = 0
-    #     for item in quantity_obj:
-    #         total_quantity += item.quantity
-    #
-    #     setattr(prd_data_db, 'quantity', total_quantity)
-    #
-    #     return prd_data_db
 
     def get_order_by_id(self, order_id, db: Session, user_id):
         obj_db = db.query(self.model).filter(
