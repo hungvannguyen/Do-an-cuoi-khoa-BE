@@ -1,4 +1,5 @@
 import datetime
+import locale
 from crud import logger
 from constants import Method, Target
 from sqlalchemy.orm import Session
@@ -90,17 +91,19 @@ def create_order_detail_email(order_id, db: Session):
                                           f"Đơn hàng #{order_id} đã đặt thành công!")
 
     total_price = int(order_db.total_price)
-    main_template = main_template.replace("$2222", f"{total_price} VNĐ")
 
     total_prd_price = 0
 
     for item in order_detail_db:
         total_prd_price += item.price
     total_prd_price = int(total_prd_price)
-    main_template = main_template.replace("$4444", f"{total_prd_price} VNĐ")
 
-    ship_price = total_price - total_prd_price
+    ship_price = "{:,.1f}".format(total_price - total_prd_price)
+    total_prd_price = "{:,.1f}".format(total_prd_price)
+    total_price = "{:,.1f}".format(total_price)
+    main_template = main_template.replace("$4444", f"{total_prd_price} VNĐ")
     main_template = main_template.replace("$3333", f"{ship_price} VNĐ")
+    main_template = main_template.replace("$2222", f"{total_price} VNĐ")
 
     name = order_db.name
 
@@ -123,5 +126,23 @@ def create_order_detail_email(order_id, db: Session):
     bankCode = payment_db.bankCode
 
     main_template = main_template.replace("PayPal", f"{bankCode}")
+
+    body_product = ""
+    STT = 0
+    for item in order_detail_db:
+        STT += 1
+        sub_template = one_order_detail
+        prd_name = item.name
+        prd_quantity = item.quantity
+        price = "{:,.1f}".format(item.price * prd_quantity)
+
+        sub_template = sub_template.replace("price", f"{STT}")
+        sub_template = sub_template.replace("Name", f"{prd_name}")
+        sub_template = sub_template.replace("quantity", f"Số lượng: {prd_quantity}")
+        sub_template = sub_template.replace("price", f"{price} VNĐ")
+
+        body_product = body_product.join(sub_template)
+
+    main_template = main_template.replace("1010", body_product)
 
     return send_mail(mail_to=mail_to, title="[DhsGundam] Kiểm tra đơn hàng của bạn!", content=main_template, db=db)
