@@ -18,14 +18,14 @@ class UserInfo(UserBase):
 class UserRegis(BaseModel):
     account: str
     email: str
+    name: str
+    phone_number: str
     password: str
     confirm_password: str
 
 
 class AdminRegis(UserRegis):
-    name: str
-    phone_number: str
-
+    pass
 
 class UserUpdateInfo(BaseModel):
     name: Optional[str]
