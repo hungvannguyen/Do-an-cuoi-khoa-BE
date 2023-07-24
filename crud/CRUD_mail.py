@@ -87,7 +87,7 @@ def create_order_detail_email(order_id, db: Session):
 
     main_template = main_template.replace("1111", f"{order_id}")
 
-    main_template = main_template.replace("Đơn hàng #1111 đã được xác nhận!",
+    main_template = main_template.replace(f"Đơn hàng #{order_id} đã được xác nhận!",
                                           f"Đơn hàng #{order_id} đã đặt thành công!")
 
     total_price = int(order_db.total_price)
