@@ -26,3 +26,7 @@ def create_confirm_mail(request: MailConfirm, db: Session = Depends(deps.get_db)
 def create_confirm_code(request: CodeConfirmCreate, db: Session = Depends(deps.get_db)):
     return CRUD_mail.create_confirm_code_email(account=request.account, db=db)
 
+
+@router.post("/order_details")
+def create_order_details_email(order_id: int, db: Session = Depends(deps.get_db)):
+    return CRUD_mail.create_order_detail_email(order_id=order_id, db=db)

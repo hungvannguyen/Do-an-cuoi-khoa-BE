@@ -124,4 +124,4 @@ def create_order_detail_email(order_id, db: Session):
 
     main_template = main_template.replace("PayPal", f"{bankCode}")
 
-    return send_mail(mail_to=mail_to, title="[DhsGundam] Đây là mã xác thực của bạn!", content=main_template, db=db)
+    return send_mail(mail_to=mail_to, title="[DhsGundam] Kiểm tra đơn hàng của bạn!", content=main_template, db=db)
