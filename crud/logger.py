@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status as code_status
 from fastapi.encoders import jsonable_encoder
 from models.log import Log
+from models.user import User
 from schemas.address import AddressInfo, AddressCreate, AddressUpdate
 from crud.base import CRUDBase
 from constants import Const
@@ -74,6 +75,18 @@ def get_log(type, target, status, id, sort, page, row_per_page, date_from, date_
 
     start = (current_page - 1) * row_per_page
     obj = obj.offset(start).limit(row_per_page).all()
+
+    for item in obj:
+        user_id = item.insert_id
+
+        user_db = db.query(User).filter(
+            User.id == user_id
+        ).first()
+
+        name = user_db.name
+
+        setattr(item, 'name', name)
+
     if not obj:
         raise HTTPException(status_code=code_status.HTTP_404_NOT_FOUND, detail=f"Không có Log phù hợp")
 
