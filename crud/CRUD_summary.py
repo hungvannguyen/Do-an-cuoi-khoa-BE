@@ -210,7 +210,7 @@ def get_top_customer(db: Session):
         }
         arr.append(obj)
 
-    arr = arr.sort(key=lambda x: x['total_price'], reverse=True)
+    arr.sort(key=lambda x: x['total_price'], reverse=True)
     return {
         'data': arr
     }
