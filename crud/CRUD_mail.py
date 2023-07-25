@@ -42,7 +42,7 @@ def create_confirm_code_email(account, db: Session):
     ).first()
     if code_db:
         code_db.delete_flag = Const.DELETE_FLAG_DELETED
-        code_db.delete_id = 1
+        code_db.delete_id = 0
         code_db.delete_at = datetime.now()
         db.merge(code_db)
         db.commit()
