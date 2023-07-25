@@ -118,7 +118,7 @@ STATICFILES_DIRS = (
 )
 STATIC_URL = '/static/'
 # VNPAY CONFIG
-VNPAY_RETURN_URL = 'http://dhsgundam.online/payment_return'  # get from config
+VNPAY_RETURN_URL = 'http://localhost:3000/payment_return'  # get from config
 VNPAY_PAYMENT_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'  # get from config
 VNPAY_API_URL = 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction'
 VNPAY_TMN_CODE = 'B5TA5KR9'  # Website ID in VNPAY System, get from config
