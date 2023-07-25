@@ -195,8 +195,10 @@ def get_top_customer(db: Session):
             Order.status != Const.ORDER_REFUND,
             Order.status != Const.ORDER_CANCEL
         ).all()
+
         total_price = 0
         total_order = 0
+
         for order in order_db:
             total_order += 1
             total_price += order.total_price
@@ -212,5 +214,5 @@ def get_top_customer(db: Session):
 
     arr.sort(key=lambda x: x['total_price'], reverse=True)
     return {
-        'data': arr
+        'data': arr[0:3]
     }
