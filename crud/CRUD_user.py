@@ -163,20 +163,25 @@ class CRUDUser(CRUDBase[User, UserRegis, UserInfo]):
 
     def confirm_email(self, email, db: Session):
         data_db = db.query(self.model).filter(
+            self.model.email == email,
             self.model.is_confirmed == Const.IS_NOT_CONFIRMED,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).all()
+        ).first()
         if not data_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                 detail=f"Email không chính xác hoặc đã xác nhận")
-        for item in data_db:
-            mail = item.email
-            if verify_password(mail, email):
-                item.is_confirmed = Const.IS_CONFIRMED
-                db.add(item)
-                db.commit()
-                db.refresh(item)
-                break
+        # for item in data_db:
+        #     mail = item.email
+        #     if verify_password(mail, email):
+        #         item.is_confirmed = Const.IS_CONFIRMED
+        #         db.add(item)
+        #         db.commit()
+        #         db.refresh(item)
+        #         break
+        data_db.is_confirmed = Const.IS_CONFIRMED
+        db.merge(data_db)
+        db.commit()
+        db.refresh(data_db)
 
         return {
             'detail': "Đã xác nhận Email thành công"

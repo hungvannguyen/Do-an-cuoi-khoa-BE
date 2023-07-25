@@ -17,8 +17,8 @@ from security.security import hash_password
 
 
 def create_confirm_mail(mail_to, db: Session):
-    hash_mail = hash_password(mail_to)
-    link = f"http://dhsgundam.online/email/confirm?email={hash_mail}"
+    # hash_mail = hash_password(mail_to)
+    link = f"http://dhsgundam.online/email/confirm?email={mail_to}"
     text = confirm_email_template
     text = text.replace('<a href="http://dhsgundam3" class="es-button"', f'<a href="{link}" class="es-button"')
 
