@@ -366,8 +366,8 @@ a[x-apple-data-detectors] {
                       <td align="center" class="es-m-txt-c" style="padding:0;Margin:0"><h2 style="Margin:0;line-height:31px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:26px;font-style:normal;font-weight:bold;color:#333333">Đơn hàng #1111 đã được xác nhận!&nbsp;</h2></td>
                      </tr>
                      <tr>
-                      <td align="center" style="padding:0;Margin:0;padding-bottom:15px;padding-top:25px"><!--[if mso]><a href="https://1111" target="_blank" hidden>
-	<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="https://1111" 
+                      <td align="center" style="padding:0;Margin:0;padding-bottom:15px;padding-top:25px"><!--[if mso]><a href="http://dhsgundam.online/order/tracking" target="_blank" hidden>
+	<v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" esdevVmlButton href="http://dhsgundam.online/order/tracking" 
                 style="height:43px; v-text-anchor:middle; width:288px" arcsize="14%" strokecolor="#5c68e2" strokeweight="1px" fillcolor="#5c68e2">
 		<w:anchorlock></w:anchorlock>
 		<center style='color:#ffffff; font-family:arial, "helvetica neue", helvetica, sans-serif; font-size:17px; font-weight:400; line-height:17px;  mso-text-raise:1px'>KIỂM TRA ĐƠN HÀNG</center>
