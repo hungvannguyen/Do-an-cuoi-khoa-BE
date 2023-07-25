@@ -191,6 +191,7 @@ def get_top_customer(db: Session):
         User.delete_flag == Const.DELETE_FLAG_NORMAL
     ).all()
     arr = []
+    stt = 0
     for user in user_db:
         user_id = user.id
         order_db = db.query(Order).filter(
@@ -212,11 +213,15 @@ def get_top_customer(db: Session):
             'id': user_id,
             'name': user_name,
             'total_price': total_price,
-            'total_order': total_order
+            'total_order': total_order,
+            'stt': 0
         }
         arr.append(obj)
 
     arr.sort(key=lambda x: x['total_price'], reverse=True)
+    arr[0]['stt'] = 1
+    arr[1]['stt'] = 2
+    arr[2]['stt'] = 3
     return {
         'data': arr[0:3]
     }
