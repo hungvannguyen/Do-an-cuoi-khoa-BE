@@ -71,7 +71,7 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
 
         order_id = order_db.id
 
-        CRUD_mail.create_order_detail_email(order_id=order_id, db=db)
+        # CRUD_mail.create_order_detail_email(order_id=order_id, db=db)
 
         return {
             'detail': 'Đã cập nhật thành công'
