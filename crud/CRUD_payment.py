@@ -130,9 +130,14 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
             Order.payment_id == payment_id
         ).first()
 
-        order_db.status = Const.ORDER_CONFIRMED
-        db.merge(order_db)
-        db.commit()
+        if vnp_ResponseCode == 00:
+            order_db.status = Const.ORDER_CONFIRMED
+            db.merge(order_db)
+            db.commit()
+            db.refresh(order_db)
+            order_id = order_db.id
+
+            CRUD_mail.create_order_detail_email(order_id=order_id, db=db)
 
         return {
             'detail': "Đã cập nhật tình trạng thanh toán"
