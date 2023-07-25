@@ -28,7 +28,6 @@ def create_confirm_mail(mail_to, db: Session):
 def create_confirm_code_email(account, db: Session):
     user_db = db.query(User).filter(
         User.account == account,
-        User.is_confirmed == Const.IS_CONFIRMED,
         User.delete_flag == Const.DELETE_FLAG_NORMAL
     ).first()
     if not user_db:
