@@ -1,12 +1,16 @@
 import json
 from datetime import datetime, timedelta
 
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from crud.CRUD_product import crud_product
 from models.order import Order
 
 from crud.CRUD_order import crud_order_product
 from constants import Const
+from models.product import Product
+from models.product_quantity import ProductQuantity
 from models.user import User
 
 
@@ -215,4 +219,46 @@ def get_top_customer(db: Session):
     arr.sort(key=lambda x: x['total_price'], reverse=True)
     return {
         'data': arr[0:3]
+    }
+
+
+def get_low_quantity_products(db: Session):
+    data_db = db.query(Product).filter(
+        Product.status == Const.ACTIVE_STATUS,
+        Product.delete_flag == Const.DELETE_FLAG_NORMAL
+    ).all()
+
+    # total_quantity = 0
+    arr = []
+    for item in data_db:
+        setattr(item, 'sale_price', item.price)
+        if item.is_sale == 1:
+            setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
+        prd_id = item.id
+        quantity_obj = db.query(ProductQuantity).filter(
+            ProductQuantity.prd_id == prd_id
+        ).all()
+        total_quantity = 0
+        setattr(item, 'details', quantity_obj)
+        for item2 in quantity_obj:
+            total_quantity += item2.quantity
+
+        item.quantity = total_quantity
+        obj = {
+            'id': item.id,
+            'name': item.name,
+            'quantity': item.quantity,
+            'img_url': item.img_url,
+            'import_price': item.import_price,
+            'sale_price': item.sale_price,
+            'is_sale': item.is_sale,
+            'sale_percent': item.sale_percent,
+        }
+        arr.append(obj)
+
+    arr.sort(key=lambda x: x['quantity'])
+
+    return {
+        'data': arr[0:5]
     }

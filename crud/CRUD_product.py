@@ -445,6 +445,62 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             'total_page': total_page
         }
 
+    def search_product_for_admin(self, keyword: str, page: int, condition, db: Session):
+
+        keyword = "%" + keyword.replace(" ", "%") + "%"
+
+        current_page = page
+        if current_page <= 0:
+            current_page = 1
+        total_product = db.query(self.model).filter(
+            self.model.name.like(keyword),
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).count()
+        total_page = int(total_product / Const.ROW_PER_PAGE)
+        if total_product % Const.ROW_PER_PAGE > 0:
+            total_page += 1
+        if current_page > total_page and total_page > 0:
+            current_page = total_page
+        offset = (current_page - 1) * Const.ROW_PER_PAGE
+        limit = Const.ROW_PER_PAGE
+        data_db = db.query(self.model).filter(
+            self.model.name.like(keyword),
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        )
+        if condition['sort'] == 1:
+            data_db = data_db.order_by(
+                asc(self.model.price * (100 - self.model.sale_percent) / 100)
+            )
+        if condition['sort'] == 2:
+            data_db = data_db.order_by(
+                desc(self.model.price * (100 - self.model.sale_percent) / 100)
+            )
+        if condition['sort'] == 3:
+            data_db = data_db.filter(
+                self.model.price * (100 - self.model.sale_percent) / 100 >= condition['min_price'],
+                self.model.price * (100 - self.model.sale_percent) / 100 <= condition['max_price']
+            )
+        data_db = data_db.order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        if not data_db:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không tìm thấy sản phẩm phù hợp")
+
+        for item in data_db:
+            setattr(item, 'sale_price', item.price)
+            if item.is_sale == Const.IS_SALE:
+                setattr(item, 'sale_price', item.price * (100 - item.sale_percent) / 100)
+
+        # if condition['sort'] == 1:
+        #     data_db.sort(key=lambda x: x.sale_price, reverse=False)
+        # elif condition['sort'] == 2:
+        #     data_db.sort(key=lambda x: x.sale_price, reverse=True)
+
+        return {
+            'data': data_db,
+            'current_page': current_page,
+            'total_page': total_page
+        }
+
+
     def create_product(self, request, db: Session, admin_id):
         request = request.dict()
         cat_id = request['cat_id']
