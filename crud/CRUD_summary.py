@@ -7,6 +7,7 @@ from models.order import Order
 
 from crud.CRUD_order import crud_order_product
 from constants import Const
+from models.user import User
 
 
 def total_income(db: Session, month_count):
@@ -172,4 +173,44 @@ def get_total_pending_refund_orders(db: Session):
 
     return {
         'count': count
+    }
+
+
+def get_price(user):
+    return user['total_price']
+
+
+def get_top_customer(db: Session):
+    user_db = db.query(User).filter(
+        User.is_confirmed == Const.IS_CONFIRMED,
+        User.role_id == 99,
+        User.delete_flag == Const.DELETE_FLAG_NORMAL
+    ).all()
+    arr = []
+    for user in user_db:
+        user_id = user.id
+        order_db = db.query(Order).filter(
+            Order.user_id == user_id,
+            Order.status >= Const.ORDER_DELIVERED,
+            Order.status != Const.ORDER_REFUND,
+            Order.status != Const.ORDER_CANCEL
+        ).all()
+        total_price = 0
+        total_order = 0
+        for order in order_db:
+            total_order += 1
+            total_price += order.total_price
+
+        user_name = user.name
+        obj = {
+            'id': user_id,
+            'name': user_name,
+            'total_price': total_price,
+            'total_order': total_order
+        }
+        arr.append(obj)
+
+    arr = arr.sort(key=lambda x: x['total_price'], reverse=True)
+    return {
+        'data': arr
     }

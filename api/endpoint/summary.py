@@ -38,3 +38,7 @@ def count_pending_orders(db: Session = Depends(deps.get_db)):
 def count_pending_refund_orders(db: Session = Depends(deps.get_db)):
     return CRUD_summary.get_total_pending_refund_orders(db=db)
 
+
+@router.get("/top_customer")
+def get_top_customers(db: Session = Depends(deps.get_db)):
+    return CRUD_summary.get_top_customer(db=db)
