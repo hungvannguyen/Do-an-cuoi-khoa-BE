@@ -27,7 +27,7 @@ class CRUDCart(CRUDBase[Cart, CartCreate, CartUpdate]):
         if data_db:
             for item in data_db:
                 prd_id = item.prd_id
-                prd_data = jsonable_encoder(crud_product.get_product_by_id(id=prd_id, db=db))
+                prd_data = jsonable_encoder(crud_product.get_product_by_id_for_cart(id=prd_id, db=db))
                 if not prd_data:
                     self.delete_cart(prd_id=prd_id, db=db, user_id=user_id)
                     raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Reloading...")

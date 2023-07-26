@@ -201,6 +201,40 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
         return data_db
 
+    def get_product_by_id_for_cart(self, id, db: Session):
+        data_db = db.query(self.model).filter(
+            self.model.id == id,
+            # self.model.status == Const.ACTIVE_STATUS,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).first()
+        if not data_db:
+
+            return None
+
+        if data_db.is_sale == 1:
+            setattr(data_db, 'sale_price', data_db.price * (100 - data_db.sale_percent) / 100)
+        else:
+            setattr(data_db, 'sale_price', data_db.price)
+
+        prd_id = data_db.id
+        quantity_obj = db.query(ProductQuantity).filter(
+            ProductQuantity.prd_id == prd_id
+        ).all()
+        total_quantity = 0
+        for item in quantity_obj:
+            total_quantity += item.quantity
+
+        setattr(data_db, 'quantity', total_quantity)
+
+        prd_id = data_db.id
+        quantity_obj = db.query(ProductQuantity).filter(
+            ProductQuantity.prd_id == prd_id
+        ).all()
+
+        setattr(data_db, 'details', quantity_obj)
+
+        return data_db
+
     def get_sale_products(self, page: int, condition, db: Session):
         current_page = page
         if current_page <= 0:
