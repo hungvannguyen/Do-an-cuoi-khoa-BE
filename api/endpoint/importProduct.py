@@ -23,3 +23,7 @@ def import_products(request: ProductImportCreate, db: Session = Depends(deps.get
 def get_all_invoices(db: Session = Depends(deps.get_db)):
     return crud_import_product.get_inport_invoice(db=db)
 
+
+@router.get("/{id}")
+def get_invoice_by_id(id: int, db: Session = Depends(deps.get_db)):
+    return crud_import_product.get_import_invoice_by_id(id=id, db=db)
