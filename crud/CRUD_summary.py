@@ -40,8 +40,10 @@ def total_income(db: Session, mode, year):
     if mode == 0:
         month = now.month
         first_date_current_month = datetime(year=year, month=month, day=1)
+        end_date_current_month = datetime(year=year, month=month, day=days_in_month[month-1])
         order_db = order_db.filter(
-            Order.insert_at >= first_date_current_month
+            Order.insert_at >= first_date_current_month,
+            Order.insert_at <= end_date_current_month
         )
     if 1 <= mode <= 5:
         start_month = 1
@@ -102,8 +104,10 @@ def order_count(db: Session, mode, year):
     if mode == 0:
         month = now.month
         first_date_current_month = datetime(year=year, month=month, day=1)
+        end_date_current_month = datetime(year=year, month=month, day=days_in_month[month-1])
         order_db = order_db.filter(
-            Order.insert_at >= first_date_current_month
+            Order.insert_at >= first_date_current_month,
+            Order.insert_at <= end_date_current_month
         )
     if 1 <= mode <= 5:
         start_month = 1
