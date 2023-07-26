@@ -204,7 +204,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
     def get_product_by_id_for_cart(self, id, db: Session):
         data_db = db.query(self.model).filter(
             self.model.id == id,
-            # self.model.status == Const.ACTIVE_STATUS,
+            self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).first()
         if not data_db:
