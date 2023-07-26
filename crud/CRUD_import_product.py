@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 from typing import Any
 from crud import logger
-from constants import Method, Target
+from constants import Method, Target, Const
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
@@ -78,7 +78,10 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
             'detail': "Đã nhập hàng thành công"
         }
 
-    def get_inport_invoice(self, db: Session):
+    def get_import_invoice(self, page, db: Session):
+        current_page = page
+        if current_page <= 0:
+            current_page = 1
 
         template = {
             'user_id': 0,
@@ -88,7 +91,17 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
             'products': None
         }
         result = []
-        import_db = db.query(self.model).all()
+
+        count = db.query(self.model).count()
+        total_page = int(count / Const.ROW_PER_PAGE_ADMIN)
+        if count % Const.ROW_PER_PAGE_ADMIN > 0:
+            total_page += 1
+        if current_page > total_page and total_page > 0:
+            current_page = total_page
+        offset = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
+        limit = Const.ROW_PER_PAGE_ADMIN
+
+        import_db = db.query(self.model).offset(offset).limit(limit).all()
         for item in import_db:
             template['user_id'] = item.user_id
             template['import_at'] = item.import_at
@@ -105,7 +118,11 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
 
             result.append(template)
 
-        return result
+        return {
+            'data': result,
+            'current_page': current_page,
+            'total_page': total_page
+        }
 
     def get_import_invoice_by_id(self, id, db: Session):
 
