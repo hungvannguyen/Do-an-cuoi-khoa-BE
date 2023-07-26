@@ -15,13 +15,13 @@ router = APIRouter()
 
 
 @router.get("/total_income")
-def get_total_income(month_count: int = 1, db: Session = Depends(deps.get_db)):
-    return CRUD_summary.total_income(db=db, month_count=month_count)
+def get_total_income(mode: int = 0, year: int = 2023, db: Session = Depends(deps.get_db)):
+    return CRUD_summary.total_income(db=db, mode=mode, year=year)
 
 
 @router.get("/order_count")
-def count_order(month_count: int = 1, db: Session = Depends(deps.get_db)):
-    return CRUD_summary.order_count(db=db, month_count=month_count)
+def count_order(mode: int = 0, year: int = 2023, db: Session = Depends(deps.get_db)):
+    return CRUD_summary.order_count(db=db, mode=mode, year=year)
 
 
 @router.get("/order/count")

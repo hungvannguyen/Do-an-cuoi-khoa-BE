@@ -14,31 +14,54 @@ from models.product_quantity import ProductQuantity
 from models.user import User
 
 
-def total_income(db: Session, month_count):
+def total_income(db: Session, mode, year):
+    order_db = db.query(Order).filter(
+        Order.status >= Const.ORDER_DELIVERED,
+        Order.status != Const.ORDER_REFUND,
+        Order.status != Const.ORDER_CANCEL
+    )
+
     total_income = 0
     total_profit = 0
     count = 0
 
-    month_count -= 1
+    # month_count -= 1
     now = datetime.utcnow()
-    month = now.month
-    year = now.year
+
+    if year is None:
+        year = now.year
     day = 1
 
     days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-    first_date_current_month = datetime(year=year, month=month, day=1)
+    if (year % 4 == 0 and year % 100 != 0) or (year % 100 == 0 and year % 400 == 0):
+        days_in_month[1] = 29
 
-    time_to_count = first_date_current_month - timedelta(
-        days=month_count * days_in_month[month - 1] - 1
-    )
+    if mode == 0:
+        month = now.month
+        first_date_current_month = datetime(year=year, month=month, day=1)
+        order_db = order_db.filter(
+            Order.insert_at >= first_date_current_month
+        )
+    if 1 <= mode <= 5:
+        start_month = 1
+        end_month = 12
+        start_day = 1
+        end_day = 31
 
-    order_db = db.query(Order).filter(
-        Order.status >= Const.ORDER_DELIVERED,
-        Order.status != Const.ORDER_REFUND,
-        Order.status != Const.ORDER_CANCEL,
-        Order.insert_at >= time_to_count
-    ).all()
+        if mode <= 4:
+            start_month = 3 * (mode - 1) + 1
+            end_month = 3 * mode
+            end_day = days_in_month[end_month - 1]
+
+        first_date_to_count = datetime(year=year, month=start_month, day=start_day)
+        end_date_to_count = datetime(year=year, month=end_month, day=end_day)
+        order_db = order_db.filter(
+            Order.insert_at >= first_date_to_count,
+            Order.insert_at <= end_date_to_count
+        )
+
+    order_db = order_db.all()
 
     for item in order_db:
         count += 1
@@ -54,7 +77,7 @@ def total_income(db: Session, month_count):
     }
 
 
-def order_count(db: Session, month_count):
+def order_count(db: Session, mode, year):
     total_count = 0
     cancel_count = 0
     pending_count = 0
@@ -65,21 +88,42 @@ def order_count(db: Session, month_count):
     refunded_count = 0
     success_count = 0
 
-    month_count -= 1
-    now = datetime.utcnow()
-    month = now.month
-    year = now.year
-    day = 1
+    order_db = db.query(Order)
 
+    now = datetime.utcnow()
+
+    if year is None:
+        year = now.year
     days_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-    first_date_current_month = datetime(year=year, month=month, day=1)
+    if (year % 4 == 0 and year % 100 != 0) or (year % 100 == 0 and year % 400 == 0):
+        days_in_month[1] = 29
 
-    time_to_count = first_date_current_month - timedelta(
-        days=month_count * days_in_month[month - 1] - 1
-    )
+    if mode == 0:
+        month = now.month
+        first_date_current_month = datetime(year=year, month=month, day=1)
+        order_db = order_db.filter(
+            Order.insert_at >= first_date_current_month
+        )
+    if 1 <= mode <= 5:
+        start_month = 1
+        end_month = 12
+        start_day = 1
+        end_day = 31
 
-    order_db = db.query(Order).filter(Order.insert_at >= time_to_count).all()
+        if mode <= 4:
+            start_month = 3 * (mode - 1) + 1
+            end_month = 3 * mode
+            end_day = days_in_month[end_month - 1]
+
+        first_date_to_count = datetime(year=year, month=start_month, day=start_day)
+        end_date_to_count = datetime(year=year, month=end_month, day=end_day)
+        order_db = order_db.filter(
+            Order.insert_at >= first_date_to_count,
+            Order.insert_at <= end_date_to_count
+        )
+
+    order_db = order_db.all()
 
     for item in order_db:
         total_count += 1
