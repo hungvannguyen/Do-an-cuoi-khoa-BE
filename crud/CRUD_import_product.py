@@ -84,6 +84,7 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
             current_page = 1
 
         template = {
+            'id': 0,
             'user_id': 0,
             'import_at': None,
             'import_quantity': 0,
@@ -115,7 +116,7 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
             ).all()
 
             template['products'] = products_import
-
+            template['id'] = import_id
             result.append(template)
 
         return {
