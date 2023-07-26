@@ -94,7 +94,7 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
         offset = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
         limit = Const.ROW_PER_PAGE_ADMIN
 
-        import_db = db.query(self.model).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
+        import_db = db.query(self.model).order_by(self.model.id.desc()).offset(offset).limit(limit).all()
         for item in import_db:
             template = {'id': 0, 'user_id': item.user_id, 'import_at': item.import_at,
                         'import_quantity': item.import_quantity, 'total_import_price': item.total_import_price,
