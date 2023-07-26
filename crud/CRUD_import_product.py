@@ -130,7 +130,7 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
 
     def get_import_invoice_by_id(self, id, db: Session):
 
-        result = []
+
         import_db = db.query(self.model).filter(
             self.model.id == id
         ).all()
@@ -142,10 +142,9 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
                 ProductImportDetail.product_import_id == import_id
             ).all()
 
-            result.append(products_import)
 
         return {
-            'data': result
+            'data': products_import
         }
 
 
