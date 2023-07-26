@@ -640,7 +640,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
     def get_all_for_import(self, db: Session):
         prd_db = db.query(self.model).filter(
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
-        ).all()
+        ).order_by(self.model.insert_at.desc()).all()
 
         return prd_db
 
