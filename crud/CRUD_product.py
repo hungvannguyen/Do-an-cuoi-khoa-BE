@@ -24,7 +24,34 @@ from security.security import hash_password, verify_password, gen_token
 
 class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
 
+    def check_product_quantity(self, db: Session):
+        prd_db = db.query(self.model).filter(
+            self.model.status == Const.ACTIVE_STATUS,
+            self.model.delete_flag == Const.DELETE_FLAG_NORMAL
+        ).all()
+
+        for item in prd_db:
+            prd_id = item.id
+            quantity_obj = db.query(ProductQuantity).filter(
+                ProductQuantity.prd_id == prd_id
+            ).all()
+            total_quantity = 0
+            setattr(item, 'details', quantity_obj)
+            for item2 in quantity_obj:
+                total_quantity += item2.quantity
+
+            if total_quantity == 0:
+                item.status = Const.NOT_ACTIVE_STATUS
+                db.merge(item)
+                db.commit()
+                db.refresh(item)
+        return None
+
+
     def get_all_products(self, page: int, condition, db: Session):
+
+        self.check_product_quantity(db=db)
+
         current_page = page
         if current_page <= 0:
             current_page = 1
@@ -103,6 +130,7 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
         }
 
     def get_all_active_products(self, page: int, condition, db: Session):
+        self.check_product_quantity(db=db)
         current_page = page
         if current_page <= 0:
             current_page = 1
