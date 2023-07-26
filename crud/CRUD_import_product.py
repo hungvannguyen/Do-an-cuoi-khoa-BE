@@ -83,14 +83,6 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
         if current_page <= 0:
             current_page = 1
 
-        template = {
-            'id': 0,
-            'user_id': 0,
-            'import_at': None,
-            'import_quantity': 0,
-            'total_import_price': 0,
-            'products': None
-        }
         result = []
 
         count = db.query(self.model).count()
@@ -104,10 +96,9 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
 
         import_db = db.query(self.model).order_by(self.model.insert_at.desc()).offset(offset).limit(limit).all()
         for item in import_db:
-            template['user_id'] = item.user_id
-            template['import_at'] = item.import_at
-            template['import_quantity'] = item.import_quantity
-            template['total_import_price'] = item.total_import_price
+            template = {'id': 0, 'user_id': item.user_id, 'import_at': item.import_at,
+                        'import_quantity': item.import_quantity, 'total_import_price': item.total_import_price,
+                        'products': None}
 
             import_id = item.id
 
