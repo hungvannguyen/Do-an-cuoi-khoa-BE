@@ -434,8 +434,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
     def cancel_order(self, order_id, cancel_reason, db: Session, user_id):
 
         order_db = db.query(self.model).filter(
-            self.model.id == order_id,
-            self.model.user_id == user_id
+            self.model.id == order_id
         ).first()
 
         if order_db.status != Const.ORDER_PENDING:
