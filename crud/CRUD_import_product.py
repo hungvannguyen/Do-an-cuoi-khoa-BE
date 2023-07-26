@@ -107,7 +107,7 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
                 ProductImportDetail.product_import_id == import_id
             ).all()
 
-            template['products'] = products_import
+            # template['products'] = products_import
             template['id'] = import_id
 
             user_id = item.user_id
