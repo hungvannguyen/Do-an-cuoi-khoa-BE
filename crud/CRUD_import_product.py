@@ -130,22 +130,11 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
 
     def get_import_invoice_by_id(self, id, db: Session):
 
-        template = {
-            'user_id': 0,
-            'import_at': None,
-            'import_quantity': 0,
-            'total_import_price': 0,
-            'products': None
-        }
         result = []
         import_db = db.query(self.model).filter(
             self.model.id == id
         ).all()
         for item in import_db:
-            template['user_id'] = item.user_id
-            template['import_at'] = item.import_at
-            template['import_quantity'] = item.import_quantity
-            template['total_import_price'] = item.total_import_price
 
             import_id = item.id
 
@@ -153,11 +142,11 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
                 ProductImportDetail.product_import_id == import_id
             ).all()
 
-            template['products'] = products_import
+            result.append(products_import)
 
-            result.append(template)
-
-        return result
+        return {
+            'data': result
+        }
 
 
 crud_import_product = CRUDImportProduct(ProductImport)
