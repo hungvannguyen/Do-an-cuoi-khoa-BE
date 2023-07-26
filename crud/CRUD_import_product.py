@@ -14,6 +14,7 @@ from models.product_quantity import ProductQuantity
 
 from crud.base import CRUDBase
 from models.order import Order
+from models.user import User
 from schemas.order import *
 
 
@@ -96,7 +97,7 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
 
         import_db = db.query(self.model).order_by(self.model.id.desc()).offset(offset).limit(limit).all()
         for item in import_db:
-            template = {'id': 0, 'user_id': item.user_id, 'import_at': item.import_at,
+            template = {'id': 0, 'user_id': item.user_id, 'name': None, 'import_at': item.import_at,
                         'import_quantity': item.import_quantity, 'total_import_price': item.total_import_price,
                         'products': None}
 
@@ -108,6 +109,17 @@ class CRUDImportProduct(CRUDBase[ProductImport, OrderBase, OrderCreate]):
 
             template['products'] = products_import
             template['id'] = import_id
+
+            user_id = item.user_id
+
+            user_db = db.query(User).filter(
+                User.id == user_id
+            ).first()
+
+            name = user_db.name
+
+            template['name'] = name
+
             result.append(template)
 
         return {

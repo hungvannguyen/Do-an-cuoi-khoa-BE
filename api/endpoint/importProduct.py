@@ -15,8 +15,8 @@ router = APIRouter()
 
 
 @router.post("/import")
-def import_products(request: ProductImportCreate, db: Session = Depends(deps.get_db)):
-    return crud_import_product.create_import_invoice(request=request, db=db, admin_id=1)
+def import_products(request: ProductImportCreate, db: Session = Depends(deps.get_db), token: TokenPayload = Depends(deps.get_employee_user)):
+    return crud_import_product.create_import_invoice(request=request, db=db, admin_id=token.id)
 
 
 @router.get("/all")
