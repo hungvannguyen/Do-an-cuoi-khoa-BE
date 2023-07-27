@@ -30,6 +30,11 @@ def count_by_user_id(user_id: int, db: Session = Depends(deps.get_db)):
 
 
 @router.get("/order/count/pending")
+def count_by_user_id(db: Session = Depends(deps.get_db)):
+    return CRUD_summary.order_count_by_status(db=db)
+
+
+@router.get("/order/count/pending")
 def count_pending_orders(db: Session = Depends(deps.get_db)):
     return CRUD_summary.get_total_pending_orders(db=db)
 

@@ -208,6 +208,44 @@ def order_count_by_user_id(user_id: int, db: Session):
     }
 
 
+def order_count_by_status(db: Session):
+    total_count = 0
+    cancel_count = 0
+    pending_count = 0
+    confirm_count = 0
+    delivering_count = 0
+    delivered_count = 0
+    pending_refund = 0
+    refunded_count = 0
+    success_count = 0
+
+    order_db = db.query(Order).all()
+
+    for item in order_db:
+        total_count += 1
+        if item.status == Const.ORDER_CANCEL:
+            cancel_count += 1
+        if item.status == Const.ORDER_PENDING:
+            pending_count += 1
+        if item.status == Const.ORDER_CONFIRMED:
+            confirm_count += 1
+        if item.status == Const.ORDER_DELIVERING:
+            delivering_count += 1
+        if item.status == Const.ORDER_DELIVERED:
+            delivered_count += 1
+        if item.status == Const.ORDER_REFUND:
+            refunded_count += 1
+        if item.status == Const.ORDER_REFUND_REQUEST:
+            pending_refund += 1
+        if item.status == Const.ORDER_SUCCESS:
+            success_count += 1
+
+    return {
+        'pending_order': pending_count,
+        'pending_refund_order': pending_refund,
+    }
+
+
 def get_total_pending_orders(db: Session):
     count = db.query(Order).filter(
         Order.status == Const.ORDER_PENDING
