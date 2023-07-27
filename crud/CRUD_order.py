@@ -441,8 +441,8 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
             self.model.id == order_id
         ).first()
 
-        if order_db.status != Const.ORDER_PENDING:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Không thể hủy đơn hàng đã được xác nhận")
+        if order_db.status > Const.ORDER_CONFIRMED:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Không thể hủy đơn hàng đã được xác nhận!")
 
         order_db.status = Const.ORDER_CANCEL
         order_db.update_at = datetime.now()
