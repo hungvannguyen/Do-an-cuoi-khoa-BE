@@ -104,6 +104,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
                 obj_db.status = Const.ORDER_CANCEL
                 obj_db.update_at = insert_at
                 obj_db.update_id = Const.SYSTEM_ID
+                obj_db.cancel_reason = "Tự động huỷ do quá thời gian thanh toán"
 
                 db.merge(obj_db)
                 db.commit()
