@@ -178,7 +178,10 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         start = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
 
-        order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE_ADMIN).all()
+        if order_status == Const.ORDER_PENDING:
+            order_db = order_db.order_by(self.model.insert_at.asc()).offset(start).limit(Const.ROW_PER_PAGE_ADMIN).all()
+        else:
+            order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE_ADMIN).all()
 
         if not order_db:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không có đơn hàng")
