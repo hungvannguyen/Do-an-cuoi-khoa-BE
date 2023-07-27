@@ -178,7 +178,7 @@ class CRUDOrder(CRUDBase[Order, OrderCreate, OrderUpdate]):
 
         start = (current_page - 1) * Const.ROW_PER_PAGE_ADMIN
 
-        if order_status == Const.ORDER_PENDING:
+        if order_status == Const.ORDER_PENDING or order_status == Const.ORDER_REFUND_REQUEST:
             order_db = order_db.order_by(self.model.insert_at.asc()).offset(start).limit(Const.ROW_PER_PAGE_ADMIN).all()
         else:
             order_db = order_db.order_by(self.model.insert_at.desc()).offset(start).limit(Const.ROW_PER_PAGE_ADMIN).all()
