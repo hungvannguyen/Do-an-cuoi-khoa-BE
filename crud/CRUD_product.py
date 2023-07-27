@@ -328,6 +328,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
         ).count()
+        if current_page > 2:
+            current_page = 2
         total_page = int(total_product / Const.ROW_PER_PAGE)
         if total_product % Const.ROW_PER_PAGE > 0:
             total_page += 1
@@ -335,6 +337,8 @@ class CRUDProduct(CRUDBase[Product, ProductCreate, ProductUpdate]):
             current_page = total_page
         offset = (current_page - 1) * Const.ROW_PER_PAGE
         limit = Const.ROW_PER_PAGE
+        if current_page == 2:
+            limit = 4
         data_db = db.query(self.model).filter(
             self.model.status == Const.ACTIVE_STATUS,
             self.model.delete_flag == Const.DELETE_FLAG_NORMAL
