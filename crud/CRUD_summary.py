@@ -1,7 +1,7 @@
 import json
 from datetime import datetime, timedelta
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from crud.CRUD_product import crud_product
@@ -350,6 +350,17 @@ def get_low_quantity_products(db: Session):
 
     arr.sort(key=lambda x: x['quantity'])
 
+    position = -1
+
+    for item in arr:
+        if item['quantity'] <= 10:
+            position += 1
+        else:
+            break
+
+    if position == -1 :
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Không có sản phẩm phù hợp")
+
     return {
-        'data': arr[0:5]
+        'data': arr[0:position]
     }
